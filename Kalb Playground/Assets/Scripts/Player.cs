@@ -44,6 +44,15 @@ public class Player : MonoBehaviour
     public float attackRange = 0.5f;
     public LayerMask enemyLayers;
     public int attackDamage = 20;
+
+    [Header("Jump Timing")]
+    public float coyoteTime = 0.15f;
+    public float jumpBufferTime = 0.1f;
+    public float jumpCutMultiplier = 0.5f;
+
+    [Header("Double Jump")]
+    public bool hasDoubleJump = true;
+    public float doubleJumpForce = 12f;
     
     private Rigidbody2D rb;
     private PlayerInput playerInput;
@@ -86,6 +95,9 @@ public class Player : MonoBehaviour
 
     private enum WallSlideState { None, Starting, Sliding, Jumping }
     private WallSlideState wallSlideState = WallSlideState.None;
+    private float coyoteTimeCounter = 0f;
+    private float jumpBufferCounter = 0f;
+    private bool hasDoubleJumped = false;
 
     void Start()
     {
@@ -141,6 +153,10 @@ public class Player : MonoBehaviour
         else if (jumpAction.WasReleasedThisFrame())
         {
             isJumpButtonHeld = false;
+            if (rb.linearVelocity.y > 0 && !isDashing && !isWallJumping && !isWallSliding)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * jumpCutMultiplier);
+            }
         }
         
         // Update timers
@@ -239,6 +255,23 @@ public class Player : MonoBehaviour
         {
             wallClingTimer = 0f;
             isWallClinging = false;
+        }
+
+        // COYOTE TIME: Update after existing timers
+        if (isGrounded)
+        {
+            coyoteTimeCounter = coyoteTime;
+            hasDoubleJumped = false;
+        }
+        else if (coyoteTimeCounter > 0)
+        {
+            coyoteTimeCounter -= Time.deltaTime;
+        }
+        
+        // JUMP BUFFER: Update after coyote time
+        if (jumpBufferCounter > 0)
+        {
+            jumpBufferCounter -= Time.deltaTime;
         }
     }
 
@@ -453,27 +486,47 @@ public class Player : MonoBehaviour
 
     private void HandleJumpInput()
     {
-        // Check for jump input (triggered on press)
-        if (jumpAction.triggered && !isDashing && !isAttacking)
+        // Store jump input in buffer
+        if (jumpAction.triggered)
+        {
+            jumpBufferCounter = jumpBufferTime;
+        }
+        
+        // Process buffered jump
+        if (jumpBufferCounter > 0)
         {
             // Wall jump
             if (isWallSliding)
             {
                 WallJump();
+                jumpBufferCounter = 0;
+                hasDoubleJumped = false; // Reset on wall jump
             }
-            // Normal jump
-            else if (isGrounded)
+            // Double jump (only if coyote time expired)
+            else if (!isGrounded && coyoteTimeCounter <= 0 && hasDoubleJump && !hasDoubleJumped && !isDashing && !isAttacking)
             {
-                jumpPressed = true;
+                DoubleJump();
+                jumpBufferCounter = 0;
+            }
+            // Normal jump (with coyote time)
+            else if (coyoteTimeCounter > 0)
+            {
+                NormalJump();
+                jumpBufferCounter = 0;
+                coyoteTimeCounter = 0;
             }
         }
+    }
 
-        // Variable jump height - release jump early to jump lower
-        // Only apply if we're not wall sliding
-        if (jumpAction.WasReleasedThisFrame() && rb.linearVelocity.y > 0 && !isDashing && !isWallJumping && !isWallSliding)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
-        }
+    private void NormalJump()
+    {
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+    }
+
+    private void DoubleJump()
+    {
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, doubleJumpForce);
+        hasDoubleJumped = true;
     }
 
     private void WallJump()
@@ -521,6 +574,7 @@ public class Player : MonoBehaviour
         if (isGrounded && resetAirDashOnGround)
         {
             airDashCount = 0;
+            hasDoubleJumped = false; 
         }
         
         // Reset wall sliding when grounded
@@ -603,13 +657,6 @@ public class Player : MonoBehaviour
             }
             
             rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing);
-            
-            // Handle jump
-            if (jumpPressed && isGrounded)
-            {
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-                jumpPressed = false;
-            }
         }
     }
 
