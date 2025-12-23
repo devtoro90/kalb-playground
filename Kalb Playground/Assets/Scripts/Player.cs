@@ -53,6 +53,11 @@ public class Player : MonoBehaviour
     [Header("Double Jump")]
     public bool hasDoubleJump = true;
     public float doubleJumpForce = 12f;
+
+    [Header("Air Control")]
+    public float airControlMultiplier = 0.5f;
+    public float maxAirSpeed = 10f;
+    public float airAcceleration = 15f;
     
     private Rigidbody2D rb;
     private PlayerInput playerInput;
@@ -646,6 +651,12 @@ public class Player : MonoBehaviour
             rb.gravityScale = 2;
             
             Vector2 targetVelocity = new Vector2(moveInput.x * currentSpeed, rb.linearVelocity.y);
+
+            // APPLY AIR CONTROL if not grounded
+            if (!isGrounded)
+            {
+                ApplyAirControl();
+            }
             
             // If wall stick timer is active, limit movement away from wall
             if (wallStickTimer > 0 && isTouchingWall)
@@ -657,6 +668,27 @@ public class Player : MonoBehaviour
             }
             
             rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing);
+        }
+    }
+
+    private void ApplyAirControl()
+    {
+        if (isGrounded || isWallSliding || isDashing) return;
+        
+        // Calculate desired velocity
+        float targetXVelocity = moveInput.x * moveSpeed * airControlMultiplier;
+        float velocityDifference = targetXVelocity - rb.linearVelocity.x;
+        
+        // Apply acceleration force
+        rb.AddForce(Vector2.right * velocityDifference * airAcceleration);
+        
+        // Clamp maximum air speed
+        if (Mathf.Abs(rb.linearVelocity.x) > maxAirSpeed)
+        {
+            rb.linearVelocity = new Vector2(
+                Mathf.Sign(rb.linearVelocity.x) * maxAirSpeed,
+                rb.linearVelocity.y
+            );
         }
     }
 
