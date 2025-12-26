@@ -1050,5 +1050,41 @@ public class Player : MonoBehaviour
         }
     }
     
+    // ====================================================================
+    // EDITOR VISUALIZATION
+    // ====================================================================
+    
+    /// <summary>
+    /// Draws debug gizmos in editor for visualization of detection areas
+    /// Helps with level design and debugging
+    /// </summary>
+    void OnDrawGizmosSelected()
+    {
+        // Ground check visualization
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        }
+        
+        // Wall check visualization
+        if (wallCheck != null)
+        {
+            Gizmos.color = Color.blue;
+            // Show both directions with offset
+            Vector2 offset = new Vector2(wallCheckOffset, 0);
+            Gizmos.DrawLine(wallCheck.position + (Vector3)offset, 
+                          wallCheck.position + (Vector3)offset + Vector3.right * wallCheckDistance);
+            Gizmos.DrawLine(wallCheck.position - (Vector3)offset, 
+                          wallCheck.position - (Vector3)offset + Vector3.left * wallCheckDistance);
+        }
+        
+        // Attack range visualization
+        if (attackPoint != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+        }
+    }
     
 }

@@ -1396,28 +1396,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   moveSpeed: 5
   runSpeed: 8
+  jumpForce: 13
+  movementSmoothing: 0.05
+  coyoteTime: 0.15
+  jumpBufferTime: 0.1
+  jumpCutMultiplier: 0.5
+  hasDoubleJump: 1
+  doubleJumpForce: 12
+  airControlMultiplier: 0.5
+  maxAirSpeed: 10
+  airAcceleration: 15
   dashSpeed: 20
   dashDuration: 0.2
   dashCooldown: 0.5
-  jumpForce: 13
-  movementSmoothing: 0.05
-  groundCheck: {fileID: 1824576742}
-  groundCheckRadius: 0.2
-  wallCheck: {fileID: 0}
-  wallCheckDistance: 0.05
-  wallCheckOffset: 0.02
-  environmentLayer:
-    serializedVersion: 2
-    m_Bits: 64
+  canAirDash: 1
+  resetAirDashOnGround: 1
+  maxAirDashes: 1
   wallSlideSpeed: 2
   wallJumpForce: 15
   wallJumpAngle: {x: 1, y: 2}
   wallJumpDuration: 0.2
   wallStickTime: 0.25
   wallSlideGravity: 0.5
-  canAirDash: 1
-  resetAirDashOnGround: 1
-  maxAirDashes: 1
+  wallClingTime: 0.2
+  wallClingSlowdown: 0.3
   attackCooldown: 0.5
   attackDuration: 0.2
   attackPoint: {fileID: 0}
@@ -1426,6 +1428,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   attackDamage: 20
+  groundCheck: {fileID: 1824576742}
+  groundCheckRadius: 0.2
+  wallCheck: {fileID: 0}
+  wallCheckDistance: 0.05
+  wallCheckOffset: 0.02
+  environmentLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &658198521
 MonoBehaviour:
   m_ObjectHideFlags: 0
