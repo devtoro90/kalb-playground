@@ -10,11 +10,17 @@ public class Player : MonoBehaviour
     // -------------------------------------------------
     // [Header] groups organize related settings in Inspector
     // -------------------------------------------------
+
+    [Header("Ability Unlocks")]
+    public bool runUnlocked = false;
+    public bool dashUnlocked = false;
+    public bool wallJumpUnlocked = false;
+    public bool doubleJumpUnlocked = false;
     
     [Header("Movement Settings")]
     public float moveSpeed = 5f;                // Base walking speed
     public float runSpeed = 8f;                 // Speed while running
-    public float jumpForce = 13f;               // Initial jump velocity
+    public float jumpForce = 12f;               // Initial jump velocity
     [Range(0, 0.3f)] public float movementSmoothing = 0.05f; // Movement interpolation smoothness
     
     [Header("Jump Timing")]
@@ -24,7 +30,7 @@ public class Player : MonoBehaviour
     
     [Header("Double Jump")]
     public bool hasDoubleJump = true;           // Enable/disable double jump ability
-    public float doubleJumpForce = 12f;         // Force applied for double jump
+    public float doubleJumpForce = 10f;         // Force applied for double jump
     
     [Header("Air Control")]
     public float airControlMultiplier = 0.5f;   // How much control player has in air (0-1)
@@ -41,7 +47,7 @@ public class Player : MonoBehaviour
     
     [Header("Wall Slide & Jump Settings")]
     public float wallSlideSpeed = 2f;           // Maximum downward speed while wall sliding
-    public float wallJumpForce = 13f;           // Force applied when jumping from wall
+    public float wallJumpForce = 11f;           // Force applied when jumping from wall
     public Vector2 wallJumpAngle = new Vector2(1, 2); // Direction vector for wall jumps (x=horizontal, y=vertical)
     public float wallJumpDuration = 0.2f;       // How long wall jump state lasts
     public float wallStickTime = 0.25f;         // Time player sticks to wall before sliding off
@@ -63,8 +69,8 @@ public class Player : MonoBehaviour
     public Transform groundCheck;               // Transform positioned at player's feet for ground detection
     public float groundCheckRadius = 0.2f;      // Radius of ground detection circle
     public Transform wallCheck;                 // Transform positioned at player's side for wall detection
-    public float wallCheckDistance = 0.5f;      // How far to check for walls
-    public float wallCheckOffset = 0.2f;        // Vertical offset for wall detection rays
+    public float wallCheckDistance = 0.05f;      // How far to check for walls
+    public float wallCheckOffset = 0.02f;        // Vertical offset for wall detection rays
     public LayerMask environmentLayer;          // Which layers count as environment (ground/walls)
     
     // ====================================================================
@@ -119,6 +125,19 @@ public class Player : MonoBehaviour
     private float jumpBufferCounter = 0f;       // Current jump buffer countdown
     private bool isJumpButtonHeld = false;      // Whether jump button is currently held down
     private bool hasDoubleJumped = false;       // Whether player has used double jump this airtime
+
+    // -------------------------------------------------
+    // Wall Collision Prevention (when wall jump disabled)
+    // -------------------------------------------------
+    private bool isAgainstWall = false;            // Whether player is pressing against a wall
+    private float wallNormalDistance = 0.05f;      // Minimum distance to maintain from wall
+    private bool wasAgainstWallLastFrame = false;  // Track wall state for smooth transitions
+    private int lastWallSide = 0;                // Which side wall we last hit (1 = right, -1 = left, 0 = none)
+    private float blockedMoveInput = 0f;         // The input value that was blocked due to wall collision
+    private bool isInputBlocked = false;         // Whether input is currently being blocked
+    private float wallDetectionHeight = 1.0f;  // How tall the wall detection area should be
+    private float wallDetectionStep = 0.2f;    // Distance between wall detection rays
+    private bool isAgainstWallAnywhere = false; // Whether player is touching wall anywhere on 
     
     // -------------------------------------------------
     // Wall Interaction Variables
@@ -212,14 +231,19 @@ public class Player : MonoBehaviour
         // 1. ENVIRONMENT DETECTION
         // -------------------------------------------------
         UpdateGroundCheck(); // Check if player is grounded
-        
+
         // -------------------------------------------------
-        // 2. MOVEMENT EXECUTION
+        // 2. WALL COLLISION PREVENTION (always check this)
+        // -------------------------------------------------
+        PreventWallStick();
+
+        // -------------------------------------------------
+        // 3. MOVEMENT EXECUTION
         // -------------------------------------------------
         HandleMovement(); // Apply movement based on current state
         
         // -------------------------------------------------
-        // 3. SPRITE ORIENTATION
+        // 4. SPRITE ORIENTATION
         // -------------------------------------------------
         // Only flip sprite when not in special states that lock orientation
         if (!isDashing && !isAttacking && !isWallJumping && !isWallSliding)
@@ -296,6 +320,9 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HandleDashInput()
     {
+         // Check if dash is unlocked
+        if (!dashUnlocked) return;
+
         // Check for dash input (only when not already dashing and cooldown is ready)
         if (dashAction.triggered && !isDashing && dashCooldownTimer <= 0 && !isAttacking && !isWallSliding)
         {
@@ -327,6 +354,12 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HandleRunInput()
     {
+        // Check if run is unlocked
+        if (!runUnlocked)
+        {
+            isRunning = false;
+            return;
+        }
         // Check if dash/run button is being held for running (only when grounded)
         if (dashAction.IsPressed() && isGrounded && !isDashing && !isAttacking && !isWallSliding)
         {
@@ -354,14 +387,14 @@ public class Player : MonoBehaviour
         if (jumpBufferCounter > 0)
         {
             // Priority 1: Wall jump (highest priority)
-            if (isWallSliding)
+            if (isWallSliding && wallJumpUnlocked)
             {
                 WallJump();
                 jumpBufferCounter = 0;
                 hasDoubleJumped = false; // Reset double jump on wall jump
             }
             // Priority 2: Double jump (only if coyote time expired)
-            else if (!isGrounded && coyoteTimeCounter <= 0 && hasDoubleJump && !hasDoubleJumped && !isDashing && !isAttacking)
+            else if (!isGrounded && coyoteTimeCounter <= 0 && doubleJumpUnlocked && hasDoubleJump && !hasDoubleJumped && !isDashing && !isAttacking)
             {
                 DoubleJump();
                 jumpBufferCounter = 0;
@@ -413,31 +446,26 @@ public class Player : MonoBehaviour
         // DASHING STATE
         if (isDashing)
         {
-            // During dash, maintain dash velocity and ignore gravity
             rb.linearVelocity = dashDirection * dashSpeed;
             rb.gravityScale = 0;
         }
         // WALL JUMPING STATE
         else if (isWallJumping)
         {
-            // During wall jump, allow limited horizontal control
             float controlForce = 5f;
             rb.AddForce(new Vector2(moveInput.x * controlForce, 0));
             
-            // Clamp horizontal speed during wall jump for consistency
             float maxWallJumpSpeed = 10f;
             if (Mathf.Abs(rb.linearVelocity.x) > maxWallJumpSpeed)
             {
                 rb.linearVelocity = new Vector2(Mathf.Sign(rb.linearVelocity.x) * maxWallJumpSpeed, rb.linearVelocity.y);
             }
             
-            // Allow gravity during wall jump so player can arc
             rb.gravityScale = 2;
         }
         // ATTACKING STATE
         else if (isAttacking)
         {
-            // Slow down or stop horizontal movement during attack
             Vector2 targetVelocity = new Vector2(0, rb.linearVelocity.y);
             rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing);
             rb.gravityScale = 2;
@@ -445,13 +473,9 @@ public class Player : MonoBehaviour
         // WALL SLIDING STATE
         else if (isWallSliding)
         {
-            // Wall slide physics - slow descent with reduced gravity
-            // Keep horizontal position fixed to wall
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             rb.gravityScale = wallSlideGravity;
             
-            // Only prevent upward movement if we're actively sliding
-            // (not during the transition out of wall slide)
             if (rb.linearVelocity.y > 0)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
@@ -463,8 +487,21 @@ public class Player : MonoBehaviour
             // Standard movement with full gravity
             rb.gravityScale = 2;
             
+            // Get the current movement input
+            float currentMoveInput = moveInput.x;
+            
+            // Apply wall collision prevention
+            if (isAgainstWall && !isWallSliding)
+            {
+                // If we're against a wall and trying to move into it, block input
+                if (Mathf.Sign(currentMoveInput) == lastWallSide)
+                {
+                    currentMoveInput = 0;
+                }
+            }
+            
             // Calculate target velocity based on input
-            Vector2 targetVelocity = new Vector2(moveInput.x * currentSpeed, rb.linearVelocity.y);
+            Vector2 targetVelocity = new Vector2(currentMoveInput * currentSpeed, rb.linearVelocity.y);
             
             // Apply air control if not grounded
             if (!isGrounded)
@@ -472,18 +509,29 @@ public class Player : MonoBehaviour
                 ApplyAirControl();
             }
             
-            // If wall stick timer is active, limit movement away from wall
-            // This creates a "stickiness" when leaving walls
-            if (wallStickTimer > 0 && isTouchingWall)
+            // Apply wall stick logic only when wall jump is unlocked AND we're wall sliding
+            if (wallJumpUnlocked && isWallSliding)
             {
-                if (Mathf.Sign(moveInput.x) == -wallSide || moveInput.x == 0)
+                if (wallStickTimer > 0 && isTouchingWall)
                 {
-                    targetVelocity.x = 0;
+                    if (Mathf.Sign(moveInput.x) == -wallSide || moveInput.x == 0)
+                    {
+                        targetVelocity.x = 0;
+                    }
                 }
             }
             
             // Smoothly interpolate to target velocity
             rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing);
+            
+            // Final safety: If we're moving into a wall (not sliding), reduce velocity
+            if (!isWallSliding && isAgainstWall && Mathf.Sign(rb.linearVelocity.x) == lastWallSide)
+            {
+                rb.linearVelocity = new Vector2(
+                    Mathf.MoveTowards(rb.linearVelocity.x, 0, Time.deltaTime * 20f),
+                    rb.linearVelocity.y
+                );
+            }
         }
     }
     
@@ -659,6 +707,133 @@ public class Player : MonoBehaviour
     // ====================================================================
     // WALL INTERACTION METHODS
     // ====================================================================
+
+    /// <summary>
+    /// Prevents player from getting stuck on walls when not wall sliding
+    /// Works for both wall jump enabled and disabled states
+    /// </summary>
+    private void PreventWallStick()
+    {
+        // Reset if grounded or not trying to move
+        if (isGrounded || Mathf.Abs(moveInput.x) < 0.1f)
+        {
+            isAgainstWall = false;
+            lastWallSide = 0;
+            return;
+        }
+        
+        // If wall jump is enabled AND we're actively wall sliding, don't prevent stick
+        if (wallJumpUnlocked && (isWallSliding || isWallClinging))
+        {
+            return; // Allow normal wall slide behavior
+        }
+        
+        // Enhanced wall collision detection
+        float direction = Mathf.Sign(moveInput.x);
+        Vector2 origin = transform.position;
+        
+        // Cast multiple rays for better coverage
+        float rayLength = 0.6f;
+        float playerHalfWidth = 0.5f;
+        int rayCount = 5;
+        float totalHeight = 1.0f;
+        
+        bool hitWall = false;
+        float closestDistance = rayLength;
+        
+        for (int i = 0; i < rayCount; i++)
+        {
+            float height = (i / (float)(rayCount - 1) - 0.5f) * totalHeight;
+            Vector2 rayOrigin = origin + new Vector2(0, height);
+            
+            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, 
+                new Vector2(direction, 0), 
+                rayLength, 
+                environmentLayer);
+            
+            Debug.DrawRay(rayOrigin, new Vector2(direction * rayLength, 0), 
+                hit.collider != null ? Color.red : Color.green);
+            
+            if (hit.collider != null && hit.distance < closestDistance)
+            {
+                hitWall = true;
+                closestDistance = hit.distance;
+                
+                // If we're too close to the wall, push away slightly
+                if (hit.distance < wallNormalDistance)
+                {
+                    Vector2 pushBack = new Vector2(-direction * (wallNormalDistance - hit.distance), 0);
+                    transform.position += (Vector3)pushBack * 0.5f; // More gentle push
+                }
+            }
+        }
+        
+        // Handle wall collision
+        if (hitWall && Mathf.Sign(moveInput.x) == direction)
+        {
+            // Check if this is the same wall we were hitting last frame
+            if (lastWallSide != direction)
+            {
+                lastWallSide = (int)direction;
+                isAgainstWall = true;
+            }
+            
+            // Block movement into the wall
+            if (Mathf.Sign(moveInput.x) == lastWallSide)
+            {
+                // Only block if we're not actively wall sliding
+                if (!isWallSliding)
+                {
+                    // Reduce input force against wall
+                    moveInput = new Vector2(0, moveInput.y);
+                    
+                    // Also reduce existing velocity against wall
+                    if (Mathf.Sign(rb.linearVelocity.x) == lastWallSide && Mathf.Abs(rb.linearVelocity.x) > 0.1f)
+                    {
+                        float reduction = Mathf.Lerp(rb.linearVelocity.x, 0, Time.deltaTime * 15f);
+                        rb.linearVelocity = new Vector2(reduction, rb.linearVelocity.y);
+                    }
+                }
+            }
+        }
+        else
+        {
+            isAgainstWall = false;
+            
+            // Reset wall side tracking
+            if (Mathf.Abs(moveInput.x) < 0.1f || Mathf.Sign(moveInput.x) != lastWallSide)
+            {
+                lastWallSide = 0;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Checks if player is colliding with a wall anywhere on their body
+    /// Uses box cast for more reliable detection
+    /// </summary>
+    private bool IsTouchingWallAnywhere(float direction)
+    {
+        // Create a box that represents the player's collider
+        Vector2 boxSize = new Vector2(0.1f, 1.0f); // Thin box for detection
+        Vector2 origin = (Vector2)transform.position + new Vector2(direction * 0.3f, 0);
+        float distance = 0.1f;
+        
+        RaycastHit2D hit = Physics2D.BoxCast(
+            origin,
+            boxSize,
+            0f,
+            new Vector2(direction, 0),
+            distance,
+            environmentLayer
+        );
+        
+        // Debug visualization
+        Debug.DrawLine(origin, origin + new Vector2(direction * distance, 0), 
+            hit.collider != null ? Color.magenta : Color.cyan);
+        
+        return hit.collider != null;
+    }
     
     /// <summary>
     /// Handles wall slide physics and state transitions
@@ -666,6 +841,15 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HandleWallSlide()
     {
+        // Check if wall jump is unlocked
+        if (!wallJumpUnlocked) 
+        {
+            isWallSliding = false;
+            isWallClinging = false;
+            wallSlideState = WallSlideState.None;
+            return;
+        }
+        
         // Update wall cling timer
         if (wallClingTimer > 0)
         {
@@ -747,50 +931,123 @@ public class Player : MonoBehaviour
     }
     
     /// <summary>
-    /// Checks for wall collisions and determines wall interaction state
-    /// Called every frame to update wall detection
+    /// Enhanced wall detection that checks multiple points along the player's height
     /// </summary>
     private void CheckWall()
     {
-        // Check both directions for walls with offset for better detection
+        // If wall jump is not unlocked, use simple wall collision prevention instead
+        if (!wallJumpUnlocked)
+        {
+            // Use the enhanced wall detection for collision prevention
+            isTouchingWall = false;
+            wallSide = 0;
+            isWallSliding = false;
+            isWallClinging = false;
+            wallSlideState = WallSlideState.None;
+            return;
+        }
+        
+        // Enhanced wall detection with multiple rays
         Vector2 wallCheckPos = wallCheck.position;
         Vector2 offset = new Vector2(wallCheckOffset, 0);
         
-        // Cast rays in both directions to detect walls
-        RaycastHit2D rightHit = Physics2D.Raycast(wallCheckPos + offset, Vector2.right, 
-            wallCheckDistance, environmentLayer);
-        RaycastHit2D leftHit = Physics2D.Raycast(wallCheckPos - offset, Vector2.left, 
-            wallCheckDistance, environmentLayer);
+        // Track if we're touching any wall for general collision prevention
+        isAgainstWallAnywhere = false;
+        int detectedWallSide = 0;
         
-        // Check if we're touching walls in either direction (only when airborne)
-        bool touchingRightWall = rightHit.collider != null && !isGrounded;
-        bool touchingLeftWall = leftHit.collider != null && !isGrounded;
+        // Cast multiple rays at different heights
+        int rayCount = Mathf.FloorToInt(wallDetectionHeight / wallDetectionStep) + 1;
+        int rightHits = 0;
+        int leftHits = 0;
         
-        // Reset wall detection
+        for (int i = 0; i < rayCount; i++)
+        {
+            float heightOffset = (i - rayCount / 2) * wallDetectionStep;
+            Vector2 heightVector = new Vector2(0, heightOffset);
+            
+            // Check right side
+            RaycastHit2D rightHit = Physics2D.Raycast(
+                wallCheckPos + heightVector + offset, 
+                Vector2.right, 
+                wallCheckDistance, 
+                environmentLayer
+            );
+            
+            // Check left side
+            RaycastHit2D leftHit = Physics2D.Raycast(
+                wallCheckPos + heightVector - offset, 
+                Vector2.left, 
+                wallCheckDistance, 
+                environmentLayer
+            );
+            
+            // Debug visualization
+            Debug.DrawRay(wallCheckPos + heightVector + offset, 
+                        Vector2.right * wallCheckDistance, 
+                        rightHit.collider != null ? Color.red : Color.green);
+            Debug.DrawRay(wallCheckPos + heightVector - offset, 
+                        Vector2.left * wallCheckDistance, 
+                        leftHit.collider != null ? Color.red : Color.green);
+            
+            if (rightHit.collider != null)
+            {
+                rightHits++;
+                isAgainstWallAnywhere = true;
+                if (detectedWallSide == 0) detectedWallSide = 1;
+            }
+            
+            if (leftHit.collider != null)
+            {
+                leftHits++;
+                isAgainstWallAnywhere = true;
+                if (detectedWallSide == 0) detectedWallSide = -1;
+            }
+        }
+        
+        // For wall sliding logic, only consider walls that are near the middle of the player
+        bool touchingRightWall = false;
+        bool touchingLeftWall = false;
+        
+        // Check middle rays specifically for wall slide eligibility
+        RaycastHit2D middleRightHit = Physics2D.Raycast(
+            wallCheckPos + offset, 
+            Vector2.right, 
+            wallCheckDistance, 
+            environmentLayer
+        );
+        
+        RaycastHit2D middleLeftHit = Physics2D.Raycast(
+            wallCheckPos - offset, 
+            Vector2.left, 
+            wallCheckDistance, 
+            environmentLayer
+        );
+        
+        touchingRightWall = middleRightHit.collider != null && !isGrounded;
+        touchingLeftWall = middleLeftHit.collider != null && !isGrounded;
+        
+        // Original wall slide logic (only uses middle rays)
         isTouchingWall = false;
         wallSide = 0;
         
         // WALL SLIDE LOGIC: Only slide when actively pressing toward the wall
         if (touchingRightWall && moveInput.x > 0.1f)
         {
-            // Touching right wall AND pressing right = wall slide right
             isTouchingWall = true;
             wallSide = 1;
-            wallClingTimer = wallClingTime; // Reset cling timer when sliding properly
+            wallClingTimer = wallClingTime;
             isWallClinging = false;
         }
         else if (touchingLeftWall && moveInput.x < -0.1f)
         {
-            // Touching left wall AND pressing left = wall slide left
             isTouchingWall = true;
             wallSide = -1;
-            wallClingTimer = wallClingTime; // Reset cling timer when sliding properly
+            wallClingTimer = wallClingTime;
             isWallClinging = false;
         }
         // WALL CLING: Check if we should cling when switching directions
         else if ((touchingRightWall || touchingLeftWall) && wallClingTimer > 0)
         {
-            // Determine which wall we're on for clinging
             if (touchingRightWall)
             {
                 wallSide = 1;
@@ -800,14 +1057,13 @@ public class Player : MonoBehaviour
                 wallSide = -1;
             }
             
-            // Check if we're switching direction (pressing away from wall)
             bool switchingDirection = (wallSide == 1 && moveInput.x < -0.1f) || 
                                     (wallSide == -1 && moveInput.x > 0.1f);
             
             if (switchingDirection)
             {
                 isWallClinging = true;
-                isTouchingWall = true; // Allow wall slide during cling time
+                isTouchingWall = true;
             }
         }
     }
@@ -1005,15 +1261,15 @@ public class Player : MonoBehaviour
         {
             animator.Play("Player_attack");
         }
-        else if (isDashing)
+        else if (isDashing && dashUnlocked) 
         {
             animator.Play("Player_dash");
         }
-        else if (isWallSliding)
+        else if (isWallSliding && wallJumpUnlocked) 
         {
             animator.Play("Player_wallslide");
         }
-        else if (isWallJumping)
+        else if (isWallJumping && wallJumpUnlocked) 
         {
             animator.Play("Player_jump");
         }
@@ -1026,7 +1282,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                if (isRunning)
+                if (isRunning && runUnlocked) 
                 {
                     animator.Play("Player_run");
                 }
@@ -1085,6 +1341,66 @@ public class Player : MonoBehaviour
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(attackPoint.position, attackRange);
         }
+    }
+
+    // ====================================================================
+    // ABILITY UNLOCK METHODS
+    // ====================================================================
+
+    /// <summary>
+    /// Unlocks the dash ability
+    /// </summary>
+    public void UnlockDash()
+    {
+        dashUnlocked = true;
+        Debug.Log("Dash unlocked!");
+    }
+
+    /// <summary>
+    /// Unlocks the run ability
+    /// </summary>
+    public void UnlockRun()
+    {
+        runUnlocked = true;
+        Debug.Log("Run unlocked!");
+    }
+
+    /// <summary>
+    /// Unlocks the wall jump ability
+    /// </summary>
+    public void UnlockWallJump()
+    {
+        wallJumpUnlocked = true;
+        Debug.Log("Wall jump unlocked!");
+    }
+
+    /// <summary>
+    /// Unlocks the double jump ability
+    /// </summary>
+    public void UnlockDoubleJump()
+    {
+        doubleJumpUnlocked = true;
+        Debug.Log("Double jump unlocked!");
+    }
+
+    /// <summary>
+    /// Unlocks all abilities (for testing)
+    /// </summary>
+    public void UnlockAllAbilities()
+    {
+        UnlockDash();
+        UnlockRun();
+        UnlockWallJump();
+        UnlockDoubleJump();
+    }
+
+    public void ResetAbilities()
+    {
+        dashUnlocked = false;
+        runUnlocked = false;
+        wallJumpUnlocked = false;
+        doubleJumpUnlocked = false;
+        Debug.Log("All abilities reset to locked state.");
     }
     
 }
