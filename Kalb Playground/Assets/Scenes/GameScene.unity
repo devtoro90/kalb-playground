@@ -1361,7 +1361,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.1600001, y: 1.5703111}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1375,11 +1375,10 @@ Transform:
   m_GameObject: {fileID: 658198515}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.3, y: -2.21, z: 0}
+  m_LocalPosition: {x: -7.28, y: -2.18, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1824576742}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &658198520
@@ -1394,10 +1393,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97d85d6aff5fe4437b4d4897eb8baa94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
-  runUnlocked: 0
-  dashUnlocked: 0
-  wallJumpUnlocked: 0
-  doubleJumpUnlocked: 0
+  runUnlocked: 1
+  dashUnlocked: 1
+  wallJumpUnlocked: 1
+  doubleJumpUnlocked: 1
   moveSpeed: 5
   runSpeed: 8
   jumpForce: 12
@@ -1424,6 +1423,12 @@ MonoBehaviour:
   wallSlideGravity: 0.5
   wallClingTime: 0.2
   wallClingSlowdown: 0.3
+  maxFallSpeed: -20
+  hardLandingThreshold: -15
+  hardLandingStunTime: 0.3
+  fallingGravityScale: 2.5
+  normalGravityScale: 2
+  quickFallGravityMultiplier: 1.2
   attackCooldown: 0.5
   attackDuration: 0.2
   attackPoint: {fileID: 0}
@@ -1432,7 +1437,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   attackDamage: 20
-  groundCheck: {fileID: 1824576742}
+  groundCheck: {fileID: 0}
   groundCheckRadius: 0.2
   wallCheck: {fileID: 0}
   wallCheckDistance: 0.05
@@ -1529,37 +1534,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0.009538889, y: -0.06868935}
   m_Size: {x: 0.8738351, y: 1.3642921}
   m_Direction: 0
---- !u!1 &1824576741
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1824576742}
-  m_Layer: 0
-  m_Name: GroundCheck
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1824576742
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1824576741}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.012, y: -0.753, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 658198519}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2102329490
 GameObject:
   m_ObjectHideFlags: 0
