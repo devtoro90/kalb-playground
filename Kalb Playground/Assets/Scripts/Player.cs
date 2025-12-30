@@ -153,13 +153,7 @@ public class Player : MonoBehaviour
     // Wall Collision Prevention
     private bool isAgainstWall = false;
     private float wallNormalDistance = 0.05f;
-    private bool wasAgainstWallLastFrame = false;
     private int lastWallSide = 0;
-    private float blockedMoveInput = 0f;
-    private bool isInputBlocked = false;
-    private float wallDetectionHeight = 1.0f;
-    private float wallDetectionStep = 0.2f;
-    private bool isAgainstWallAnywhere = false;
     
     // Wall Interaction Variables
     private int wallSide = 0;
@@ -863,7 +857,7 @@ public class Player : MonoBehaviour
         }
         else if (fallDistance > 0.5f)
         {
-            // Soft landing with screen shake based on impact
+            // Soft landing
             animator.Play("Player_land");
         }
     }
