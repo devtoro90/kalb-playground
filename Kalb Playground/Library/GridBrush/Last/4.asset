@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Default Brush
   m_EditorClassIdentifier: Unity.2D.Tilemap.Editor::UnityEditor.Tilemaps.GridBrush
   m_Cells:
-  - m_Tile: {fileID: 11400000, guid: 4362c43cdeaee421c82713b60b9d8317, type: 2}
+  - m_Tile: {fileID: 11400000, guid: e0b985e5f4eee4e008f7ab7f899c1243, type: 2}
     m_Matrix:
       e00: 1
       e01: 0
@@ -39,5 +39,5 @@ MonoBehaviour:
   m_FloodFillContiguousOnly: 1
   m_LastPickedLayout: 0
   m_LastPickedCellSwizzle: 0
-  m_LastPickedCellSize: {x: 1.0404041, y: 1.0404041, z: 0}
+  m_LastPickedCellSize: {x: 1.3571428, y: 1.3265306, z: 0}
   m_LastPickedCellGap: {x: 0, y: 0, z: 0}

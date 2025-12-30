@@ -47,7 +47,6 @@ public class Player : MonoBehaviour
     public Vector2 wallJumpAngle = new Vector2(1, 2);
     public float wallJumpDuration = 0.2f;
     public float wallStickTime = 0.25f;
-    public float wallSlideGravity = 0.5f;
     
     [Header("Wall Cling Settings")]
     public float wallClingTime = 0.2f;
@@ -72,12 +71,6 @@ public class Player : MonoBehaviour
     public bool enableScreenShake = true;
     public float hardLandingShakeIntensity = 0.15f;
     public float hardLandingShakeDuration = 0.25f;
-    public float dashShakeIntensity = 0.15f;
-    public float dashShakeDuration = 0.15f;
-    public float attackShakeIntensity = 0.1f;
-    public float attackShakeDuration = 0.1f;
-    public float wallJumpShakeIntensity = 0.08f;
-    public float wallJumpShakeDuration = 0.1f;
     
     [Header("Attack Settings")]
     public float attackCooldown = 0.5f;
@@ -193,7 +186,6 @@ public class Player : MonoBehaviour
         
         SetupMissingObjects();
         
-        Debug.Log("Screen height for hard landing: " + (screenHeightInUnits * minScreenHeightForHardLanding) + " units");
     }
     
     /// <summary>
@@ -212,7 +204,6 @@ public class Player : MonoBehaviour
             Vector3 bottomOfScreen = mainCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 0));
             screenHeightInUnits = Vector3.Distance(topOfScreen, bottomOfScreen);
             
-            Debug.Log("Screen Height in World Units: " + screenHeightInUnits);
         }
         else
         {
@@ -289,7 +280,6 @@ public class Player : MonoBehaviour
             if (cameraShake == null)
             {
                 cameraShake = Camera.main.gameObject.AddComponent<CameraShake>();
-                Debug.Log("CameraShake component added to main camera");
             }
         }
         else
@@ -840,7 +830,6 @@ public class Player : MonoBehaviour
         if (fellFromOffScreenPosition && fallDistance > screenHeightInUnits * 0.5f)
         {
             shouldHardLand = true;
-            Debug.Log("Forced hard landing: Fell from off-screen!");
         }
         
         if (shouldHardLand)
@@ -849,11 +838,6 @@ public class Player : MonoBehaviour
             
             // Debug output
             string method = useScreenHeightForHardLanding ? "Screen Height" : "Velocity Only";
-            Debug.Log($"Hard Landing! ({method}) " +
-                     $"Fall Speed: {fallSpeed:F1}, " +
-                     $"Distance: {fallDistance:F1}, " +
-                     $"Screen Height: {screenHeightInUnits * minScreenHeightForHardLanding:F1}, " +
-                     $"Off-screen: {fellFromOffScreenPosition}");
         }
         else if (fallDistance > 0.5f)
         {
@@ -1355,25 +1339,21 @@ public class Player : MonoBehaviour
     public void UnlockDash()
     {
         dashUnlocked = true;
-        Debug.Log("Dash unlocked!");
     }
     
     public void UnlockRun()
     {
         runUnlocked = true;
-        Debug.Log("Run unlocked!");
     }
     
     public void UnlockWallJump()
     {
         wallJumpUnlocked = true;
-        Debug.Log("Wall jump unlocked!");
     }
     
     public void UnlockDoubleJump()
     {
         doubleJumpUnlocked = true;
-        Debug.Log("Double jump unlocked!");
     }
     
     public void UnlockAllAbilities()
@@ -1390,7 +1370,6 @@ public class Player : MonoBehaviour
         runUnlocked = false;
         wallJumpUnlocked = false;
         doubleJumpUnlocked = false;
-        Debug.Log("All abilities reset to locked state.");
     }
     
     // ====================================================================
