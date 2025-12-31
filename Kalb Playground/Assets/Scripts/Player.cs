@@ -87,6 +87,27 @@ public class Player : MonoBehaviour
     public float wallCheckDistance = 0.05f;
     public float wallCheckOffset = 0.02f;
     public LayerMask environmentLayer;
+
+    [Header("Swimming Settings")]
+    public float swimSpeed = 3f;
+    public float swimFastSpeed = 5f;
+    public float swimDashSpeed = 10f;
+    public float swimJumpForce = 8f;
+    public float waterSurfaceOffset = 1.15f; // How much of the face is above water
+    public float waterEntrySpeedReduction = 0.5f; // Slow down when entering water
+    public LayerMask waterLayer; // Set this to the Water layer in the Inspector
+    public float waterCheckRadius = 0.5f;
+    public Transform waterCheckPoint; // Point to check for water (around chest level)
+    public float waterEntryGravity = 0.5f; // Low gravity after entry
+    public float buoyancyStrength = 50f; // HIGHER = Faster response (was 15f)
+    public float buoyancyDamping = 10f; // HIGHER = Less oscillation
+    public float maxBuoyancyForce = 20f; // Limit maximum force
+    
+    [Header("Floating Effect Settings")]
+    public float floatAmplitude = 0.05f; // How high/low the player bobs
+    public float floatFrequency = 1f; // How fast the player bobs
+    public float floatSmoothness = 5f; // How smooth the bobbing is
+    public bool enableFloating = true; // Toggle floating effect
     
     // ====================================================================
     // INTERNAL STATE - PRIVATE VARIABLES
@@ -156,6 +177,26 @@ public class Player : MonoBehaviour
     // Dash Variables
     private Vector2 dashDirection = Vector2.right;
     private int airDashCount = 0;
+
+    // Swimming State
+    private bool isInWater = false;
+    private bool isSwimming = false;
+    private bool isSwimDashing = false;
+    private bool wasInWater = false;
+    private float swimDashTimer = 0f;
+    private float swimDashCooldownTimer = 0f;
+    private float swimDashDuration = 0.15f;
+    private float swimDashCooldown = 0.3f;
+    private Vector2 swimDashDirection = Vector2.right;
+    private float waterSurfaceY = 0f;
+    private Collider2D currentWaterCollider = null;
+    private float preDashGravityScale;
+
+    // Floating Effect Variables
+    private float floatTimer = 0f;
+    private float currentFloatOffset = 0f;
+    private float targetFloatOffset = 0f;
+    private Vector3 originalPosition; // Store original position for reference
     
     // ====================================================================
     // UNITY LIFE CYCLE METHODS
@@ -176,6 +217,8 @@ public class Player : MonoBehaviour
         attackAction = playerInput.actions["Attack"];
         
         animator = GetComponent<Animator>();
+
+        originalPosition = transform.position;
         
         // Get camera reference for screen height calculations
         mainCamera = Camera.main;
@@ -302,8 +345,10 @@ public class Player : MonoBehaviour
         
         // 3. Environment Checks
         CheckWall();
+        CheckWater();
         
         // 4. Input Handling
+        HandleSwimInput();
         HandleDashInput();
         HandleRunInput();
         HandleJumpInput();
@@ -331,10 +376,17 @@ public class Player : MonoBehaviour
         PreventWallStick();
         
         // 4. Movement Execution
-        HandleMovement();
+        if (isSwimming)
+        {
+            HandleSwimMovement(); 
+        }
+        else
+        {
+            HandleMovement(); 
+        }
         
         // 5. Sprite Orientation
-        if (!isDashing && !isAttacking && !isWallJumping && !isWallSliding && !isHardLanding)
+        if (!isDashing && !isAttacking && !isWallJumping && !isWallSliding && !isHardLanding && !isSwimDashing)
         {
             HandleFlip();
         }
@@ -371,6 +423,14 @@ public class Player : MonoBehaviour
             attackPointObj.transform.parent = transform;
             attackPointObj.transform.localPosition = new Vector3(0.5f, 0, 0);
             attackPoint = attackPointObj.transform;
+        }
+
+        if (waterCheckPoint == null)
+        {
+            GameObject waterCheckObj = new GameObject("WaterCheck");
+            waterCheckObj.transform.parent = transform;
+            waterCheckObj.transform.localPosition = new Vector3(0, 0.2f, 0);
+            waterCheckPoint = waterCheckObj.transform;
         }
     }
     
@@ -426,7 +486,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HandleDashInput()
     {
-        if (!dashUnlocked || isHardLanding) return;
+        if (!dashUnlocked || isHardLanding || isSwimming) return;
         
         if (dashAction.triggered && !isDashing && dashCooldownTimer <= 0 && !isAttacking && !isWallSliding)
         {
@@ -474,7 +534,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HandleJumpInput()
     {
-        if (isHardLanding) return;
+        if (isHardLanding || isSwimming) return;
         
         if (jumpAction.triggered)
         {
@@ -513,6 +573,26 @@ public class Player : MonoBehaviour
         if (attackAction.triggered && !isAttacking && attackCooldownTimer <= 0 && !isDashing)
         {
             StartAttack();
+        }
+    }
+
+    /// <summary>
+    /// Handles swimming-specific input
+    /// </summary>
+    private void HandleSwimInput()
+    {
+        if (!isSwimming || isHardLanding) return;
+        
+        // Handle swim dash
+        if (dashAction.triggered && !isSwimDashing && swimDashCooldownTimer <= 0)
+        {
+            StartSwimDash();
+        }
+        
+        // Handle swim jump (jumping out of water)
+        if (jumpAction.triggered && !isSwimDashing)
+        {
+            SwimJump();
         }
     }
     
@@ -611,11 +691,11 @@ public class Player : MonoBehaviour
     }
     
     /// <summary>
-    /// Hollow Knight-style gravity system
+    /// Gravity system
     /// </summary>
     private void UpdateGravity()
     {
-        if (isDashing || isWallSliding || isHardLanding || isWallJumping)
+        if (isDashing || isWallSliding || isHardLanding || isWallJumping | isSwimming)
         {
             return;
         }
@@ -872,6 +952,237 @@ public class Player : MonoBehaviour
         rb.gravityScale = normalGravityScale;
         animator.Play("Player_idle");
     }
+
+    /// <summary>
+    /// Starts a swim dash
+    /// </summary>
+    private void StartSwimDash()
+    {
+        isSwimDashing = true;
+        swimDashTimer = swimDashDuration;
+        swimDashCooldownTimer = swimDashCooldown;
+        
+        // Save the current gravity scale before dash
+        preDashGravityScale = rb.gravityScale;
+        
+        // Set gravity to 0 during dash
+        rb.gravityScale = 0f;
+        
+        // Determine dash direction
+        if (Mathf.Abs(moveInput.x) > 0.1f)
+        {
+            swimDashDirection = new Vector2(Mathf.Sign(moveInput.x), 0);
+        }
+        else
+        {
+            swimDashDirection = facingRight ? Vector2.right : Vector2.left;
+        }
+    }
+
+    /// <summary>
+    /// Ends swim dash
+    /// </summary>
+    private void EndSwimDash()
+    {
+        isSwimDashing = false;
+        
+        // Restore the gravity scale from before the dash
+        rb.gravityScale = preDashGravityScale;
+        
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.5f, rb.linearVelocity.y * 0.5f);
+    }
+
+    /// <summary>
+    /// Jumps out of water
+    /// </summary>
+    private void SwimJump()
+    {
+        if (!isSwimming || isSwimDashing) return;
+        
+        // Jump out of water
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, swimJumpForce);
+        
+        // Exit swimming state
+        isSwimming = false;
+        rb.gravityScale = normalGravityScale;
+        
+        // Reset coyote time for potential double jump
+        coyoteTimeCounter = coyoteTime;
+    }
+
+    /// <summary>
+    /// Handles swimming movement with fast buoyancy
+    /// </summary>
+    private void HandleSwimMovement()
+    {
+        if (!isSwimming || isHardLanding) return;
+        
+        // Update original position reference (for floating effect)
+        if (Mathf.Abs(moveInput.x) < 0.1f)
+        {
+            // When not moving horizontally, update original position for floating
+            originalPosition = new Vector3(originalPosition.x, transform.position.y - currentFloatOffset, originalPosition.z);
+        }
+        
+        float currentSwimSpeed = swimSpeed;
+        
+        // Check for fast swimming
+        if (dashAction.IsPressed() && !isSwimDashing)
+        {
+            currentSwimSpeed = swimFastSpeed;
+        }
+        
+        // Apply swim dash
+        if (isSwimDashing)
+        {
+            rb.linearVelocity = swimDashDirection * swimDashSpeed;
+            rb.gravityScale = 0f; // No gravity during dash
+            return;
+        }
+        
+        // Apply fast buoyancy FIRST (most important)
+        ApplyBuoyancy();
+        
+        // Backup: direct position correction if needed
+        ApplyDirectBuoyancyCorrection();
+        
+        // Apply floating effect
+        if (enableFloating)
+        {
+            ApplyFloatingEffect();
+        }
+        
+        // Horizontal movement - direct control for responsiveness
+        float targetXVelocity = moveInput.x * currentSwimSpeed;
+        
+        // FAST horizontal response - minimal smoothing
+        float horizontalLerp = Mathf.Lerp(rb.linearVelocity.x, targetXVelocity, Time.fixedDeltaTime * 15f);
+        
+        // Apply velocities - buoyancy handles vertical, we handle horizontal
+        rb.linearVelocity = new Vector2(horizontalLerp, rb.linearVelocity.y - currentFloatOffset * 2f);
+        
+        // Clamp horizontal speed
+        float maxHorizontalSpeed = currentSwimSpeed * 1.2f;
+        if (Mathf.Abs(rb.linearVelocity.x) > maxHorizontalSpeed)
+        {
+            rb.linearVelocity = new Vector2(
+                Mathf.Sign(rb.linearVelocity.x) * maxHorizontalSpeed,
+                rb.linearVelocity.y
+            );
+        }
+        
+        // Add slight upward bias if staying still to prevent slow sinking
+        if (Mathf.Abs(moveInput.x) < 0.1f && Mathf.Abs(rb.linearVelocity.y) < 0.5f)
+        {
+            rb.AddForce(new Vector2(0, 1f));
+        }
+    }
+
+    /// <summary>
+    /// Applies fast, responsive buoyancy force
+    /// </summary>
+    private void ApplyBuoyancy()
+    {
+        if (!isSwimming || currentWaterCollider == null) return;
+        
+        // Calculate target position (face above water)
+        float playerHeight = GetComponent<Collider2D>().bounds.extents.y * 2f;
+        float targetY = waterSurfaceY + waterSurfaceOffset - (playerHeight * 0.8f);
+        
+        // Adjust target Y with floating offset when enabled
+        if (enableFloating && !isSwimDashing)
+        {
+            targetY += currentFloatOffset;
+        }
+        
+        // Current position
+        float currentY = transform.position.y;
+        float depthDifference = targetY - currentY;
+        
+        // Apply STRONG, FAST buoyancy force
+        float buoyancyForce = depthDifference * buoyancyStrength;
+        
+        // Apply strong damping to prevent oscillation
+        float dampingForce = -rb.linearVelocity.y * buoyancyDamping;
+        
+        // Combined force
+        float totalForce = buoyancyForce + dampingForce;
+        
+        // Clamp to maximum force
+        totalForce = Mathf.Clamp(totalForce, -maxBuoyancyForce, maxBuoyancyForce);
+        
+        // Apply the force
+        rb.AddForce(new Vector2(0, totalForce));
+        
+        // Debug visualization
+        Debug.DrawLine(
+            new Vector3(transform.position.x - 0.5f, targetY, 0),
+            new Vector3(transform.position.x + 0.5f, targetY, 0),
+            Color.green
+        );
+        
+        // Draw force vector
+        Debug.DrawRay(
+            transform.position,
+            new Vector3(0, totalForce * 0.1f, 0),
+            Color.yellow
+        );
+    }
+
+    /// <summary>
+    /// Direct position correction for instant buoyancy (backup system)
+    /// </summary>
+    private void ApplyDirectBuoyancyCorrection()
+    {
+        if (!isSwimming || currentWaterCollider == null) return;
+        
+        // Only apply if significantly off target
+        float playerHeight = GetComponent<Collider2D>().bounds.extents.y * 2f;
+        float targetY = waterSurfaceY + waterSurfaceOffset - (playerHeight * 0.8f);
+        float currentY = transform.position.y;
+        float yDifference = Mathf.Abs(targetY - currentY);
+        
+        // If more than 0.3 units off, apply direct correction
+        if (yDifference > 0.3f)
+        {
+            // Fast direct movement toward target
+            float newY = Mathf.Lerp(currentY, targetY, Time.fixedDeltaTime * 10f);
+            rb.MovePosition(new Vector2(transform.position.x, newY));
+        }
+    }
+
+    /// <summary>
+    /// Applies floating/bobbing effect when swimming
+    /// </summary>
+    private void ApplyFloatingEffect()
+    {
+        if (!isSwimming || isSwimDashing || !enableFloating) return;
+        
+        // Update timer based on frequency
+        floatTimer += Time.deltaTime * floatFrequency;
+        
+        // Calculate sine wave for natural bobbing
+        float sineWave = Mathf.Sin(floatTimer * Mathf.PI * 2f);
+        
+        // Calculate target offset with reduced effect when moving horizontally
+        float horizontalMovementFactor = Mathf.Clamp01(1f - Mathf.Abs(moveInput.x) * 0.5f);
+        targetFloatOffset = sineWave * floatAmplitude * horizontalMovementFactor;
+        
+        // Smoothly interpolate to target offset
+        currentFloatOffset = Mathf.Lerp(currentFloatOffset, targetFloatOffset, Time.deltaTime * floatSmoothness);
+        
+        // Apply the floating offset to position
+        Vector3 currentPos = transform.position;
+        transform.position = new Vector3(currentPos.x, originalPosition.y + currentFloatOffset, currentPos.z);
+        
+        // Debug visualization
+        Debug.DrawLine(
+            new Vector3(transform.position.x - 0.3f, originalPosition.y, 0),
+            new Vector3(transform.position.x + 0.3f, originalPosition.y, 0),
+            Color.magenta
+        );
+    }
+
     
     // ====================================================================
     // WALL INTERACTION METHODS
@@ -1246,6 +1557,20 @@ public class Player : MonoBehaviour
         {
             jumpBufferCounter -= Time.deltaTime;
         }
+
+        if (swimDashCooldownTimer > 0)
+        {
+            swimDashCooldownTimer -= Time.deltaTime;
+        }
+        
+        if (isSwimDashing)
+        {
+            swimDashTimer -= Time.deltaTime;
+            if (swimDashTimer <= 0)
+            {
+                EndSwimDash();
+            }
+        }
     }
     
     /// <summary>
@@ -1282,6 +1607,28 @@ public class Player : MonoBehaviour
         if (isHardLanding)
         {
             animator.Play("Player_hard_land");
+        }
+        else if (isSwimming) // Add swimming animations
+        {
+            if (isSwimDashing)
+            {
+                animator.Play("Player_dash"); // Reuse dash animation or create "Player_swim_dash"
+            }
+            else if (Mathf.Abs(horizontalInput) > 0.1f)
+            {
+                if (dashAction.IsPressed() && !isSwimDashing)
+                {
+                    animator.Play("Player_swim"); // Fast swimming
+                }
+                else
+                {
+                    animator.Play("Player_swim"); // Normal swimming
+                }
+            }
+            else
+            {
+                animator.Play("Player_swim_idle"); // Floating in water
+            }
         }
         else if (isAttacking)
         {
@@ -1330,6 +1677,103 @@ public class Player : MonoBehaviour
                 animator.Play("Player_fall");
             }
         }
+    }
+
+    /// <summary>
+    /// Checks if the player is in water
+    /// </summary>
+    private void CheckWater()
+    {
+        wasInWater = isInWater;
+        
+        // Check multiple points for reliable detection
+        Vector2 checkCenter = transform.position;
+        float checkRadius = 0.4f;
+        
+        Collider2D waterCollider = Physics2D.OverlapCircle(
+            checkCenter, 
+            checkRadius, 
+            waterLayer
+        );
+        
+        isInWater = waterCollider != null;
+        currentWaterCollider = waterCollider;
+        
+        if (isInWater && waterCollider != null)
+        {
+            waterSurfaceY = waterCollider.bounds.max.y;
+        }
+        
+        // Handle state changes
+        if (isInWater && !wasInWater)
+        {
+            OnEnterWater();
+        }
+        else if (!isInWater && wasInWater)
+        {
+            OnExitWater();
+        }
+    }
+
+    /// <summary>
+    /// Called when player enters water
+    /// </summary>
+    private void OnEnterWater()
+    {
+        isSwimming = true;
+        
+        // Initialize floating effect
+        floatTimer = Random.Range(0f, Mathf.PI * 2f); // Random starting point for variety
+        originalPosition = transform.position;
+        currentFloatOffset = 0f;
+        targetFloatOffset = 0f;
+        
+        // Fast entry - immediately set to appropriate downward speed
+        if (rb.linearVelocity.y < 0)
+        {
+            rb.linearVelocity = new Vector2(
+                rb.linearVelocity.x * 0.7f,
+                -3f
+            );
+        }
+        else
+        {
+            rb.linearVelocity = new Vector2(
+                rb.linearVelocity.x * 0.7f,
+                Mathf.Min(rb.linearVelocity.y, 2f) * 0.3f
+            );
+        }
+        
+        // Set low gravity for buoyancy feel
+        rb.gravityScale = waterEntryGravity;
+        
+        // Reset other states
+        isDashing = false;
+        isWallJumping = false;
+        wallSlideState = WallSlideState.None;
+        isWallSliding = false;
+        
+        airDashCount = 0;
+        hasDoubleJumped = false;
+        
+        Debug.Log("Entered water - Fast buoyancy activated");
+    }
+
+    /// <summary>
+    /// Called when player exits water
+    /// </summary>
+    private void OnExitWater()
+    {
+        isSwimming = false;
+        isSwimDashing = false;
+        isInWater = false;
+        
+        // Restore normal physics IMMEDIATELY
+        rb.gravityScale = normalGravityScale;
+        
+        swimDashCooldownTimer = 0f;
+        
+        Debug.Log("Exited water");
     }
     
     // ====================================================================
@@ -1436,6 +1880,42 @@ public class Player : MonoBehaviour
             new Vector3(screenBounds.min.x, offScreenTop.y, 0),
             new Vector3(screenBounds.max.x, offScreenTop.y, 0)
         );
+
+        if (isSwimming && currentWaterCollider != null)
+        {
+            // Draw target surface position
+            float targetY = waterSurfaceY + waterSurfaceOffset;
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(
+                new Vector3(transform.position.x - 0.5f, targetY, 0),
+                new Vector3(transform.position.x + 0.5f, targetY, 0)
+            );
+            
+            // Draw current position
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(
+                new Vector3(transform.position.x - 0.5f, transform.position.y, 0),
+                new Vector3(transform.position.x + 0.5f, transform.position.y, 0)
+            );
+        }
+
+        if (isSwimming && enableFloating)
+        {
+            // Draw floating effect range
+            Gizmos.color = Color.cyan;
+            float floatRange = floatAmplitude * 2f;
+            Gizmos.DrawWireCube(
+                new Vector3(transform.position.x, originalPosition.y, 0),
+                new Vector3(0.5f, floatRange, 0)
+            );
+            
+            // Draw current float offset
+            Gizmos.color = Color.white;
+            Gizmos.DrawLine(
+                new Vector3(transform.position.x - 0.25f, originalPosition.y + currentFloatOffset, 0),
+                new Vector3(transform.position.x + 0.25f, originalPosition.y + currentFloatOffset, 0)
+            );
+        }
     }
 }
 

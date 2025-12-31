@@ -185,7 +185,7 @@ CompositeCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -257,7 +257,7 @@ TilemapCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -1716,7 +1716,6 @@ MonoBehaviour:
   wallJumpAngle: {x: 1, y: 2}
   wallJumpDuration: 0.2
   wallStickTime: 0.25
-  wallSlideGravity: 0.5
   wallClingTime: 0.2
   wallClingSlowdown: 0.3
   maxFallSpeed: -20
@@ -1732,12 +1731,6 @@ MonoBehaviour:
   enableScreenShake: 1
   hardLandingShakeIntensity: 0.15
   hardLandingShakeDuration: 0.25
-  dashShakeIntensity: 0.15
-  dashShakeDuration: 0.15
-  attackShakeIntensity: 0.1
-  attackShakeDuration: 0.1
-  wallJumpShakeIntensity: 0.08
-  wallJumpShakeDuration: 0.1
   attackCooldown: 0.5
   attackDuration: 0.2
   attackPoint: {fileID: 0}
@@ -1754,6 +1747,25 @@ MonoBehaviour:
   environmentLayer:
     serializedVersion: 2
     m_Bits: 64
+  swimSpeed: 3
+  swimFastSpeed: 5
+  swimDashSpeed: 10
+  swimJumpForce: 8
+  waterSurfaceOffset: 1.15
+  waterEntrySpeedReduction: 0.5
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16
+  waterCheckRadius: 0.5
+  waterCheckPoint: {fileID: 0}
+  waterEntryGravity: 0.5
+  buoyancyStrength: 50
+  buoyancyDamping: 10
+  maxBuoyancyForce: 20
+  floatAmplitude: 0.05
+  floatFrequency: 1
+  floatSmoothness: 5
+  enableFloating: 1
 --- !u!114 &658198521
 MonoBehaviour:
   m_ObjectHideFlags: 0
