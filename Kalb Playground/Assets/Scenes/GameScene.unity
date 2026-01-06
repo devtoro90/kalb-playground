@@ -1751,7 +1751,7 @@ MonoBehaviour:
   swimFastSpeed: 5
   swimDashSpeed: 10
   swimJumpForce: 8
-  waterSurfaceOffset: 1.15
+  waterSurfaceOffset: 1.2
   waterEntrySpeedReduction: 0.5
   waterLayer:
     serializedVersion: 2
@@ -1766,13 +1766,6 @@ MonoBehaviour:
   floatFrequency: 1
   floatSmoothness: 5
   enableFloating: 1
-  ledgeGrabRange: 0.5
-  ledgeGrabPointOffset: 0.5
-  ledgeClimbDuration: 0.4
-  ledgeLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  ledgeGrabCooldown: 0.2
 --- !u!114 &658198521
 MonoBehaviour:
   m_ObjectHideFlags: 0

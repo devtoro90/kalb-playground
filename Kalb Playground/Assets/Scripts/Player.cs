@@ -93,7 +93,7 @@ public class Player : MonoBehaviour
     public float swimFastSpeed = 5f;
     public float swimDashSpeed = 10f;
     public float swimJumpForce = 8f;
-    public float waterSurfaceOffset = 1.15f; // How much of the face is above water
+    public float waterSurfaceOffset = 1.20f; // How much of the face is above water
     public float waterEntrySpeedReduction = 0.5f; // Slow down when entering water
     public LayerMask waterLayer; // Set this to the Water layer in the Inspector
     public float waterCheckRadius = 0.5f;
@@ -1650,7 +1650,7 @@ public class Player : MonoBehaviour
             {
                 if (dashAction.IsPressed() && !isSwimDashing)
                 {
-                    animator.Play("Player_swim"); // Fast swimming
+                    animator.Play("Player_swim_fast"); // Fast swimming
                 }
                 else
                 {
