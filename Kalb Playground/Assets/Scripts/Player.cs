@@ -1788,7 +1788,6 @@ public class Player : MonoBehaviour
         airDashCount = 0;
         hasDoubleJumped = false;
         
-        Debug.Log("Entered water - Fast buoyancy activated");
     }
 
     /// <summary>
@@ -1805,7 +1804,6 @@ public class Player : MonoBehaviour
         
         swimDashCooldownTimer = 0f;
         
-        Debug.Log("Exited water");
     }
     
     // ====================================================================
