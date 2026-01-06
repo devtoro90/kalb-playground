@@ -108,6 +108,16 @@ public class Player : MonoBehaviour
     public float floatFrequency = 1f; // How fast the player bobs
     public float floatSmoothness = 5f; // How smooth the bobbing is
     public bool enableFloating = true; // Toggle floating effect
+
+    [Header("Ledge Settings")]
+    public float ledgeDetectionDistance = 0.5f;
+    public float ledgeGrabOffsetY = 0.15f; // Vertical offset for hand position
+    public float ledgeGrabOffsetX = 0.8f; // Horizontal offset from wall
+    public float ledgeClimbTime = 0.3f;
+    public float ledgeJumpForce = 12f;
+    public Vector2 ledgeJumpAngle = new Vector2(1, 2);
+    public float ledgeClimbCheckRadius = 0.2f;
+    public Transform ledgeCheckPoint; // Point to check for ledges
     
     // ====================================================================
     // INTERNAL STATE - PRIVATE VARIABLES
@@ -197,6 +207,17 @@ public class Player : MonoBehaviour
     private float currentFloatOffset = 0f;
     private float targetFloatOffset = 0f;
     private Vector3 originalPosition; // Store original position for reference
+
+    // Ledge Variables
+    private bool isLedgeGrabbing = false;
+    private bool isLedgeClimbing = false;
+    private bool ledgeDetected = false;
+    private Vector2 ledgePosition;
+    private float ledgeClimbTimer = 0f;
+    private int ledgeSide = 0;
+    private float ledgeGrabTime = 0f; 
+    private float minLedgeGrabTime = 0.2f; 
+    private bool climbInputQueued = false; 
     
     // ====================================================================
     // UNITY LIFE CYCLE METHODS
@@ -347,18 +368,30 @@ public class Player : MonoBehaviour
         CheckWall();
         CheckWater();
         
-        // 4. Input Handling
+        // 4. Ledge Detection (only if not already grabbing)
+        if (!isLedgeGrabbing && !isLedgeClimbing)
+        {
+            ledgeDetected = CheckForLedge();
+        }
+        
+        // 5. Input Handling
         HandleSwimInput();
         HandleDashInput();
         HandleRunInput();
         HandleJumpInput();
         HandleAttackInput();
         
-        // 5. State Management
-        HandleWallSlide();
+        // 6. Ledge Input Handling
+        HandleLedgeInput();
         
-        // 6. Visual Feedback
+        // 7. State Management
+        HandleWallSlide();
+        HandleLedgeClimb();
+        
+        // 8. Visual Feedback
         SetAnimation(moveInput.x);
+
+        DisplayDebugInfo();
     }
     
     /// <summary>
@@ -369,14 +402,21 @@ public class Player : MonoBehaviour
         // 1. Environment Detection
         UpdateGroundCheck();
         
-        // 2. Gravity Control
-        UpdateGravity();
+        // 2. Gravity Control (skip if ledge grabbing)
+        if (!isLedgeGrabbing && !isLedgeClimbing)
+        {
+            UpdateGravity();
+        }
         
         // 3. Wall Collision Prevention
         PreventWallStick();
         
-        // 4. Movement Execution
-        if (isSwimming)
+        // 4. Movement Execution (skip if ledge grabbing/climbing)
+        if (isLedgeGrabbing || isLedgeClimbing)
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
+        else if (isSwimming)
         {
             HandleSwimMovement(); 
         }
@@ -385,8 +425,8 @@ public class Player : MonoBehaviour
             HandleMovement(); 
         }
         
-        // 5. Sprite Orientation
-        if (!isDashing && !isAttacking && !isWallJumping && !isWallSliding && !isHardLanding && !isSwimDashing)
+        // 5. Sprite Orientation (skip if ledge grabbing/climbing)
+        if (!isLedgeGrabbing && !isLedgeClimbing && !isDashing && !isAttacking && !isWallJumping && !isWallSliding && !isHardLanding && !isSwimDashing)
         {
             HandleFlip();
         }
@@ -431,6 +471,13 @@ public class Player : MonoBehaviour
             waterCheckObj.transform.parent = transform;
             waterCheckObj.transform.localPosition = new Vector3(0, 0.2f, 0);
             waterCheckPoint = waterCheckObj.transform;
+        }
+        if (ledgeCheckPoint == null)
+        {
+            GameObject ledgeCheckObj = new GameObject("LedgeCheck");
+            ledgeCheckObj.transform.parent = transform;
+            ledgeCheckObj.transform.localPosition = new Vector3(0, 0.5f, 0);
+            ledgeCheckPoint = ledgeCheckObj.transform;
         }
     }
     
@@ -593,6 +640,77 @@ public class Player : MonoBehaviour
         if (jumpAction.triggered && !isSwimDashing)
         {
             SwimJump();
+        }
+    }
+
+    /// <summary>
+    /// Handles ledge-related inputs
+    /// </summary>
+    private void HandleLedgeInput()
+    {   
+        // Auto-grab ledge when detected and falling past it
+        if (ledgeDetected && !isLedgeGrabbing && !isLedgeClimbing && rb.linearVelocity.y < 0)
+        {
+            // Check if player is at the right height to grab
+            float playerBottom = GetComponent<Collider2D>().bounds.min.y;
+            float ledgeTop = ledgePosition.y;
+            
+            // Player should be slightly below the ledge to grab it
+            if (playerBottom < ledgeTop && playerBottom > ledgeTop - 1.0f)
+            {
+                GrabLedge();
+            }
+        }
+        
+        // If already grabbing ledge, handle input
+        if (isLedgeGrabbing)
+        {
+            // Calculate input direction relative to ledge
+            float inputDirection = 0f;
+            
+            // Prioritize vertical input first
+            if (Mathf.Abs(moveInput.y) > Mathf.Abs(moveInput.x))
+            {
+                inputDirection = Mathf.Sign(moveInput.y);
+            }
+            else
+            {
+                inputDirection = Mathf.Sign(moveInput.x);
+            }
+            
+            // CLIMB UP (press Up OR towards the ledge)
+            if (moveInput.y > 0.5f || (inputDirection == ledgeSide && Mathf.Abs(moveInput.x) > 0.5f))
+            {
+                // Queue the climb input if we haven't been grabbing long enough
+                if (ledgeGrabTime < minLedgeGrabTime)
+                {
+                    climbInputQueued = true;
+                }
+                else if (!isLedgeClimbing)
+                {
+                    // Enough time has passed, allow climbing
+                    ClimbLedge();
+                }
+            }
+            // LET GO (press Down OR away from the ledge)
+            else if (moveInput.y < -0.5f || (inputDirection == -ledgeSide && Mathf.Abs(moveInput.x) > 0.5f))
+            {
+                // Allow immediate release when pressing down or away from wall
+                ReleaseLedge();
+            }
+            // LET GO (press jump button)
+            else if (jumpAction.triggered)
+            {
+                LedgeJump();
+                return;
+            }
+            
+            // Check if we have a queued climb input and enough time has passed
+            if (climbInputQueued && ledgeGrabTime >= minLedgeGrabTime && !isLedgeClimbing)
+            {
+                ClimbLedge();
+                climbInputQueued = false;
+            }
         }
     }
     
@@ -1215,6 +1333,51 @@ public class Player : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// Handles ledge climbing animation and movement
+    /// </summary>
+    private void HandleLedgeClimb()
+    {
+        if (!isLedgeClimbing) return;
+        
+        if (ledgeClimbTimer > 0)
+        {
+            ledgeClimbTimer -= Time.deltaTime;
+            
+            // Get player collider for accurate positioning
+            Collider2D playerCollider = GetComponent<Collider2D>();
+            if (playerCollider != null)
+            {
+                float playerHeight = playerCollider.bounds.size.y;
+                
+                // Calculate target position - standing on the platform
+                Vector3 climbTarget = new Vector3(
+                    ledgePosition.x + (ledgeSide * 0.3f), // Move slightly away from edge
+                    ledgePosition.y + (playerHeight * 0.5f), // Center player vertically on platform
+                    transform.position.z
+                );
+                
+                // Smooth movement during climb
+                float climbProgress = 1f - (ledgeClimbTimer / ledgeClimbTime);
+                transform.position = Vector3.Lerp(transform.position, climbTarget, climbProgress * 5f * Time.deltaTime);
+                
+                // Draw debug line
+                Debug.DrawLine(transform.position, climbTarget, Color.cyan);
+            }
+        }
+        else
+        {
+            // Climb finished
+            isLedgeClimbing = false;
+            rb.gravityScale = normalGravityScale;
+            
+            // Small hop at the end for polish
+            rb.linearVelocity = new Vector2(0, 3f);
+            
+            Debug.Log("Ledge climb complete!");
+        }
+    }
+
     
     // ====================================================================
     // WALL INTERACTION METHODS
@@ -1311,7 +1474,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HandleWallSlide()
     {
-        if (!wallJumpUnlocked || isHardLanding) 
+        if (!wallJumpUnlocked || isHardLanding || isLedgeGrabbing || isLedgeClimbing) 
         {
             isWallSliding = false;
             isWallClinging = false;
@@ -1387,7 +1550,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void CheckWall()
     {
-        if (!wallJumpUnlocked || isHardLanding)
+        if (!wallJumpUnlocked || isHardLanding || isLedgeGrabbing || isLedgeClimbing)
         {
             isTouchingWall = false;
             wallSide = 0;
@@ -1458,6 +1621,273 @@ public class Player : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// Detects ledges that can be grabbed
+    /// </summary>
+    private bool CheckForLedge()
+    {
+        if (isGrounded || isDashing || isAttacking || isHardLanding || isSwimming || isWallSliding)
+            return false;
+
+        // Only check for ledges when falling
+        if (rb.linearVelocity.y >= 0)
+            return false;
+
+        // Determine which side to check based on facing direction and movement input
+        float checkDirection = facingRight ? 1f : -1f;
+        
+        // Also consider movement input - if moving opposite direction, use that
+        if (Mathf.Abs(moveInput.x) > 0.1f)
+        {
+            checkDirection = Mathf.Sign(moveInput.x);
+        }
+        
+        ledgeSide = (int)checkDirection;
+        
+        // Get player collider bounds for accurate positioning
+        Collider2D playerCollider = GetComponent<Collider2D>();
+        if (playerCollider == null) return false;
+        
+        Vector2 playerCenter = playerCollider.bounds.center;
+        float playerHalfWidth = playerCollider.bounds.extents.x;
+        float playerHalfHeight = playerCollider.bounds.extents.y;
+        
+        // Position for checking wall (at player's side)
+        Vector2 wallCheckPos = new Vector2(
+            playerCenter.x + (checkDirection * (playerHalfWidth + 0.05f)),
+            playerCenter.y
+        );
+        
+        // Position for checking ledge (above player's head)
+        Vector2 ledgeCheckPos = new Vector2(
+            playerCenter.x + (checkDirection * (playerHalfWidth + 0.05f)),
+            playerCenter.y + playerHalfHeight * 0.8f  // 80% up the player's height
+        );
+        
+        // Position for checking ground at ledge (above player's head)
+        Vector2 groundCheckPos = new Vector2(
+            playerCenter.x + (checkDirection * (playerHalfWidth + 0.3f)), // Slightly further out
+            playerCenter.y + playerHalfHeight * 0.8f
+        );
+        
+        // DEBUG VISUALIZATION - Always draw these to see what's being checked
+        Debug.DrawRay(wallCheckPos, Vector2.right * checkDirection * 0.2f, Color.red, 0.1f);
+        Debug.DrawRay(ledgeCheckPos, Vector2.right * checkDirection * 0.2f, Color.green, 0.1f);
+        Debug.DrawRay(groundCheckPos, Vector2.down * (playerHalfHeight * 1.5f), Color.blue, 0.1f);
+        
+        // 1. Check for wall at side (must have wall)
+        RaycastHit2D wallHit = Physics2D.Raycast(
+            wallCheckPos,
+            Vector2.right * checkDirection,
+            0.2f,
+            environmentLayer
+        );
+        
+        if (wallHit.collider == null)
+        {
+            // No wall - can't grab ledge
+            return false;
+        }
+        
+        // 2. Check for NO wall at ledge height (must have empty space above wall)
+        RaycastHit2D ledgeHit = Physics2D.Raycast(
+            ledgeCheckPos,
+            Vector2.right * checkDirection,
+            0.2f,
+            environmentLayer
+        );
+        
+        if (ledgeHit.collider != null)
+        {
+            // There's still wall at this height - not a ledge
+            return false;
+        }
+        
+        // 3. Check for ground/surface at the top of the wall
+        RaycastHit2D groundHit = Physics2D.Raycast(
+            groundCheckPos,
+            Vector2.down,
+            playerHalfHeight * 1.5f, // Check far enough down
+            environmentLayer
+        );
+        
+        if (groundHit.collider == null)
+        {
+            // No ground above - not a ledge
+            return false;
+        }
+        
+        // Found a valid ledge!
+        ledgePosition = groundHit.point;
+        
+        // Add extra debug info
+        Debug.Log($"Ledge detected! Position: {ledgePosition}, Side: {ledgeSide}");
+        
+        return true;
+    }
+
+    /// <summary>
+    /// Grabs onto a detected ledge
+    /// </summary>
+    private void GrabLedge()
+    {
+        if (!ledgeDetected || isLedgeGrabbing)
+            return;
+        
+        Debug.Log("Grabbing ledge!");
+        
+        isLedgeGrabbing = true;
+        isLedgeClimbing = false;
+        ledgeClimbTimer = 0f;
+        ledgeGrabTime = 0f;
+        climbInputQueued = false;
+        
+        // Stop all movement
+        rb.linearVelocity = Vector2.zero;
+        rb.gravityScale = 0f;
+        
+        // Get player collider for accurate positioning
+        Collider2D playerCollider = GetComponent<Collider2D>();
+        if (playerCollider == null) return;
+        
+        float playerHeight = playerCollider.bounds.size.y;
+        
+        // CRITICAL FIX: Position player BELOW the ledge, not on top of it
+        // ledgePosition.y is the TOP of the platform where you stand
+        // We want player's hands at ledge level, so body is below
+        
+        float grabX = ledgePosition.x - (ledgeSide * ledgeGrabOffsetX);
+        
+        // IMPORTANT: Position player so their UPPER body is at ledge level
+        // Player hangs with hands at ledge, body extends downward
+        // 0.7f means hands are at 70% of player height (roughly chest/shoulder level)
+        float hangOffset = playerHeight * ledgeGrabOffsetY; // How much body extends below hands
+        
+        // Calculate position so player's "grab point" (hands) aligns with ledge
+        // We subtract hangOffset to position the player's transform below the ledge
+        float grabY = ledgePosition.y - hangOffset;
+        
+        // Alternative: Use a more precise calculation
+        // float playerBottom = playerCollider.bounds.min.y;
+        // float playerTop = playerCollider.bounds.max.y;
+        // float grabY = ledgePosition.y - (playerTop - playerBottom) * 0.8f;
+        
+        // Snap to ledge position
+        Vector3 targetPosition = new Vector3(grabX, grabY, transform.position.z);
+        transform.position = targetPosition;
+        
+        // Face the wall
+        if ((ledgeSide == 1 && !facingRight) || (ledgeSide == -1 && facingRight))
+        {
+            Flip();
+        }
+        
+        // Reset other states
+        isDashing = false;
+        isWallSliding = false;
+        isWallClinging = false;
+        wallSlideState = WallSlideState.None;
+        
+        // Reset ledge detection to prevent re-grabbing
+        ledgeDetected = false;
+        
+        // Trigger animation
+        animator.Play("Player_ledge_grab");
+        
+        Debug.Log($"Ledge grab complete. Position: {transform.position}, Target: {targetPosition}");
+        Debug.Log($"Ledge Y: {ledgePosition.y}, Player Y: {transform.position.y}, Hang Offset: {hangOffset}");
+    }
+
+    /// <summary>
+    /// Releases from the ledge
+    /// </summary>
+    private void ReleaseLedge()
+    {
+        if (!isLedgeGrabbing) return;
+        
+        isLedgeGrabbing = false;
+        rb.gravityScale = normalGravityScale;
+        
+        // Small downward push when releasing
+        rb.linearVelocity = new Vector2(0, -2f);
+    }
+
+    /// <summary>
+    /// Climbs up onto the ledge
+    /// </summary>
+    private void ClimbLedge()
+    {
+        if (!isLedgeGrabbing || isLedgeClimbing)
+            return;
+        
+        Debug.Log("Climbing ledge!");
+        
+        isLedgeClimbing = true;
+        isLedgeGrabbing = false;
+        ledgeClimbTimer = ledgeClimbTime;
+        
+        // Play climb animation
+        animator.Play("Player_ledge_climb");
+        
+        // Get player collider for accurate positioning
+        Collider2D playerCollider = GetComponent<Collider2D>();
+        if (playerCollider == null) return;
+        
+        float playerHeight = playerCollider.bounds.size.y;
+        
+        // Calculate final position after climb
+        // Player should end up STANDING on the platform
+        // 1. Move slightly away from edge (so not clipping into wall)
+        // 2. Move up so feet are on platform
+        
+        // Platform surface is at ledgePosition.y
+        // Player's feet should be at ledgePosition.y
+        
+        float climbX = ledgePosition.x + (ledgeSide * 0.3f); // Move slightly away from edge
+        float climbY = ledgePosition.y + (playerHeight * 0.5f); // Center player on platform
+        
+        // Debug information
+        Debug.Log($"Climbing to: X={climbX}, Y={climbY}");
+        Debug.Log($"Current pos: {transform.position}, Ledge pos: {ledgePosition}");
+    }
+
+    /// <summary>
+    /// Jumps away from the ledge
+    /// </summary>
+    private void LedgeJump()
+    {
+        if (!isLedgeGrabbing)
+            return;
+        
+        isLedgeGrabbing = false;
+        isLedgeClimbing = false;
+        
+        // Restore gravity
+        rb.gravityScale = normalGravityScale;
+        
+        // Apply jump force
+        Vector2 jumpDir = new Vector2(-ledgeSide * ledgeJumpAngle.x, ledgeJumpAngle.y).normalized;
+        rb.AddForce(jumpDir * ledgeJumpForce, ForceMode2D.Impulse);
+        
+        // Face away from wall for jump
+        if (ledgeSide == 1 && !facingRight)
+        {
+            Flip();
+        }
+        else if (ledgeSide == -1 && facingRight)
+        {
+            Flip();
+        }
+        
+        // Reset air dash
+        airDashCount = 0;
+        
+        // Track jump height
+        peakHeight = transform.position.y;
+        fallStartHeight = transform.position.y;
+        fellFromOffScreen = CheckIfFellFromOffScreen(fallStartHeight);
+    }
     
     // ====================================================================
     // ENVIRONMENT DETECTION & UTILITY METHODS
@@ -1470,6 +1900,12 @@ public class Player : MonoBehaviour
     {
         bool wasGrounded = isGrounded;
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, environmentLayer);
+
+        // Release ledge if grounded
+        if (isGrounded && (isLedgeGrabbing || isLedgeClimbing))
+        {
+            ReleaseLedge();
+        }
         
         // Track peak height during jump/rise
         if (!isGrounded && !wasGrounded && rb.linearVelocity.y > 0)
@@ -1603,6 +2039,25 @@ public class Player : MonoBehaviour
                 EndSwimDash();
             }
         }
+
+        if (isLedgeClimbing)
+        {
+            ledgeClimbTimer -= Time.deltaTime;
+            if (ledgeClimbTimer <= 0)
+            {
+                isLedgeClimbing = false;
+                rb.gravityScale = normalGravityScale;
+            }
+        }
+
+        if (isLedgeGrabbing)
+        {
+            ledgeGrabTime += Time.deltaTime;
+        }
+        else
+        {
+            ledgeGrabTime = 0f;
+        }
     }
     
     /// <summary>
@@ -1636,7 +2091,15 @@ public class Player : MonoBehaviour
     /// </summary>
     private void SetAnimation(float horizontalInput)
     {
-        if (isHardLanding)
+        if (isLedgeClimbing)
+        {
+            animator.Play("Player_ledge_climb");
+        }
+        else if (isLedgeGrabbing)
+        {
+            animator.Play("Player_ledge_grab");
+        }
+        else if (isHardLanding)
         {
             animator.Play("Player_hard_land");
         }
@@ -1852,7 +2315,7 @@ public class Player : MonoBehaviour
     
     void OnDrawGizmosSelected()
     {
-        if (groundCheck != null)
+        /*if (groundCheck != null)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
@@ -1945,9 +2408,110 @@ public class Player : MonoBehaviour
                 new Vector3(transform.position.x - 0.25f, originalPosition.y + currentFloatOffset, 0),
                 new Vector3(transform.position.x + 0.25f, originalPosition.y + currentFloatOffset, 0)
             );
+        }*/
+
+        // Ledge detection visualization
+        if (ledgeCheckPoint != null && Application.isPlaying)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(ledgeCheckPoint.position, 0.1f);
+            
+            if (ledgeDetected)
+            {
+                Gizmos.color = Color.white;
+                Gizmos.DrawWireCube(ledgePosition, new Vector3(0.3f, 0.1f, 0));
+            }
+        }
+
+        // Ledge positioning debug
+        if (Application.isPlaying && isLedgeGrabbing)
+        {
+            // Draw where the player should be hanging
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(ledgePosition, 0.1f);
+            
+            // Draw player's current position
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, 0.1f);
+            
+            // Draw line between them
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, ledgePosition);
+            
+            // Draw the platform surface
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(
+                new Vector3(ledgePosition.x - 0.5f, ledgePosition.y, 0),
+                new Vector3(ledgePosition.x + 0.5f, ledgePosition.y, 0)
+            );
+        }
+    }
+
+    /// <summary>
+    /// Draws debug information in the scene view
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        // Only draw in Play mode
+        if (!Application.isPlaying) return;
+        
+        // Draw ledge detection info
+        if (ledgeCheckPoint != null)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(ledgeCheckPoint.position, 0.1f);
+            
+            if (ledgeDetected)
+            {
+                Gizmos.color = Color.white;
+                Gizmos.DrawWireCube(ledgePosition, new Vector3(0.3f, 0.1f, 0));
+                
+                // Draw line from player to ledge
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(transform.position, ledgePosition);
+            }
+        }
+        
+        // Draw state info above player
+        Vector3 textPos = transform.position + Vector3.up * 2f;
+        
+        // Use Handles for text (requires UnityEditor namespace)
+        #if UNITY_EDITOR
+        string stateInfo = $"LedgeDetected: {ledgeDetected}\n" +
+                        $"IsLedgeGrabbing: {isLedgeGrabbing}\n" +
+                        $"IsLedgeClimbing: {isLedgeClimbing}\n" +
+                        $"LedgeSide: {ledgeSide}\n" +
+                        $"LedgePos: {ledgePosition}\n" +
+                        $"VelocityY: {rb.linearVelocity.y:F2}";
+        
+        UnityEditor.Handles.Label(textPos, stateInfo);
+        #endif
+    }
+
+    /// <summary>
+    /// Displays debug information on screen
+    /// </summary>
+    private void DisplayDebugInfo()
+    {
+        // Create a debug string
+        string debugInfo = $"Ledge System Debug:\n" +
+                        $"LedgeDetected: {ledgeDetected}\n" +
+                        $"IsGrabbing: {isLedgeGrabbing}\n" +
+                        $"IsClimbing: {isLedgeClimbing}\n" +
+                        $"LedgeSide: {ledgeSide}\n" +
+                        $"VelocityY: {rb.linearVelocity.y:F2}\n" +
+                        $"MoveInput: {moveInput}\n" +
+                        $"IsGrounded: {isGrounded}\n";
+        
+        // Log to console for debugging
+        if (ledgeDetected && !isLedgeGrabbing && !isLedgeClimbing)
+        {
+            Debug.Log(debugInfo);
         }
     }
 }
+
+
 
 // ====================================================================
 // CAMERA SHAKE COMPONENT

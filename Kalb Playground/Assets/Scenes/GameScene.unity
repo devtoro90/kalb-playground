@@ -533,7 +533,7 @@ Tilemap:
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.2}
   m_Origin: {x: -9, y: -5, z: 0}
   m_Size: {x: 18, y: 11, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
@@ -1766,6 +1766,14 @@ MonoBehaviour:
   floatFrequency: 1
   floatSmoothness: 5
   enableFloating: 1
+  ledgeDetectionDistance: 0.5
+  ledgeGrabOffsetY: 0.15
+  ledgeGrabOffsetX: 0.8
+  ledgeClimbTime: 0.3
+  ledgeJumpForce: 12
+  ledgeJumpAngle: {x: 1, y: 2}
+  ledgeClimbCheckRadius: 0.2
+  ledgeCheckPoint: {fileID: 0}
 --- !u!114 &658198521
 MonoBehaviour:
   m_ObjectHideFlags: 0
