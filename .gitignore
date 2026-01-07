@@ -1,1 +1,39 @@
-Kalb Playground/Library/PackageCache/
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Unity3D Generated files
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+
+# Unity3D
+*.pidb.meta
+*.pdb.meta
+
+# Crashlytics generated file
+crashlytics-build.properties
+
+# Packed Assets
+*.apk
+*.unitypackage
+
+# Burst AOT Compilation
+[Bb]urstCache/
+
+# VS Code
+.vscode/
