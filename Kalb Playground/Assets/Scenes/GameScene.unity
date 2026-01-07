@@ -1768,8 +1768,8 @@ MonoBehaviour:
   enableFloating: 1
   ledgeDetectionDistance: 0.5
   ledgeGrabOffsetY: 0.15
-  ledgeGrabOffsetX: 0.8
-  ledgeClimbTime: 0.3
+  ledgeGrabOffsetX: 0.6
+  ledgeClimbTime: 0.5
   ledgeJumpForce: 12
   ledgeJumpAngle: {x: 1, y: 2}
   ledgeClimbCheckRadius: 0.2

@@ -218,7 +218,7 @@ TextureImporter:
         width: 138
         height: 169
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -227,6 +227,72 @@ TextureImporter:
       bones: []
       spriteID: acc8bad545e5d487f93c2373de70c557
       internalID: -2061560352
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player3_5
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 414
+        width: 142
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 036b42ff3581245eaa318baabd50df5c
+      internalID: -1546484398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player3_6
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 434
+        width: 127
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d7171b4eca88434da6553eb4956db5c
+      internalID: 1705508078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player3_7
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 420
+        width: 110
+        height: 161
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7ce86d9cd3c140b1b31abd9788ba55c
+      internalID: -194841683
       vertices: []
       indices: 
       edges: []
@@ -250,6 +316,9 @@ TextureImporter:
       Player3_2: -784343451983666409
       Player3_3: -7049311782475203411
       Player3_4: -2061560352
+      Player3_5: -1546484398
+      Player3_6: 1705508078
+      Player3_7: -194841683
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
