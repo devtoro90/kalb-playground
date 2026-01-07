@@ -1697,6 +1697,7 @@ MonoBehaviour:
   runSpeed: 8
   jumpForce: 12
   movementSmoothing: 0.05
+  facingRight: 1
   coyoteTime: 0.15
   jumpBufferTime: 0.1
   jumpCutMultiplier: 0.5
@@ -1731,7 +1732,7 @@ MonoBehaviour:
   enableScreenShake: 1
   hardLandingShakeIntensity: 0.15
   hardLandingShakeDuration: 0.25
-  attackCooldown: 0.5
+  attackCooldown: 0.1
   attackDuration: 0.2
   attackPoint: {fileID: 0}
   attackRange: 0.5
@@ -1739,6 +1740,36 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   attackDamage: 20
+  maxComboHits: 3
+  comboWindow: 0.2
+  comboResetTime: 0.6
+  enableAirCombo: 1
+  enableWallCombo: 1
+  comboDamage:
+  - 20
+  - 25
+  - 35
+  comboKnockback:
+  - 5
+  - 7
+  - 12
+  comboRange:
+  - 0.5
+  - 0.6
+  - 0.8
+  comboAttackDurations:
+  - 0.2
+  - 0.2
+  - 0.2
+  comboCooldowns:
+  - 0.2
+  - 0.2
+  - 0.2
+  comboAnimations:
+  - Player_attack1
+  - Player_attack2
+  - Player_attack3
+  comboResetAnimation: attack_reset
   groundCheck: {fileID: 0}
   groundCheckRadius: 0.2
   wallCheck: {fileID: 0}
@@ -1774,6 +1805,9 @@ MonoBehaviour:
   ledgeJumpAngle: {x: 1, y: 2}
   ledgeClimbCheckRadius: 0.2
   ledgeCheckPoint: {fileID: 0}
+  minLedgeHoldTime: 0.3
+  ledgeReleaseForce: 5
+  ledgeReleaseCooldown: 0.2
 --- !u!114 &658198521
 MonoBehaviour:
   m_ObjectHideFlags: 0

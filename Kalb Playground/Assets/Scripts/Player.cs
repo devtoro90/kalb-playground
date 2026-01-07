@@ -70,12 +70,30 @@ public class Player : MonoBehaviour
     public float hardLandingShakeDuration = 0.25f;
     
     [Header("Attack")]
-    public float attackCooldown = 0.5f;
+    public float attackCooldown = 0.1f;
     public float attackDuration = 0.2f;
     public Transform attackPoint;
     public float attackRange = 0.5f;
     public LayerMask enemyLayers;
     public int attackDamage = 20;
+
+    [Header("Combo Attack System")]
+    public int maxComboHits = 3;                     // Maximum combo hits
+    public float comboWindow = 0.2f;                 // Time window to continue combo
+    public float comboResetTime = 0.6f;              // Time before combo resets
+    public bool enableAirCombo = true;               // Can combo in air
+    public bool enableWallCombo = true;              // Can combo while wall sliding
+
+    [Header("Combo Attack Settings")]
+    public float[] comboDamage = new float[] { 20f, 25f, 35f };     // Damage per combo hit
+    public float[] comboKnockback = new float[] { 5f, 7f, 12f };    // Knockback per hit
+    public float[] comboRange = new float[] { 0.2f, 0.2f, 0.2f };   // Range per hit
+    public float[] comboAttackDurations = new float[] { 0.2f, 0.2f, 0.2f };  // Duration per attack
+    public float[] comboCooldowns = new float[] { 0.3f, 0.4f, 0.6f };         // Cooldown per attack
+
+    [Header("Combo Animation Names")]
+    public string[] comboAnimations = new string[] { "Player_attack1", "Player_attack2", "Player_attack3" };
+    public string comboResetAnimation = "Player_attack_reset";
     
     [Header("Environment Detection")]
     public Transform groundCheck;
@@ -141,6 +159,7 @@ public class Player : MonoBehaviour
     private Vector2 moveInput;
     private bool isJumpButtonHeld = false;
     private bool isRunning = false;
+    private bool attackQueued = false; 
     
     // MOVEMENT STATE
     private Vector3 velocity = Vector3.zero;
@@ -156,6 +175,9 @@ public class Player : MonoBehaviour
     private bool isSwimDashing = false;
     private bool isLedgeGrabbing = false;
     private bool isLedgeClimbing = false;
+    private int currentCombo = 0;                   // Current combo count (0 = no combo)
+    private bool comboAvailable = true;            // Can start/combo attacks
+    private bool isComboFinishing = false;         // Final combo attack is active
     
     // WALL INTERACTION STATE
     private bool isWallSliding;
@@ -192,6 +214,8 @@ public class Player : MonoBehaviour
     private float wallClingTimer = 0f;
     private float wallJumpTimer = 0f;
     private float wallStickTimer = 0f;
+    private float comboWindowTimer = 0f;           // Already declared above, just note it's here
+    private float comboResetTimer = 0f;           // Already declared above
     
     // DASH VARIABLES
     private Vector2 dashDirection = Vector2.right;
@@ -220,7 +244,6 @@ public class Player : MonoBehaviour
     private float ledgeClimbTimer = 0f;
     private int ledgeSide = 0;
     private float ledgeGrabTime = 0f;
-    private bool climbInputQueued = false;
     private float currentLedgeHoldTime = 0f;
     private float ledgeReleaseTimer = 0f;
     private bool canGrabLedge = true;
@@ -427,6 +450,8 @@ public class Player : MonoBehaviour
         // Special system timers
         UpdateSwimTimers();
         UpdateLedgeTimers();
+        UpdateComboTimers();
+        
     }
     
     /// <summary>
@@ -536,6 +561,38 @@ public class Player : MonoBehaviour
             {
                 isLedgeClimbing = false;
                 rb.gravityScale = normalGravityScale;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates combo system timers
+    /// </summary>
+    private void UpdateComboTimers()
+    {
+        // Combo window timer (time to continue combo)
+        if (comboWindowTimer > 0)
+        {
+            comboWindowTimer -= Time.deltaTime;
+            if (comboWindowTimer <= 0)
+            {
+                comboWindowTimer = 0;
+                
+                // If we're not attacking and combo window closed, start reset timer
+                if (!isAttacking && currentCombo > 0)
+                {
+                    comboResetTimer = comboResetTime;
+                }
+            }
+        }
+        
+        // Combo reset timer (time before combo resets to 0)
+        if (comboResetTimer > 0)
+        {
+            comboResetTimer -= Time.deltaTime;
+            if (comboResetTimer <= 0)
+            {
+                ResetCombo();
             }
         }
     }
@@ -819,15 +876,46 @@ public class Player : MonoBehaviour
     }
     
     /// <summary>
-    /// Handles attack input with cooldown checks
+    /// Enhanced attack input handler with combo system
     /// </summary>
     private void HandleAttackInput()
     {
-        if (isHardLanding) return;
+        if (isHardLanding || isLedgeGrabbing || isLedgeClimbing || isInWater || isSwimming) return;
         
-        if (attackAction.triggered && !isAttacking && attackCooldownTimer <= 0 && !isDashing)
+        // Check if attack button was pressed this frame
+        bool attackPressed = attackAction.triggered;
+        
+        if (!attackPressed) return; // No attack input this frame
+        
+        // If we're currently attacking, queue the next attack if within combo window
+        if (isAttacking)
         {
-            StartAttack();
+            if (comboWindowTimer > 0 && currentCombo > 0 && currentCombo < maxComboHits)
+            {
+                attackQueued = true;
+                comboWindowTimer = comboWindow; // Extend window for queued attack
+            }
+            return;
+        }
+        
+        // Not currently attacking, check if we can start a new attack
+        bool canAttack = attackCooldownTimer <= 0 && !isDashing && comboAvailable;
+        
+        // Additional checks based on state
+        if (!isGrounded && !enableAirCombo)
+            canAttack = false;
+        if (isWallSliding && !enableWallCombo)
+            canAttack = false;
+        
+        // Check if we need to reset combo first (max combo reached)
+        if (currentCombo >= maxComboHits)
+        {
+            ResetCombo();
+        }
+        
+        if (canAttack)
+        {
+            StartComboAttack();
         }
     }
     
@@ -985,12 +1073,23 @@ public class Player : MonoBehaviour
     }
     
     /// <summary>
-    /// Handles movement during attack state (mostly stops horizontal movement)
+    /// Handles movement during attack state with combo considerations
     /// </summary>
     private void HandleAttackMovement()
     {
-        Vector2 targetVelocity = new Vector2(0, rb.linearVelocity.y);
-        rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing);
+        // Allow slight movement during first two combo hits
+        if (currentCombo < 3 && comboWindowTimer > 0)
+        {
+            float moveSpeedMultiplier = 0.3f; // Reduced movement during attack
+            Vector2 targetVelocity = new Vector2(moveInput.x * moveSpeed * moveSpeedMultiplier, rb.linearVelocity.y);
+            rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing);
+        }
+        else
+        {
+            // Stop movement for final hit or no combo
+            Vector2 targetVelocity = new Vector2(0, rb.linearVelocity.y);
+            rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing);
+        }
     }
     
     /// <summary>
@@ -1220,6 +1319,7 @@ public class Player : MonoBehaviour
         
         airDashCount = 0;
         ResetFallTracking();
+        CancelCombo();
     }
     
     /// <summary>
@@ -1250,6 +1350,8 @@ public class Player : MonoBehaviour
         {
             dashDirection = new Vector2(Mathf.Sign(moveInput.x), 0);
         }
+
+        CancelCombo();
     }
     
     /// <summary>
@@ -1267,29 +1369,154 @@ public class Player : MonoBehaviour
         }
     }
     
+
     /// <summary>
-    /// Starts attack animation and checks for hit enemies
+    /// Starts or continues a combo attack
     /// </summary>
-    private void StartAttack()
+    private void StartComboAttack()
     {
+        // Determine combo index (0-based)
+        int comboIndex = Mathf.Clamp(currentCombo, 0, maxComboHits - 1);
+        
+        // Start attack
         isAttacking = true;
-        attackTimer = attackDuration;
-        attackCooldownTimer = attackCooldown;
+        attackTimer = comboAttackDurations[comboIndex];
+        attackCooldownTimer = comboCooldowns[comboIndex];
+        
+        // Set combo state
+        currentCombo++;
+        comboWindowTimer = comboWindow;  // Open window for next attack
+        comboResetTimer = comboResetTime; // Reset overall combo timer
+        
+        // Check if this is the final hit
+        isComboFinishing = (currentCombo >= maxComboHits);
+        
+        // Play appropriate animation
+        if (animator != null)
+        {
+            string animationName = isComboFinishing ? comboAnimations[maxComboHits - 1] : comboAnimations[comboIndex];
+            animator.Play(animationName);
+        }
+        
+        // Perform attack based on combo hit
+        ExecuteComboAttack(comboIndex);
+    }
+
+    /// <summary>
+    /// Executes attack logic for specific combo hit
+    /// </summary>
+    private void ExecuteComboAttack(int comboIndex)
+    {
+        // Get attack parameters for this combo hit
+        float damage = comboDamage[comboIndex];
+        float knockback = comboKnockback[comboIndex];
+        float range = comboRange[comboIndex];
         
         // Check for enemies in attack range
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, range, enemyLayers);
         
-        // Damage enemies (implementation depends on your enemy system)
-        // foreach (Collider2D enemy in hitEnemies) { ... }
+        // Apply damage and knockback to each enemy
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            // Example damage application - adjust based on your enemy system
+            // enemy.GetComponent<EnemyHealth>().TakeDamage(damage);
+            
+            // Apply knockback
+            Vector2 knockbackDirection = facingRight ? Vector2.right : Vector2.left;
+            // enemy.GetComponent<Rigidbody2D>().AddForce(knockbackDirection * knockback, ForceMode2D.Impulse);
+        }
+        
+        // Apply movement effects based on combo hit
+        ApplyComboMovement(comboIndex);
     }
-    
+
     /// <summary>
-    /// Ends attack state
+    /// Applies movement effects during combo attacks
+    /// </summary>
+    private void ApplyComboMovement(int comboIndex)
+    {
+        // Stop horizontal movement during attack
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        
+        // Add slight forward movement for first two hits
+        if (comboIndex < 2)
+        {
+            float forwardForce = 3f + (comboIndex * 2f);
+            Vector2 forceDirection = facingRight ? Vector2.right : Vector2.left;
+            rb.AddForce(forceDirection * forwardForce, ForceMode2D.Impulse);
+        }
+        // For final hit, add upward lift if grounded
+        else if (comboIndex == 2 && isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce * 0.3f);
+        }
+    }
+
+    /// <summary>
+    /// Ends attack and manages combo continuation
     /// </summary>
     private void EndAttack()
     {
         isAttacking = false;
+        
+        // Check if we have a queued attack
+        if (attackQueued && comboWindowTimer > 0 && currentCombo < maxComboHits)
+        {
+            attackQueued = false; // Clear the queue
+            StartComboAttack();   // Execute the queued attack
+            return;
+        }
+        
+        // No queued attack, check if combo window is closed
+        if (comboWindowTimer <= 0 && currentCombo > 0)
+        {
+            // Start reset timer
+            comboResetTimer = comboResetTime;
+            
+            // Play combo reset animation if available and this was the final hit
+            if (animator != null && !string.IsNullOrEmpty(comboResetAnimation) && currentCombo >= maxComboHits)
+            {
+                animator.Play(comboResetAnimation);
+            }
+        }
+        else if (currentCombo == 0)
+        {
+            // No combo active, reset immediately
+            ResetCombo();
+        }
     }
+
+    /// <summary>
+    /// Resets combo state
+    /// </summary>
+    private void ResetCombo()
+    {
+        currentCombo = 0;
+        comboWindowTimer = 0f;
+        comboResetTimer = 0f;
+        comboAvailable = true;
+        isComboFinishing = false;
+        attackQueued = false; // NEW: Clear any queued attacks
+        
+        // Ensure attack state is cleared
+        if (!isAttacking)
+        {
+            attackCooldownTimer = 0f;
+        }
+    }
+
+    /// <summary>
+    /// Cancels combo (called when taking damage, etc.)
+    /// </summary>
+    public void CancelCombo()
+    {
+        ResetCombo();
+        isAttacking = false;
+        attackCooldownTimer = 0f;
+        attackQueued = false; // NEW: Clear queued attacks
+    }
+
+
     
     /// <summary>
     /// Enhanced hard landing detection with screen-height check
@@ -1471,6 +1698,7 @@ public class Player : MonoBehaviour
         isSwimming = false;
         rb.gravityScale = normalGravityScale;
         coyoteTimeCounter = coyoteTime; // Allow potential double jump
+        CancelCombo();
     }
     
     /// <summary>
@@ -1674,6 +1902,7 @@ public class Player : MonoBehaviour
         isWallSliding = false;
         airDashCount = 0;
         hasDoubleJumped = false;
+        CancelCombo();
     }
     
     /// <summary>
@@ -2049,7 +2278,6 @@ public class Player : MonoBehaviour
         isLedgeClimbing = false;
         ledgeClimbTimer = 0f;
         ledgeGrabTime = 0f;
-        climbInputQueued = false;
         currentLedgeHoldTime = 0f;
         
         // Stop movement and gravity
@@ -2121,7 +2349,6 @@ public class Player : MonoBehaviour
         isLedgeClimbing = true;
         isLedgeGrabbing = false;
         ledgeClimbTimer = ledgeClimbTime;
-        climbInputQueued = false;
         
         // Start climb animation
         if (animator != null)
@@ -2251,11 +2478,13 @@ public class Player : MonoBehaviour
         {
             HandleSwimmingAnimations(horizontalInput);
         }
-        // ACTION STATES
-        else if (isAttacking)
+        // COMBO ATTACK STATE (new priority - above regular attacks)
+        else if (isAttacking && currentCombo > 0)
         {
-            animator.Play("Player_attack");
+            // Animator parameters handle this via HandleComboAnimations()
+            HandleComboAnimations();
         }
+        // ACTION STATES
         else if (isDashing && dashUnlocked)
         {
             animator.Play("Player_dash");
@@ -2345,6 +2574,44 @@ public class Player : MonoBehaviour
             animator.Play("Player_fall");
         }
     }
+
+    /// <summary>
+    /// Handles combo attack animations through Animator parameters
+    /// </summary>
+    private void HandleComboAnimations()
+    {
+        if (animator == null) return;
+        
+        // Set animator parameters
+        animator.SetBool("IsAttacking", isAttacking);
+        animator.SetInteger("CurrentCombo", currentCombo);
+        animator.SetFloat("ComboWindow", comboWindowTimer);
+        
+        // Adjust animation speed based on combo hit duration
+        if (isAttacking && currentCombo > 0)
+        {
+            int comboIndex = Mathf.Clamp(currentCombo - 1, 0, maxComboHits - 1);
+            float attackDuration = comboAttackDurations[comboIndex];
+            
+            // Calculate speed multiplier (normalize to 1.0 for 0.2s duration)
+            float speedMultiplier = 0.2f / attackDuration;
+            animator.SetFloat("AttackSpeed", speedMultiplier);
+            
+            // Ensure the correct animation is playing
+            string animationName = isComboFinishing ? comboAnimations[maxComboHits - 1] : comboAnimations[comboIndex];
+            
+            // Only force play if not already playing this animation
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            if (!stateInfo.IsName(animationName) || stateInfo.normalizedTime > 1.0f)
+            {
+                animator.Play(animationName, -1, 0f);
+            }
+        }
+        else
+        {
+            animator.SetFloat("AttackSpeed", 1.0f);
+        }
+    }
     
     // ====================================================================
     // SECTION 14: PUBLIC API & ABILITY MANAGEMENT
@@ -2402,6 +2669,48 @@ public class Player : MonoBehaviour
         runUnlocked = false;
         wallJumpUnlocked = false;
         doubleJumpUnlocked = false;
+    }
+
+    /// <summary>
+    /// Unlocks longer combo chain
+    /// </summary>
+    public void UpgradeCombo(int newMaxCombo)
+    {
+        maxComboHits = newMaxCombo;
+        // Resize arrays if needed
+        if (comboDamage.Length < newMaxCombo)
+        {
+            System.Array.Resize(ref comboDamage, newMaxCombo);
+            System.Array.Resize(ref comboKnockback, newMaxCombo);
+            System.Array.Resize(ref comboRange, newMaxCombo);
+            System.Array.Resize(ref comboAttackDurations, newMaxCombo);
+            System.Array.Resize(ref comboCooldowns, newMaxCombo);
+            System.Array.Resize(ref comboAnimations, newMaxCombo);
+        }
+    }
+
+    /// <summary>
+    /// Gets current combo count
+    /// </summary>
+    public int GetCurrentCombo()
+    {
+        return currentCombo;
+    }
+
+    /// <summary>
+    /// Gets max combo hits
+    /// </summary>
+    public int GetMaxCombo()
+    {
+        return maxComboHits;
+    }
+
+    /// <summary>
+    /// Checks if player is in combo finisher state
+    /// </summary>
+    public bool IsComboFinishing()
+    {
+        return isComboFinishing;
     }
     
     // ====================================================================
@@ -2553,6 +2862,19 @@ public class Player : MonoBehaviour
                 new Vector3(transform.position.x - 0.25f, originalPosition.y + currentFloatOffset, 0),
                 new Vector3(transform.position.x + 0.25f, originalPosition.y + currentFloatOffset, 0)
             );
+        }
+        // Draw combo attack range if attacking
+        if (isAttacking && currentCombo > 0)
+        {
+            int comboIndex = (currentCombo - 1) % maxComboHits;
+            float range = comboRange[comboIndex];
+            
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(attackPoint.position, range);
+            
+            // Draw combo number
+            UnityEditor.Handles.Label(transform.position + Vector3.up * 2f, 
+                $"Combo: {currentCombo}/{maxComboHits}");
         }
     }
     
