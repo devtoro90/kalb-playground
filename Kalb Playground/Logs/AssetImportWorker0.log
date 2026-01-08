@@ -4917,3 +4917,1423 @@ Memory consumption went from 380.1 MB to 375.7 MB.
 Total: 17.434755 ms (FindLiveObjects: 0.972591 ms CreateObjectMapping: 1.610054 ms MarkObjects: 11.764136 ms  DeleteObjects: 3.086843 ms)
 
 Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 2295.550026 seconds.
+  path: Assets/Scripts/Player.cs
+  artifactKey: Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Scripts/Player.cs using Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '55c1523a1e4cbcaeee4f26c7157a159d') in 0.147133867 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000070 seconds.
+  path: Assets/Animation/Player_attack2.anim
+  artifactKey: Guid(8324246b561644591960d37b059a91c0) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Player_attack2.anim using Guid(8324246b561644591960d37b059a91c0) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '4ade0f1ff5199581d8c971a8e592cb2e') in 0.043636383 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000071 seconds.
+  path: Assets/Scenes/GameScene.unity
+  artifactKey: Guid(8c9cfa26abfee488c85f1582747f6a02) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Scenes/GameScene.unity using Guid(8c9cfa26abfee488c85f1582747f6a02) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '18ea2d469fa94a72ea55630d73ccd8b0') in 0.012112977 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000097 seconds.
+  path: Assets/Animation/Player_ledge_grab.anim
+  artifactKey: Guid(061e6daf5bc15447296145061c266d83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Player_ledge_grab.anim using Guid(061e6daf5bc15447296145061c266d83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '0d24510f6d55cbe5791d6d535b77a10c') in 0.007563883 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000086 seconds.
+  path: Assets/Animation/Player_attack3.anim
+  artifactKey: Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Player_attack3.anim using Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '42a3905cfe0332e17ea81e85540870bd') in 0.00538756 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000083 seconds.
+  path: Assets/Animation/Player.controller
+  artifactKey: Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Player.controller using Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'beff296e3629398efbc683bcecca47c0') in 0.025837526 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 38
+
+========================================================================
+Received Import Request.
+  Time since last request: 17.651819 seconds.
+  path: Assets/Scripts/Characters
+  artifactKey: Guid(29af3c04792374d59862d186290f93fd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Characters using Guid(29af3c04792374d59862d186290f93fd) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '06b54c4eedbfd11840b9d99d4ceb3eac') in 0.001132506 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.897992 seconds.
+  path: Assets/Scripts/Characters
+  artifactKey: Guid(29af3c04792374d59862d186290f93fd) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Scripts/Characters using Guid(29af3c04792374d59862d186290f93fd) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'a4b6f5b59a80299cde069c735d00f8aa') in 0.009361911 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Prepare
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.91 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6869 unused Assets / (4.2 MB). Loaded Objects now: 7997.
+Memory consumption went from 381.6 MB to 377.4 MB.
+Total: 21.490807 ms (FindLiveObjects: 1.193154 ms CreateObjectMapping: 2.117850 ms MarkObjects: 14.066286 ms  DeleteObjects: 4.111863 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 3.436072 seconds.
+  path: Assets/Scripts/Characters/Player.cs
+  artifactKey: Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Scripts/Characters/Player.cs using Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '12a7f1569f9f9f1bb36aa3497d295f42') in 0.006388381 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+- Loaded All Assemblies, in  1.613 seconds
+Refreshing native plugins compatible for Editor in 1.62 ms, found 2 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  1.819 seconds
+Domain Reload Profiling: 3437ms
+	BeginReloadAssembly (494ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (33ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (1ms)
+		CreateAndSetChildDomain (220ms)
+	RebuildCommonClasses (85ms)
+	RebuildNativeTypeToScriptingClass (29ms)
+	initialDomainReloadingComplete (41ms)
+	LoadAllAssembliesAndSetupDomain (968ms)
+		LoadAssemblies (604ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (479ms)
+			TypeCache.Refresh (16ms)
+				TypeCache.ScanAssembly (1ms)
+			BuildScriptInfoCaches (434ms)
+			ResolveRequiredComponents (21ms)
+	FinalizeReload (1820ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1497ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (4ms)
+			SetLoadedEditorAssemblies (7ms)
+			BeforeProcessingInitializeOnLoad (384ms)
+			ProcessInitializeOnLoadAttributes (925ms)
+			ProcessInitializeOnLoadMethodAttributes (175ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (24ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.86 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6879 unused Assets / (4.3 MB). Loaded Objects now: 8000.
+Memory consumption went from 380.6 MB to 376.3 MB.
+Total: 16.221013 ms (FindLiveObjects: 0.930319 ms CreateObjectMapping: 1.742633 ms MarkObjects: 10.414183 ms  DeleteObjects: 3.132007 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 26.266429 seconds.
+  path: Assets/Scripts/Utilities
+  artifactKey: Guid(92f07b0b089b746f9a010ca059ded2eb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Utilities using Guid(92f07b0b089b746f9a010ca059ded2eb) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'f461e4caaf0920b081d6a2864178834c') in 0.002809389 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Prepare
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.91 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6869 unused Assets / (4.2 MB). Loaded Objects now: 8000.
+Memory consumption went from 380.7 MB to 376.4 MB.
+Total: 19.145798 ms (FindLiveObjects: 1.244621 ms CreateObjectMapping: 1.932760 ms MarkObjects: 12.506749 ms  DeleteObjects: 3.460031 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  1.605 seconds
+Refreshing native plugins compatible for Editor in 0.88 ms, found 2 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  2.284 seconds
+Domain Reload Profiling: 3897ms
+	BeginReloadAssembly (460ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (29ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (1ms)
+		CreateAndSetChildDomain (193ms)
+	RebuildCommonClasses (97ms)
+	RebuildNativeTypeToScriptingClass (37ms)
+	initialDomainReloadingComplete (47ms)
+	LoadAllAssembliesAndSetupDomain (971ms)
+		LoadAssemblies (645ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (462ms)
+			TypeCache.Refresh (18ms)
+				TypeCache.ScanAssembly (1ms)
+			BuildScriptInfoCaches (407ms)
+			ResolveRequiredComponents (26ms)
+	FinalizeReload (2285ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1921ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (7ms)
+			SetLoadedEditorAssemblies (10ms)
+			BeforeProcessingInitializeOnLoad (458ms)
+			ProcessInitializeOnLoadAttributes (1229ms)
+			ProcessInitializeOnLoadMethodAttributes (215ms)
+			AfterProcessingInitializeOnLoad (2ms)
+			EditorAssembliesLoaded (1ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (31ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 1.00 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6879 unused Assets / (4.5 MB). Loaded Objects now: 8003.
+Memory consumption went from 381.1 MB to 376.6 MB.
+Total: 19.372683 ms (FindLiveObjects: 1.348904 ms CreateObjectMapping: 2.064749 ms MarkObjects: 12.019063 ms  DeleteObjects: 3.938311 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 36.467006 seconds.
+  path: Assets/Scripts/Utilities
+  artifactKey: Guid(92f07b0b089b746f9a010ca059ded2eb) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Scripts/Utilities using Guid(92f07b0b089b746f9a010ca059ded2eb) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'fae80599be7b2a774d0b1c9c86ce1ba3') in 0.06324881 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.476876 seconds.
+  path: Assets/Sprites/Characters
+  artifactKey: Guid(24cffb038907e451690151e22ef41842) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprites/Characters using Guid(24cffb038907e451690151e22ef41842) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'e12085799ca1f7e0177a7035a84e26bc') in 0.000867479 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.901572 seconds.
+  path: Assets/Sprites/Characters
+  artifactKey: Guid(24cffb038907e451690151e22ef41842) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Characters using Guid(24cffb038907e451690151e22ef41842) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '48ea5f9131e89a10f6d46aaee2276fa2') in 0.008636963 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 10.509804 seconds.
+  path: Assets/Sprites/Environment
+  artifactKey: Guid(a9c6a2a76f2924a4fb2532a15595c312) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Sprites/Environment using Guid(a9c6a2a76f2924a4fb2532a15595c312) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '53b53495fe953000fc0cba9fc272b42a') in 0.000925574 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.925750 seconds.
+  path: Assets/Sprites/Environment
+  artifactKey: Guid(a9c6a2a76f2924a4fb2532a15595c312) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment using Guid(a9c6a2a76f2924a4fb2532a15595c312) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'a07779769a9a1af0251933d985851031') in 0.008240775 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 11.224012 seconds.
+  path: Assets/Sprites/Characters/Player3.png
+  artifactKey: Guid(58561d92be9874d1d82dd3c6708a83b7) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Characters/Player3.png using Guid(58561d92be9874d1d82dd3c6708a83b7) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '755c46b26b89958dafbd2f3e191003d7') in 0.169957894 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 12
+
+========================================================================
+Received Import Request.
+  Time since last request: 8.569168 seconds.
+  path: Assets/Sprites/Environment/Tiles
+  artifactKey: Guid(6a9ab0b6c553d441688f88ce2a18fd31) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles using Guid(6a9ab0b6c553d441688f88ce2a18fd31) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '58d82c19ee742e8a89ba9db9881d09fd') in 0.003027163 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000066 seconds.
+  path: Assets/Sprites/Environment/Tiles/Platforms_0.asset
+  artifactKey: Guid(569b6f72274314009ad00aa14431966c) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Platforms_0.asset using Guid(569b6f72274314009ad00aa14431966c) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '74c31c377b513e3d277306d64509adce') in 0.052772783 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000083 seconds.
+  path: Assets/Sprites/Environment/Tiles/Platforms_5.asset
+  artifactKey: Guid(5cf8dd2dabe5b41f5a387eebb3ba70f2) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Platforms_5.asset using Guid(5cf8dd2dabe5b41f5a387eebb3ba70f2) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '2b0ac4a5f314c3229559bb0fbc1f4820') in 0.007694198 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000093 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_11.asset
+  artifactKey: Guid(1466e184cce5348d3a341b700b43ae01) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_11.asset using Guid(1466e184cce5348d3a341b700b43ae01) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '81087200357d93a8f8bc100e5e0c1ca2') in 0.007989887 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000074 seconds.
+  path: Assets/Sprites/Environment/Tiles/Platforms_11.asset
+  artifactKey: Guid(b7a74d837651c4cbc8e05f6d9652b449) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Platforms_11.asset using Guid(b7a74d837651c4cbc8e05f6d9652b449) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '767e69c30a7c4115d6e0dbb896f1d677') in 0.006236791 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000138 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_8.asset
+  artifactKey: Guid(db0029dab6f7a4d22a7770e6abcceb3d) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_8.asset using Guid(db0029dab6f7a4d22a7770e6abcceb3d) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '8e3a17266a0d90ead7e57abf56a35cd6') in 0.007846257 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000078 seconds.
+  path: Assets/Sprites/Environment/Tiles/Platforms_3.asset
+  artifactKey: Guid(46ed08cd0df744371b2a039ceb778a80) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Platforms_3.asset using Guid(46ed08cd0df744371b2a039ceb778a80) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'c81e2a2a2382a11e4700fe9c033e66ff') in 0.006802342 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000095 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_7.asset
+  artifactKey: Guid(f8b56a62875a4466d80d7aa80dc316ec) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_7.asset using Guid(f8b56a62875a4466d80d7aa80dc316ec) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '5587d2891c23a1b3f4c3a85f1cf4d45b') in 0.005348396 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000077 seconds.
+  path: Assets/Sprites/Environment/Tiles/Platforms_6.asset
+  artifactKey: Guid(15d57ca51a76245c1970acdcdc75b919) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Platforms_6.asset using Guid(15d57ca51a76245c1970acdcdc75b919) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '0582b6408ed36794936970bb0535e06b') in 0.006166083 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000139 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_6.asset
+  artifactKey: Guid(3e191fd592d13419fb37b12eb10aaa06) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_6.asset using Guid(3e191fd592d13419fb37b12eb10aaa06) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '57420233c7a46d3f324e9cd03e56e04c') in 0.006150215 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000078 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_19.asset
+  artifactKey: Guid(88e29490daede40e88c96631dedeb8c7) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_19.asset using Guid(88e29490daede40e88c96631dedeb8c7) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'afb0e29e71fd0280625093d88a2ffa25') in 0.007659103 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000081 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_17.asset
+  artifactKey: Guid(0115534a11a884a0c961c630121094c2) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_17.asset using Guid(0115534a11a884a0c961c630121094c2) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'bef2f27d84dc51bc9cdda7057c28af6b') in 0.005450071 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000097 seconds.
+  path: Assets/Sprites/Environment/Water.png
+  artifactKey: Guid(005616a8f469543ebb5d91157a3b5709) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Water.png using Guid(005616a8f469543ebb5d91157a3b5709) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '8ad9d3d9815411b6fb20b77686f42beb') in 0.057400147 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 29
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000098 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_4.asset
+  artifactKey: Guid(e17c2bb0cf90244e79ddb908a9d697c4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_4.asset using Guid(e17c2bb0cf90244e79ddb908a9d697c4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '46d2ec62759eb6268ccee7a7f5342118') in 0.008469581 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000081 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_23.asset
+  artifactKey: Guid(bd635c8e77bc0423dba404b0e4632d01) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_23.asset using Guid(bd635c8e77bc0423dba404b0e4632d01) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '5b8b169e33eb8a2f5b78caf27dd89944') in 0.009562244 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000150 seconds.
+  path: Assets/Sprites/Environment/Tiles/Platforms_2.asset
+  artifactKey: Guid(8be1a34051a74463ba5db2918d0559e4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Platforms_2.asset using Guid(8be1a34051a74463ba5db2918d0559e4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '3cbec36908ab7113c3dd5fc3d2cec4ff') in 0.020707949 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000078 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_0.asset
+  artifactKey: Guid(9092add77ddda42b4bf3fc8149a75958) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_0.asset using Guid(9092add77ddda42b4bf3fc8149a75958) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '6c7363fccd133dd034612d1d4f6efd22') in 0.007138528 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000063 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_5.asset
+  artifactKey: Guid(91a88203dab5f46648d573f0180355a5) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_5.asset using Guid(91a88203dab5f46648d573f0180355a5) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'eb4523607ed50ab85ba140bb402f32fd') in 0.006647342 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000084 seconds.
+  path: Assets/Sprites/Environment/Tiles/Platforms_4.asset
+  artifactKey: Guid(89700f5bd86de42d1917dd693b3aaaf3) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Platforms_4.asset using Guid(89700f5bd86de42d1917dd693b3aaaf3) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '77ef0f83581b1260de47c8acbdb87d07') in 0.007697995 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000074 seconds.
+  path: Assets/Sprites/Environment/Tiles/Platforms_1.asset
+  artifactKey: Guid(23e477841021740e186ea892986a7602) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Platforms_1.asset using Guid(23e477841021740e186ea892986a7602) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '6e044b8cbe86749f0b09e8bb17112d00') in 0.006712258 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000121 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_10.asset
+  artifactKey: Guid(dc034e85da40248ec998b8eadd1a9063) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_10.asset using Guid(dc034e85da40248ec998b8eadd1a9063) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'a473fa25e8e32afc3892babe037a172c') in 0.006692901 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000085 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_12.asset
+  artifactKey: Guid(8409d4ccce8c2447fafe7b831a2e23ec) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_12.asset using Guid(8409d4ccce8c2447fafe7b831a2e23ec) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '448d78f329825e7b28579a0bff40008e') in 0.005372925 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000062 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_25.asset
+  artifactKey: Guid(004c9f6e080054db0ba7a337d185654c) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_25.asset using Guid(004c9f6e080054db0ba7a337d185654c) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '59943264374b8d78f5acca142ca556fd') in 0.007894114 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000085 seconds.
+  path: Assets/Sprites/Environment/Tiles/Water_13.asset
+  artifactKey: Guid(a0fab66efd22d46a1a2f01191243e8bb) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Sprites/Environment/Tiles/Water_13.asset using Guid(a0fab66efd22d46a1a2f01191243e8bb) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'a8da38ce42d336b0359bd772b2f96ae9') in 0.007222183 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 2
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.440277 seconds.
+  path: Assets/Settings/Lit2DSceneTemplate.scenetemplate
+  artifactKey: Guid(d03ed43fc9d8a4f2e9fa70c1c7916eb9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Settings/Lit2DSceneTemplate.scenetemplate using Guid(d03ed43fc9d8a4f2e9fa70c1c7916eb9) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'd9c9054c2dfd1c170d820c541f8a40b4') in 0.136682993 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 4
+
+========================================================================
+Received Import Request.
+  Time since last request: 17.449812 seconds.
+  path: Assets/Animation/Characters
+  artifactKey: Guid(51fc8f4794f1548ba89dbe990d841568) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters using Guid(51fc8f4794f1548ba89dbe990d841568) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '81ba78af80aae80752931b068cdfaa6d') in 0.000913582 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.905322 seconds.
+  path: Assets/Animation/Characters
+  artifactKey: Guid(51fc8f4794f1548ba89dbe990d841568) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters using Guid(51fc8f4794f1548ba89dbe990d841568) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '58ecfd78068058e80573971e6689cf7b') in 0.008484658 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 10.103908 seconds.
+  path: Assets/Animation/Characters/Kalb
+  artifactKey: Guid(fccd6ddac8af84bda842dad4df91e4d7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb using Guid(fccd6ddac8af84bda842dad4df91e4d7) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'b88a1a59ee624fe0953289a59e2ae8fb') in 0.0008877 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.928998 seconds.
+  path: Assets/Animation/Characters/Kalb
+  artifactKey: Guid(fccd6ddac8af84bda842dad4df91e4d7) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb using Guid(fccd6ddac8af84bda842dad4df91e4d7) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '1a93d094376ff0931c503896dab21873') in 0.007967099 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 3.429411 seconds.
+  path: Assets/Animation/Player.controller
+  artifactKey: Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Player.controller using Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '3605d885bf04602cb40871f297c5ff8c') in 0.014232157 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 38
+
+========================================================================
+Received Import Request.
+  Time since last request: 3.760450 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_idle.anim
+  artifactKey: Guid(14c3c7203c2344b60973ccfe34d564b4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Player_idle.anim using Guid(14c3c7203c2344b60973ccfe34d564b4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '2b191fca89a9dc752ed158736ccfb197') in 0.01830105 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000121 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_swim_fast.anim
+  artifactKey: Guid(d1bf1e89dd5cb43a1841cf095ed6b5f4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Player_swim_fast.anim using Guid(d1bf1e89dd5cb43a1841cf095ed6b5f4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '7337c6ecc3e6e28c31927b1bf8aad39b') in 0.006598998 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000082 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_walk.anim
+  artifactKey: Guid(22aeb1532add54a7fb08e831d248a35e) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Player_walk.anim using Guid(22aeb1532add54a7fb08e831d248a35e) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'beacc6543731047c7195f8374e1fbae7') in 0.00762709 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000074 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_attack3.anim
+  artifactKey: Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Player_attack3.anim using Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '74f40521d99cc69f56bad073dff25bfe') in 0.006464316 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000102 seconds.
+  path: Assets/Animation/Characters/Kalb/Player.controller
+  artifactKey: Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Player.controller using Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'f0e4e4e47ff4585fc5ec567f658e6dc1') in 0.008576113 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 38
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000074 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_dash.anim
+  artifactKey: Guid(b258a1ae5d12447e8b8af55cd208082e) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Player_dash.anim using Guid(b258a1ae5d12447e8b8af55cd208082e) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '9bf9a9d90a86cd24566c9857edba0eb1') in 0.008037709 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000091 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_ledge_climb.anim
+  artifactKey: Guid(1e92ce8849ca74ffea93610de92231af) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Player_ledge_climb.anim using Guid(1e92ce8849ca74ffea93610de92231af) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'a9f0f26083571d079e19c4e474cf83f0') in 0.005277481 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000072 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_run.anim
+  artifactKey: Guid(8048b239fde9c4bfb99243ccb6f41c54) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Player_run.anim using Guid(8048b239fde9c4bfb99243ccb6f41c54) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'f8dc162441a78f7e3db8ff6eae9746cc') in 0.006889638 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000065 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_attack_reset.anim
+  artifactKey: Guid(e174d9dd01bb14499917938c74edb330) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Player_attack_reset.anim using Guid(e174d9dd01bb14499917938c74edb330) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '3e7af6c0d69ea2f11b9da5299e7b8859') in 0.006838845 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 10.358810 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb.controller
+  artifactKey: Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb.controller using Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'e452a61c7251564adbe338573d26e761') in 0.004794332 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 38
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.930476 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb.controller
+  artifactKey: Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb.controller using Guid(c54ba00f90d0a4889a79aaf5fa958fa1) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'c06e66c3dd1103b9254c6abbbbc47876') in 0.013206709 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 38
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.323629 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_attack1.anim
+  artifactKey: Guid(9600538f72ecd438da9108a3ebee72a1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_attack1.anim using Guid(9600538f72ecd438da9108a3ebee72a1) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '74bedca9c57818c47504e0f26c147a75') in 0.001576652 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 21.019549 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_attack1.anim
+  artifactKey: Guid(9600538f72ecd438da9108a3ebee72a1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_attack1.anim using Guid(9600538f72ecd438da9108a3ebee72a1) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'c0176ce8b6512c5ab018bea49499c37f') in 0.001668672 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.929631 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_attack1.anim
+  artifactKey: Guid(9600538f72ecd438da9108a3ebee72a1) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_attack1.anim using Guid(9600538f72ecd438da9108a3ebee72a1) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'cc4e751178fd072be426413be1d7a7cf') in 0.006346081 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.399452 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_attack2.anim
+  artifactKey: Guid(8324246b561644591960d37b059a91c0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_attack2.anim using Guid(8324246b561644591960d37b059a91c0) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '12ce494f32ddd1e648ef6c50c7a51058') in 0.001759695 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 8.940230 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_attack2.anim
+  artifactKey: Guid(8324246b561644591960d37b059a91c0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_attack2.anim using Guid(8324246b561644591960d37b059a91c0) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '056bca17d90affe00806130cece33bdf') in 0.001922424 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.724356 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_attack3.anim
+  artifactKey: Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_attack3.anim using Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '3d60bc2f5edb7480f8c1958e1bbcc27d') in 0.001675493 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.168105 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_attack2.anim
+  artifactKey: Guid(8324246b561644591960d37b059a91c0) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_attack2.anim using Guid(8324246b561644591960d37b059a91c0) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'b866bd500ca3d38b7ed0109b8020479b') in 0.010147084 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 6.838175 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_attack3.anim
+  artifactKey: Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_attack3.anim using Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'db34c6223262ed493a6c8d9da1186654') in 0.001706176 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.930567 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_attack3.anim
+  artifactKey: Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_attack3.anim using Guid(ab57edcd27013405f9cc3d0e07f2db83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '84a88830af7e005483ca7502266ab017') in 0.009437199 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.355605 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_attack_reset.anim
+  artifactKey: Guid(e174d9dd01bb14499917938c74edb330) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_attack_reset.anim using Guid(e174d9dd01bb14499917938c74edb330) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'd2f852cd02bc539adbf1022b93472ecb') in 0.001893847 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 9.342071 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_attack_reset.anim
+  artifactKey: Guid(e174d9dd01bb14499917938c74edb330) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_attack_reset.anim using Guid(e174d9dd01bb14499917938c74edb330) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '6498ebaef79923d7da15cc4fbb56e5b3') in 0.001899245 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.933530 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_attack_reset.anim
+  artifactKey: Guid(e174d9dd01bb14499917938c74edb330) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_attack_reset.anim using Guid(e174d9dd01bb14499917938c74edb330) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '38681ce61ab56409064336c31fd926ec') in 0.004951743 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.038266 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_dash.anim
+  artifactKey: Guid(b258a1ae5d12447e8b8af55cd208082e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_dash.anim using Guid(b258a1ae5d12447e8b8af55cd208082e) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '1c6ce96043d6ffb1e49f99a08642bd9a') in 0.001559624 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 9.778386 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_dash.anim
+  artifactKey: Guid(b258a1ae5d12447e8b8af55cd208082e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_dash.anim using Guid(b258a1ae5d12447e8b8af55cd208082e) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'f395604e41df3da3fc5b786cf71fc53d') in 0.001732057 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.871711 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_fall.anim
+  artifactKey: Guid(829099280bfb64e46bdb2baa5ecad1b3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_fall.anim using Guid(829099280bfb64e46bdb2baa5ecad1b3) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '3dfd8327af414b7d77d43a4470c6ab5b') in 0.001683142 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.022076 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_dash.anim
+  artifactKey: Guid(b258a1ae5d12447e8b8af55cd208082e) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_dash.anim using Guid(b258a1ae5d12447e8b8af55cd208082e) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'd2222104a2ae8635fd5977dacc76b99f') in 0.0058107 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 6.696694 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_fall.anim
+  artifactKey: Guid(829099280bfb64e46bdb2baa5ecad1b3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_fall.anim using Guid(829099280bfb64e46bdb2baa5ecad1b3) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'e86b855539a3b1ee71d0b1a480796d91') in 0.001628647 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.932064 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_fall.anim
+  artifactKey: Guid(829099280bfb64e46bdb2baa5ecad1b3) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_fall.anim using Guid(829099280bfb64e46bdb2baa5ecad1b3) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'bd0682d318669546cc5c979309f3db8a') in 0.010193312 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.095663 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_hard_land.anim
+  artifactKey: Guid(cc9e6239713ea4922a05fdfa58c04a4f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_hard_land.anim using Guid(cc9e6239713ea4922a05fdfa58c04a4f) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'a9a7b965a5e92706a7f395dcc0963090') in 0.001724159 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.897817 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_hard_land.anim
+  artifactKey: Guid(cc9e6239713ea4922a05fdfa58c04a4f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_hard_land.anim using Guid(cc9e6239713ea4922a05fdfa58c04a4f) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'cc624fc36bbee82c6819d5c090a707af') in 0.001674813 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.929567 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_hard_land.anim
+  artifactKey: Guid(cc9e6239713ea4922a05fdfa58c04a4f) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_hard_land.anim using Guid(cc9e6239713ea4922a05fdfa58c04a4f) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '096445d67c9bcb7e59222bc8ac196e8a') in 0.008811288 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 6.047124 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_idle.anim
+  artifactKey: Guid(14c3c7203c2344b60973ccfe34d564b4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_idle.anim using Guid(14c3c7203c2344b60973ccfe34d564b4) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '4fd8e315ac25ace0b7be0613079a8bbf') in 0.00177951 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.927937 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_idle.anim
+  artifactKey: Guid(14c3c7203c2344b60973ccfe34d564b4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_idle.anim using Guid(14c3c7203c2344b60973ccfe34d564b4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '5ddc5f7c8c98e5dd70dfeaab975e988a') in 0.005741449 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.509966 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_jump.anim
+  artifactKey: Guid(c3c969b4d846b4d9f9b593495317f392) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_jump.anim using Guid(c3c969b4d846b4d9f9b593495317f392) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '3de64351e8a7de6c721ee9e57666d615') in 0.001805778 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.193250 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_jump.anim
+  artifactKey: Guid(c3c969b4d846b4d9f9b593495317f392) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_jump.anim using Guid(c3c969b4d846b4d9f9b593495317f392) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '4d0d4afbccbb74675ad5d5a60a7e0af9') in 0.00170737 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.931792 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_jump.anim
+  artifactKey: Guid(c3c969b4d846b4d9f9b593495317f392) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_jump.anim using Guid(c3c969b4d846b4d9f9b593495317f392) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'a4ae038000be80028577b315b28ee51b') in 0.009600324 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 7.086686 seconds.
+  path: Assets/Animation/Characters/Kalb/PlayerKalb.anim
+  artifactKey: Guid(60c8d1e601de94bb38fa1ab06b774b4d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/PlayerKalb.anim using Guid(60c8d1e601de94bb38fa1ab06b774b4d) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'c6d61f257112f106c17be620dce5cb74') in 0.00158983 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.930587 seconds.
+  path: Assets/Animation/Characters/Kalb/PlayerKalb.anim
+  artifactKey: Guid(60c8d1e601de94bb38fa1ab06b774b4d) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/PlayerKalb.anim using Guid(60c8d1e601de94bb38fa1ab06b774b4d) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'acfc0b36b9962d1b02742fb7319695eb') in 0.009830943 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.645383 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_ledge_climb.anim
+  artifactKey: Guid(1e92ce8849ca74ffea93610de92231af) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_ledge_climb.anim using Guid(1e92ce8849ca74ffea93610de92231af) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '65d07988a24465dd80c4c9f6329e1c36') in 0.001578061 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.733904 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_ledge_grab.anim
+  artifactKey: Guid(061e6daf5bc15447296145061c266d83) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_ledge_grab.anim using Guid(061e6daf5bc15447296145061c266d83) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'dff2ab120facab385d8b243ef5804921') in 0.001460042 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 11.227180 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_ledge_climb.anim
+  artifactKey: Guid(1e92ce8849ca74ffea93610de92231af) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_ledge_climb.anim using Guid(1e92ce8849ca74ffea93610de92231af) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '46295a48ded91ede8d369b9309293dc9') in 0.002293383 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.928400 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_ledge_climb.anim
+  artifactKey: Guid(1e92ce8849ca74ffea93610de92231af) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_ledge_climb.anim using Guid(1e92ce8849ca74ffea93610de92231af) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'abab77539b992c04ef2ce4e5002b3e48') in 0.009165457 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 9.743177 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_ledge_grab.anim
+  artifactKey: Guid(061e6daf5bc15447296145061c266d83) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_ledge_grab.anim using Guid(061e6daf5bc15447296145061c266d83) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '71c088c7401cd3c504dcb2c816aa7851') in 0.001646745 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.931993 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_ledge_grab.anim
+  artifactKey: Guid(061e6daf5bc15447296145061c266d83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_ledge_grab.anim using Guid(061e6daf5bc15447296145061c266d83) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '7ef6f4613b795a7d0019e30601a51ab4') in 0.009873075 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.070011 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_run.anim
+  artifactKey: Guid(8048b239fde9c4bfb99243ccb6f41c54) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_run.anim using Guid(8048b239fde9c4bfb99243ccb6f41c54) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '3e69b5679e091dc98043b46c0e788249') in 0.001860431 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 9.285141 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_run.anim
+  artifactKey: Guid(8048b239fde9c4bfb99243ccb6f41c54) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_run.anim using Guid(8048b239fde9c4bfb99243ccb6f41c54) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'b70bfbdc48dd17eb11630b2b80ecbcb0') in 0.004555765 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.991683 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_swim.anim
+  artifactKey: Guid(bf4f5e7208110404c8836a94b3218bbb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_swim.anim using Guid(bf4f5e7208110404c8836a94b3218bbb) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '7425d0a374347b354d9a11ab9a1de060') in 0.001585333 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.267354 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_swim.anim
+  artifactKey: Guid(bf4f5e7208110404c8836a94b3218bbb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_swim.anim using Guid(bf4f5e7208110404c8836a94b3218bbb) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '38ef11eb1a79e92aa22498236ace367d') in 0.001733449 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.553311 seconds.
+  path: Assets/Animation/Characters/Kalb/Player_swim_fast.anim
+  artifactKey: Guid(d1bf1e89dd5cb43a1841cf095ed6b5f4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Player_swim_fast.anim using Guid(d1bf1e89dd5cb43a1841cf095ed6b5f4) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '42c86be3f4253c1c7f67881a8c0d8c9d') in 0.002088297 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.644100 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_swim.anim
+  artifactKey: Guid(bf4f5e7208110404c8836a94b3218bbb) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_swim.anim using Guid(bf4f5e7208110404c8836a94b3218bbb) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '4f69cddb049a360f548483cf1c77845e') in 0.007165931 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 6.933550 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_swim_fast.anim
+  artifactKey: Guid(d1bf1e89dd5cb43a1841cf095ed6b5f4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_swim_fast.anim using Guid(d1bf1e89dd5cb43a1841cf095ed6b5f4) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'cc4c27f1ab434810cb9d964b3a570b09') in 0.001602969 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.098112 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_swim_fast.anim
+  artifactKey: Guid(d1bf1e89dd5cb43a1841cf095ed6b5f4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_swim_fast.anim using Guid(d1bf1e89dd5cb43a1841cf095ed6b5f4) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '1dc8d3903d29223bfa9b681895cc3abf') in 0.006803609 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.513922 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_swim_idle.anim
+  artifactKey: Guid(89aea0a18a10249298ce97eee73c92a7) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_swim_idle.anim using Guid(89aea0a18a10249298ce97eee73c92a7) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '0abdb998e9643a92f4e107929f6e6ff6') in 0.001650814 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.085040 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_swim_idle.anim
+  artifactKey: Guid(89aea0a18a10249298ce97eee73c92a7) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_swim_idle.anim using Guid(89aea0a18a10249298ce97eee73c92a7) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '1e9c50a8dc900fbb0763b99764273f0c') in 0.005407584 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 3.020762 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_walk.anim
+  artifactKey: Guid(22aeb1532add54a7fb08e831d248a35e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_walk.anim using Guid(22aeb1532add54a7fb08e831d248a35e) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '3329f624fac7da70f4fb1f3d56c99117') in 0.002009433 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.919989 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_walk.anim
+  artifactKey: Guid(22aeb1532add54a7fb08e831d248a35e) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_walk.anim using Guid(22aeb1532add54a7fb08e831d248a35e) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '0c290e459dbba3658675d81eff38fce0') in 0.00470619 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 8.097809 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_wallslide.anim
+  artifactKey: Guid(473286cfa7e79489b91865b9aa41b7ff) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_wallslide.anim using Guid(473286cfa7e79489b91865b9aa41b7ff) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '8a84abdfdb1a6c6863267339c6439eb1') in 0.001860711 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.925461 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_wallslide.anim
+  artifactKey: Guid(473286cfa7e79489b91865b9aa41b7ff) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_wallslide.anim using Guid(473286cfa7e79489b91865b9aa41b7ff) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '0d337ec2a80b18c7f7575642a8a3c9f0') in 0.009765708 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 145.081926 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_land.anim
+  artifactKey: Guid(60c8d1e601de94bb38fa1ab06b774b4d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Animation/Characters/Kalb/Kalb_land.anim using Guid(60c8d1e601de94bb38fa1ab06b774b4d) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '5f1106e49445d06122035321265d89f7') in 0.001639561 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.914368 seconds.
+  path: Assets/Animation/Characters/Kalb/Kalb_land.anim
+  artifactKey: Guid(60c8d1e601de94bb38fa1ab06b774b4d) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Animation/Characters/Kalb/Kalb_land.anim using Guid(60c8d1e601de94bb38fa1ab06b774b4d) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'fd4466de54d0bc5ea9418508470ffcf3') in 0.008898579 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+- Loaded All Assemblies, in  1.354 seconds
+Refreshing native plugins compatible for Editor in 0.74 ms, found 2 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  1.726 seconds
+Domain Reload Profiling: 3085ms
+	BeginReloadAssembly (389ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (24ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (173ms)
+	RebuildCommonClasses (78ms)
+	RebuildNativeTypeToScriptingClass (27ms)
+	initialDomainReloadingComplete (41ms)
+	LoadAllAssembliesAndSetupDomain (824ms)
+		LoadAssemblies (554ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (368ms)
+			TypeCache.Refresh (16ms)
+				TypeCache.ScanAssembly (1ms)
+			BuildScriptInfoCaches (324ms)
+			ResolveRequiredComponents (20ms)
+	FinalizeReload (1727ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1436ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (4ms)
+			SetLoadedEditorAssemblies (7ms)
+			BeforeProcessingInitializeOnLoad (374ms)
+			ProcessInitializeOnLoadAttributes (893ms)
+			ProcessInitializeOnLoadMethodAttributes (153ms)
+			AfterProcessingInitializeOnLoad (4ms)
+			EditorAssembliesLoaded (1ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (25ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.85 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6879 unused Assets / (4.3 MB). Loaded Objects now: 8007.
+Memory consumption went from 381.8 MB to 377.5 MB.
+Total: 15.771112 ms (FindLiveObjects: 0.944845 ms CreateObjectMapping: 1.647225 ms MarkObjects: 9.962590 ms  DeleteObjects: 3.215126 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  1.360 seconds
+Refreshing native plugins compatible for Editor in 0.95 ms, found 2 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  1.725 seconds
+Domain Reload Profiling: 3091ms
+	BeginReloadAssembly (413ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (25ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (192ms)
+	RebuildCommonClasses (83ms)
+	RebuildNativeTypeToScriptingClass (27ms)
+	initialDomainReloadingComplete (40ms)
+	LoadAllAssembliesAndSetupDomain (804ms)
+		LoadAssemblies (521ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (385ms)
+			TypeCache.Refresh (13ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (342ms)
+			ResolveRequiredComponents (21ms)
+	FinalizeReload (1726ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1407ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (4ms)
+			SetLoadedEditorAssemblies (7ms)
+			BeforeProcessingInitializeOnLoad (344ms)
+			ProcessInitializeOnLoadAttributes (901ms)
+			ProcessInitializeOnLoadMethodAttributes (148ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (25ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.86 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6879 unused Assets / (4.0 MB). Loaded Objects now: 8010.
+Memory consumption went from 382.4 MB to 378.3 MB.
+Total: 16.208560 ms (FindLiveObjects: 1.003629 ms CreateObjectMapping: 1.658526 ms MarkObjects: 10.491524 ms  DeleteObjects: 3.053542 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+- Loaded All Assemblies, in  1.421 seconds
+Refreshing native plugins compatible for Editor in 0.98 ms, found 2 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  2.251 seconds
+Domain Reload Profiling: 3680ms
+	BeginReloadAssembly (435ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (34ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (185ms)
+	RebuildCommonClasses (78ms)
+	RebuildNativeTypeToScriptingClass (27ms)
+	initialDomainReloadingComplete (41ms)
+	LoadAllAssembliesAndSetupDomain (847ms)
+		LoadAssemblies (526ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (427ms)
+			TypeCache.Refresh (14ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (381ms)
+			ResolveRequiredComponents (22ms)
+	FinalizeReload (2253ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1879ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (9ms)
+			SetLoadedEditorAssemblies (8ms)
+			BeforeProcessingInitializeOnLoad (488ms)
+			ProcessInitializeOnLoadAttributes (1184ms)
+			ProcessInitializeOnLoadMethodAttributes (187ms)
+			AfterProcessingInitializeOnLoad (2ms)
+			EditorAssembliesLoaded (1ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (30ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 1.09 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6879 unused Assets / (4.2 MB). Loaded Objects now: 8013.
+Memory consumption went from 383.0 MB to 378.8 MB.
+Total: 20.136276 ms (FindLiveObjects: 1.141227 ms CreateObjectMapping: 2.537194 ms MarkObjects: 12.355689 ms  DeleteObjects: 4.100531 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 305.719806 seconds.
+  path: Assets/Scripts/Characters/Player.cs
+  artifactKey: Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Characters/Player.cs using Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '3184e927b7d119596db8ac539625e78d') in 0.002877586 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.165534 seconds.
+  path: Assets/Scripts/Characters/Player.cs
+  artifactKey: Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Scripts/Characters/Player.cs using Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: 'dbaea3af4216777188ce1fe4977e768b') in 0.098643259 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Prepare
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.79 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6869 unused Assets / (4.3 MB). Loaded Objects now: 8013.
+Memory consumption went from 384.1 MB to 379.9 MB.
+Total: 16.345886 ms (FindLiveObjects: 1.130135 ms CreateObjectMapping: 1.835341 ms MarkObjects: 10.357903 ms  DeleteObjects: 3.021483 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 3.544037 seconds.
+  path: Assets/Scripts/Characters/Kalb.cs
+  artifactKey: Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d)
+Start importing Assets/Scripts/Characters/Kalb.cs using Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(2089858483,b0f066a214c2f5e87bad3c948f4d605d) (ScriptedImporter) -> (artifact id: '95f7699b314b3d1459d010834feb8f0f') in 0.004570003 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000085 seconds.
+  path: Assets/Scripts/Characters/Kalb.cs
+  artifactKey: Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Characters/Kalb.cs using Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '8b5098a8f126cfd589deaa220f150e0d') in 0.000965887 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+- Loaded All Assemblies, in  2.004 seconds
+Refreshing native plugins compatible for Editor in 1.16 ms, found 2 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  1.937 seconds
+Domain Reload Profiling: 3947ms
+	BeginReloadAssembly (847ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (49ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (1ms)
+		CreateAndSetChildDomain (335ms)
+	RebuildCommonClasses (112ms)
+	RebuildNativeTypeToScriptingClass (35ms)
+	initialDomainReloadingComplete (52ms)
+	LoadAllAssembliesAndSetupDomain (963ms)
+		LoadAssemblies (637ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (476ms)
+			TypeCache.Refresh (19ms)
+				TypeCache.ScanAssembly (1ms)
+			BuildScriptInfoCaches (422ms)
+			ResolveRequiredComponents (26ms)
+	FinalizeReload (1938ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1555ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (6ms)
+			SetLoadedEditorAssemblies (8ms)
+			BeforeProcessingInitializeOnLoad (414ms)
+			ProcessInitializeOnLoadAttributes (971ms)
+			ProcessInitializeOnLoadMethodAttributes (153ms)
+			AfterProcessingInitializeOnLoad (2ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (23ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 1.45 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6879 unused Assets / (4.5 MB). Loaded Objects now: 8016.
+Memory consumption went from 383.5 MB to 379.0 MB.
+Total: 18.925990 ms (FindLiveObjects: 1.331706 ms CreateObjectMapping: 1.999301 ms MarkObjects: 11.771007 ms  DeleteObjects: 3.822578 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  1.464 seconds
+Refreshing native plugins compatible for Editor in 0.87 ms, found 2 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  1.911 seconds
+Domain Reload Profiling: 3382ms
+	BeginReloadAssembly (419ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (24ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (200ms)
+	RebuildCommonClasses (83ms)
+	RebuildNativeTypeToScriptingClass (37ms)
+	initialDomainReloadingComplete (61ms)
+	LoadAllAssembliesAndSetupDomain (870ms)
+		LoadAssemblies (565ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (415ms)
+			TypeCache.Refresh (18ms)
+				TypeCache.ScanAssembly (1ms)
+			BuildScriptInfoCaches (365ms)
+			ResolveRequiredComponents (21ms)
+	FinalizeReload (1912ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1589ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (5ms)
+			SetLoadedEditorAssemblies (7ms)
+			BeforeProcessingInitializeOnLoad (362ms)
+			ProcessInitializeOnLoadAttributes (1025ms)
+			ProcessInitializeOnLoadMethodAttributes (187ms)
+			AfterProcessingInitializeOnLoad (2ms)
+			EditorAssembliesLoaded (1ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (31ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 1.16 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6879 unused Assets / (4.0 MB). Loaded Objects now: 8019.
+Memory consumption went from 384.1 MB to 380.1 MB.
+Total: 19.190405 ms (FindLiveObjects: 1.028034 ms CreateObjectMapping: 2.000846 ms MarkObjects: 12.760814 ms  DeleteObjects: 3.399168 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 42.882262 seconds.
+  path: Assets/Scripts/Characters/Kalb.cs
+  artifactKey: Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Characters/Kalb.cs using Guid(97d85d6aff5fe4437b4d4897eb8baa94) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'f811733bbfeb27ba38c29b0c261d7d47') in 0.00274567 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Prepare
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  1.296 seconds
+Refreshing native plugins compatible for Editor in 0.76 ms, found 2 plugins.
+Native extension for WindowsStandalone target not found
+Native extension for OSXStandalone target not found
+Native extension for WebGL target not found
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  1.721 seconds
+Domain Reload Profiling: 3022ms
+	BeginReloadAssembly (376ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (25ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (1ms)
+		CreateAndSetChildDomain (169ms)
+	RebuildCommonClasses (78ms)
+	RebuildNativeTypeToScriptingClass (28ms)
+	initialDomainReloadingComplete (41ms)
+	LoadAllAssembliesAndSetupDomain (779ms)
+		LoadAssemblies (493ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (383ms)
+			TypeCache.Refresh (11ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (339ms)
+			ResolveRequiredComponents (21ms)
+	FinalizeReload (1722ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1411ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (4ms)
+			SetLoadedEditorAssemblies (7ms)
+			BeforeProcessingInitializeOnLoad (356ms)
+			ProcessInitializeOnLoadAttributes (875ms)
+			ProcessInitializeOnLoadMethodAttributes (167ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (22ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.82 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 17 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 6879 unused Assets / (4.9 MB). Loaded Objects now: 8022.
+Memory consumption went from 384.7 MB to 379.8 MB.
+Total: 17.166541 ms (FindLiveObjects: 0.975774 ms CreateObjectMapping: 1.965330 ms MarkObjects: 10.588099 ms  DeleteObjects: 3.635531 ms)
+
+Prepare: number of updated asset objects reloaded= 0

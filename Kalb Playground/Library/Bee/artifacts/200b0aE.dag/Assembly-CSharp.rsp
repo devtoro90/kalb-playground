@@ -469,8 +469,8 @@
 -analyzer:"/Applications/Unity/Hub/Editor/6000.3.1f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"/Applications/Unity/Hub/Editor/6000.3.1f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 -analyzer:"/Applications/Unity/Hub/Editor/6000.3.1f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
-"Assets/Scripts/Player.cs"
-"Assets/Scripts/PlayerInputActions.cs"
+"Assets/Scripts/Characters/Kalb.cs"
+"Assets/Scripts/Utilities/PlayerInputActions.cs"
 -langversion:9.0
 /deterministic
 /optimize+

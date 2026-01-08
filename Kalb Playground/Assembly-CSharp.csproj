@@ -48,8 +48,8 @@
     <Analyzer Include="/Applications/Unity/Hub/Editor/6000.3.1f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets/Scripts/PlayerInputActions.cs" />
-    <Compile Include="Assets/Scripts/Player.cs" />
+    <Compile Include="Assets/Scripts/Utilities/PlayerInputActions.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets/TextMesh Pro/Shaders/TMPro.cginc" />

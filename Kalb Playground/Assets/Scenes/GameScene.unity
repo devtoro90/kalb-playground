@@ -1570,7 +1570,7 @@ GameObject:
   - component: {fileID: 658198522}
   - component: {fileID: 658198523}
   m_Layer: 0
-  m_Name: Player
+  m_Name: Kalb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1766,10 +1766,10 @@ MonoBehaviour:
   - 0.4
   - 0.6
   comboAnimations:
-  - Player_attack1
-  - Player_attack2
-  - Player_attack3
-  comboResetAnimation: Player_attack_reset
+  - Kalb_attack1
+  - Kalb_attack2
+  - Kalb_attack3
+  comboResetAnimation: Kalb_attack_reset
   groundCheck: {fileID: 0}
   groundCheckRadius: 0.2
   wallCheck: {fileID: 0}
