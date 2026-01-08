@@ -156,7 +156,7 @@ public class Kalb : MonoBehaviour
     private Collider2D playerCollider;
     
     // INPUT STATE
-    private Vector2 moveInput;
+    public Vector2 moveInput;
     private bool isJumpButtonHeld = false;
     private bool isRunning = false;
     private bool attackQueued = false; 
@@ -167,9 +167,9 @@ public class Kalb : MonoBehaviour
     private float currentFallSpeed = 0f;
     
     // ACTION STATE FLAGS (organized by system)
-    private bool isDashing = false;
+    public bool isDashing = false;
     private bool isAttacking = false;
-    private bool isWallJumping = false;
+    public bool isWallJumping = false;
     private bool isHardLanding = false;
     private bool isSwimming = false;
     private bool isSwimDashing = false;
@@ -184,7 +184,7 @@ public class Kalb : MonoBehaviour
     private bool isTouchingWall;
     private bool isWallClinging = false;
     private bool isAgainstWall = false;
-    private int wallSide = 0;
+    public int wallSide = 0;
     private int lastWallSide = 0;
     private float wallNormalDistance = 0.05f;
     
@@ -247,6 +247,9 @@ public class Kalb : MonoBehaviour
     private float currentLedgeHoldTime = 0f;
     private float ledgeReleaseTimer = 0f;
     private bool canGrabLedge = true;
+    private MetroidvaniaCamera metroidvaniaCamera;
+
+    //CAMERA
     
     // ====================================================================
     // SECTION 3: UNITY LIFE CYCLE METHODS
@@ -260,7 +263,7 @@ public class Kalb : MonoBehaviour
     {
         InitializeComponents();
         CalculateScreenHeightInUnits();
-        SetupCameraShake();
+        //SetupCameraShake();
         SetupMissingObjects();
     }
     
@@ -333,6 +336,11 @@ public class Kalb : MonoBehaviour
         
         originalPosition = transform.position;
         mainCamera = Camera.main;
+        metroidvaniaCamera = FindFirstObjectByType<MetroidvaniaCamera>();
+        if (metroidvaniaCamera == null && Camera.main != null)
+        {
+            metroidvaniaCamera = Camera.main.gameObject.AddComponent<MetroidvaniaCamera>();
+        }
     }
     
     /// <summary>
@@ -358,7 +366,7 @@ public class Kalb : MonoBehaviour
     /// Sets up the camera shake component on the main camera
     /// Creates one if it doesn't exist
     /// </summary>
-    private void SetupCameraShake()
+    /*private void SetupCameraShake()
     {
         if (Camera.main != null)
         {
@@ -370,7 +378,7 @@ public class Kalb : MonoBehaviour
         {
             Debug.LogWarning("Main camera not found. Screen shake will not work.");
         }
-    }
+    }*/
     
     /// <summary>
     /// Creates required child GameObjects if not assigned in Inspector
@@ -1618,7 +1626,9 @@ public class Kalb : MonoBehaviour
         animator.Play("Kalb_hard_land");
         
         // Screen shake for hard landing
-        TriggerLandingScreenShake(currentFallSpeed, totalFallDistance);
+        //TriggerLandingScreenShake(currentFallSpeed, totalFallDistance);
+        TriggerCameraEffects();
+
     }
     
     /// <summary>
@@ -1636,6 +1646,29 @@ public class Kalb : MonoBehaviour
         float duration = Mathf.Lerp(0.1f, hardLandingShakeDuration, combinedFactor);
         
         cameraShake.Shake(intensity, duration);
+    }
+
+    private void TriggerCameraEffects()
+    {
+        if (metroidvaniaCamera == null) return;
+        
+        // Hard landing camera shake
+        if (isHardLanding)
+        {
+            metroidvaniaCamera.TriggerScreenShake(0.15f, 0.25f);
+        }
+        
+        // Dash camera shake
+        if (isDashing && dashUnlocked)
+        {
+            metroidvaniaCamera.TriggerScreenShake(0.05f, 0.1f);
+        }
+        
+        // Wall jump camera effect
+        if (isWallJumping)
+        {
+            metroidvaniaCamera.TriggerScreenShake(0.08f, 0.15f);
+        }
     }
     
     /// <summary>
