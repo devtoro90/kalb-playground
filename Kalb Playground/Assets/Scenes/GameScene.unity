@@ -1754,22 +1754,22 @@ MonoBehaviour:
   - 7
   - 12
   comboRange:
-  - 0.5
-  - 0.6
-  - 0.8
+  - 0.2
+  - 0.2
+  - 0.2
   comboAttackDurations:
   - 0.2
   - 0.2
   - 0.2
   comboCooldowns:
-  - 0.2
-  - 0.2
-  - 0.2
+  - 0.3
+  - 0.4
+  - 0.6
   comboAnimations:
   - Player_attack1
   - Player_attack2
   - Player_attack3
-  comboResetAnimation: attack_reset
+  comboResetAnimation: Player_attack_reset
   groundCheck: {fileID: 0}
   groundCheckRadius: 0.2
   wallCheck: {fileID: 0}
@@ -1799,8 +1799,8 @@ MonoBehaviour:
   enableFloating: 1
   ledgeDetectionDistance: 0.5
   ledgeGrabOffsetY: 0.15
-  ledgeGrabOffsetX: 0.6
-  ledgeClimbTime: 0.5
+  ledgeGrabOffsetX: 0.55
+  ledgeClimbTime: 0.3
   ledgeJumpForce: 12
   ledgeJumpAngle: {x: 1, y: 2}
   ledgeClimbCheckRadius: 0.2

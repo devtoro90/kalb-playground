@@ -213,10 +213,10 @@ TextureImporter:
       name: Player3_4
       rect:
         serializedVersion: 2
-        x: 10
-        y: 14
-        width: 138
-        height: 169
+        x: 17
+        y: 32
+        width: 131
+        height: 173
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -240,7 +240,7 @@ TextureImporter:
         width: 142
         height: 172
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -262,7 +262,7 @@ TextureImporter:
         width: 127
         height: 158
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -284,7 +284,7 @@ TextureImporter:
         width: 110
         height: 161
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -293,6 +293,50 @@ TextureImporter:
       bones: []
       spriteID: f7ce86d9cd3c140b1b31abd9788ba55c
       internalID: -194841683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player3_8
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 23
+        width: 132
+        height: 176
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e68f641f6bbc49b8b86d3968093d2e0
+      internalID: 1000081235
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player3_9
+      rect:
+        serializedVersion: 2
+        x: 411
+        y: 14
+        width: 136
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7cb364ce924b844929a57e6f7c772514
+      internalID: -1207833729
       vertices: []
       indices: 
       edges: []
@@ -319,6 +363,8 @@ TextureImporter:
       Player3_5: -1546484398
       Player3_6: 1705508078
       Player3_7: -194841683
+      Player3_8: 1000081235
+      Player3_9: -1207833729
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -127,7 +127,7 @@ public class Player : MonoBehaviour
     [Header("Ledge System")]
     public float ledgeDetectionDistance = 0.5f;
     public float ledgeGrabOffsetY = 0.15f;
-    public float ledgeGrabOffsetX = 0.6f;
+    public float ledgeGrabOffsetX = 0.55f;
     public float ledgeClimbTime = 0.5f;
     public float ledgeJumpForce = 12f;
     public Vector2 ledgeJumpAngle = new Vector2(1, 2);
@@ -1708,34 +1708,63 @@ public class Player : MonoBehaviour
     {
         if (!isSwimming || isHardLanding) return;
         
-        // Swim dash takes priority
+        // Handle swim dash first
         if (isSwimDashing)
         {
             rb.linearVelocity = swimDashDirection * swimDashSpeed;
-            rb.gravityScale = 0f;
+            rb.gravityScale = 0f; // No gravity during dash
             return;
         }
         
-        // Apply buoyancy first (most important for swimming)
+        // Apply fast buoyancy FIRST (most important) - always active
         ApplyBuoyancy();
         
         // Calculate horizontal movement
-        float currentSwimSpeed = dashAction.IsPressed() && !isSwimDashing ? swimFastSpeed : swimSpeed;
+        float currentSwimSpeed = swimSpeed;
+        
+        // Check for fast swimming (when holding dash button)
+        if (dashAction.IsPressed() && !isSwimDashing)
+        {
+            currentSwimSpeed = swimFastSpeed;
+        }
+        
+        // Apply horizontal movement with velocity control instead of forces
         float targetXVelocity = moveInput.x * currentSwimSpeed;
         float currentXVelocity = rb.linearVelocity.x;
         
-        // Smooth horizontal movement
-        float horizontalAcceleration = isInWater ? 25f : 15f;
+        // Smooth horizontal movement but prioritize buoyancy
+        float horizontalAcceleration = isInWater ? 25f : 15f; // Faster in water
         float newXVelocity = Mathf.MoveTowards(currentXVelocity, targetXVelocity, 
                                             Time.fixedDeltaTime * horizontalAcceleration);
         
-        // Apply floating effect
-        if (enableFloating)
+        // Only apply floating effect when not actively moving horizontally
+        if (enableFloating && Mathf.Abs(moveInput.x) < 0.1f)
         {
+            // Update original position reference for floating
+            if (Mathf.Abs(currentFloatOffset) > 0.01f)
+            {
+                originalPosition = new Vector3(originalPosition.x, 
+                                            transform.position.y - currentFloatOffset, 
+                                            originalPosition.z);
+            }
+            
             ApplyFloatingEffect();
+            
+            // Apply the floating offset
+            Vector3 currentPos = transform.position;
+            transform.position = new Vector3(currentPos.x, 
+                                        originalPosition.y + currentFloatOffset, 
+                                        currentPos.z);
+        }
+        else if (enableFloating)
+        {
+            // When moving horizontally, reduce floating effect intensity
+            floatTimer += Time.deltaTime * floatFrequency * 0.5f; // Slower bobbing when moving
+            targetFloatOffset = Mathf.Sin(floatTimer * Mathf.PI * 2f) * floatAmplitude * 0.3f; // Reduced amplitude
+            currentFloatOffset = Mathf.Lerp(currentFloatOffset, targetFloatOffset, Time.deltaTime * floatSmoothness);
         }
         
-        // Apply velocities
+        // Apply the velocities - buoyancy handles vertical, we handle horizontal
         rb.linearVelocity = new Vector2(newXVelocity, rb.linearVelocity.y);
         
         // Clamp horizontal speed
@@ -1748,7 +1777,7 @@ public class Player : MonoBehaviour
             );
         }
         
-        // Force buoyancy correction if significantly off target
+        // Force buoyancy correction if player is too high above target
         ApplyBuoyancyCorrection();
     }
     
@@ -1787,18 +1816,26 @@ public class Player : MonoBehaviour
     /// </summary>
     private void ApplyBuoyancyCorrection()
     {
-        if (!isSwimming || currentWaterCollider == null) return;
-        
-        float playerHeight = playerCollider.bounds.extents.y * 2f;
-        float targetY = waterSurfaceY + waterSurfaceOffset - (playerHeight * 0.8f);
-        float currentY = transform.position.y;
-        float yDifference = Mathf.Abs(targetY - currentY);
-        
-        // Apply direct correction if significantly off target
-        if (yDifference > 0.3f)
+        if (isSwimming && currentWaterCollider != null)
         {
-            float newY = Mathf.Lerp(currentY, targetY, Time.fixedDeltaTime * 10f);
-            rb.MovePosition(new Vector2(transform.position.x, newY));
+            float playerHeight = GetComponent<Collider2D>().bounds.extents.y * 2f;
+            float targetY = waterSurfaceY + waterSurfaceOffset - (playerHeight * 0.8f);
+            float currentY = transform.position.y;
+            float yDifference = targetY - currentY;
+            
+            // If player is significantly above target position (more buoyant than expected)
+            if (yDifference > 0.5f) // Increased threshold for more aggressive correction
+            {
+                // Apply additional downward force
+                rb.AddForce(new Vector2(0, -Mathf.Min(yDifference * 5f, 10f)));
+                
+                // OR use direct position adjustment as fallback
+                if (yDifference > 1.0f)
+                {
+                    float newY = Mathf.Lerp(currentY, targetY, Time.fixedDeltaTime * 15f);
+                    rb.MovePosition(new Vector2(transform.position.x, newY));
+                }
+            }
         }
     }
     
