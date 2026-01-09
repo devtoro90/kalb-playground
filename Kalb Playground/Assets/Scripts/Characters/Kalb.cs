@@ -151,7 +151,6 @@ public class Kalb : MonoBehaviour
     private InputAction dashAction;
     private InputAction attackAction;
     private Animator animator;
-    private CameraShake cameraShake;
     private Camera mainCamera;
     private Collider2D playerCollider;
     
@@ -1626,26 +1625,8 @@ public class Kalb : MonoBehaviour
         animator.Play("Kalb_hard_land");
         
         // Screen shake for hard landing
-        //TriggerLandingScreenShake(currentFallSpeed, totalFallDistance);
         TriggerCameraEffects();
 
-    }
-    
-    /// <summary>
-    /// Triggers screen shake based on fall impact intensity
-    /// </summary>
-    private void TriggerLandingScreenShake(float fallSpeed, float fallDistance)
-    {
-        if (!enableScreenShake || cameraShake == null) return;
-        
-        float normalizedFallSpeed = Mathf.Abs(fallSpeed) / Mathf.Abs(maxFallSpeed);
-        float normalizedFallDistance = Mathf.Clamp01(fallDistance / (screenHeightInUnits * 2f));
-        float combinedFactor = (normalizedFallSpeed * 0.6f) + (normalizedFallDistance * 0.4f);
-        
-        float intensity = Mathf.Lerp(0.1f, hardLandingShakeIntensity, combinedFactor);
-        float duration = Mathf.Lerp(0.1f, hardLandingShakeDuration, combinedFactor);
-        
-        cameraShake.Shake(intensity, duration);
     }
 
     private void TriggerCameraEffects()
@@ -1655,19 +1636,28 @@ public class Kalb : MonoBehaviour
         // Hard landing camera shake
         if (isHardLanding)
         {
-            metroidvaniaCamera.TriggerScreenShake(0.15f, 0.25f);
+            // Use the enhanced hard landing shake
+            //metroidvaniaCamera.TriggerHardLandingShake(currentFallSpeed, totalFallDistance);
+            
+            // OR for even more dramatic effect (with optional time freeze):
+            metroidvaniaCamera.TriggerHardLandingWithFreeze(currentFallSpeed, totalFallDistance);
+
+           
         }
         
         // Dash camera shake
         if (isDashing && dashUnlocked)
         {
-            metroidvaniaCamera.TriggerScreenShake(0.05f, 0.1f);
+            // Directional shake in dash direction
+            Vector3 dashDir = facingRight ? Vector3.right : Vector3.left;
+            metroidvaniaCamera.TriggerScreenShake(0.08f, 0.1f, dashDir);
         }
         
         // Wall jump camera effect
         if (isWallJumping)
         {
-            metroidvaniaCamera.TriggerScreenShake(0.08f, 0.15f);
+            Vector3 wallJumpDir = new Vector3(-wallSide * 0.7f, 0.3f, 0);
+            metroidvaniaCamera.TriggerScreenShake(0.12f, 0.15f, wallJumpDir);
         }
     }
     
@@ -2989,86 +2979,3 @@ public class Kalb : MonoBehaviour
     }
 }
 
-// ====================================================================
-// SECTION 16: CAMERA SHAKE COMPONENT (SEPARATE CLASS)
-// ====================================================================
-
-/// <summary>
-/// Simple camera shake effect component
-/// Attach to main camera for screen shake effects
-/// </summary>
-public class CameraShake : MonoBehaviour
-{
-    [Header("Shake Settings")]
-    public float shakeIntensity = 0.1f;
-    public float shakeDuration = 0.2f;
-    public float dampingSpeed = 1.0f;
-    
-    private Vector3 initialPosition;
-    private float shakeTimer = 0f;
-    private float currentIntensity = 0f;
-    
-    /// <summary>
-    /// Initializes camera shake component
-    /// Stores the camera's original position
-    /// </summary>
-    void Start()
-    {
-        initialPosition = transform.localPosition;
-    }
-    
-    /// <summary>
-    /// Updates shake effect if active
-    /// Applies random offset based on intensity and timer
-    /// </summary>
-    void Update()
-    {
-        if (shakeTimer > 0)
-        {
-            // Apply random offset for shake effect
-            transform.localPosition = initialPosition + Random.insideUnitSphere * currentIntensity;
-            
-            // Reduce shake over time
-            shakeTimer -= Time.deltaTime * dampingSpeed;
-            currentIntensity = Mathf.Lerp(0f, currentIntensity, shakeTimer / shakeDuration);
-        }
-        else
-        {
-            // Reset to original position when shake ends
-            shakeTimer = 0f;
-            transform.localPosition = initialPosition;
-        }
-    }
-    
-    /// <summary>
-    /// Triggers a camera shake with specified intensity and duration
-    /// If called during an existing shake, uses the stronger values
-    /// </summary>
-    /// <param name="intensity">How strong the shake should be</param>
-    /// <param name="duration">How long the shake should last</param>
-    public void Shake(float intensity, float duration)
-    {
-        // Use the higher intensity if already shaking
-        if (intensity > currentIntensity)
-        {
-            currentIntensity = intensity;
-        }
-        
-        // Use the longer duration if already shaking
-        if (duration > shakeTimer)
-        {
-            shakeTimer = duration;
-            this.shakeDuration = duration;
-        }
-    }
-    
-    /// <summary>
-    /// Stops camera shake immediately
-    /// Returns camera to original position
-    /// </summary>
-    public void StopShake()
-    {
-        shakeTimer = 0f;
-        transform.localPosition = initialPosition;
-    }
-}
