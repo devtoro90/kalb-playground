@@ -158,6 +158,36 @@ public class Kalb : MonoBehaviour
     public float pogoEffectDuration = 0.3f;
     public Color pogoFlashColor = Color.yellow;
     public float pogoFlashDuration = 0.1f;
+
+    [Header("Health & Damage System")]
+    public int maxHealth = 100;
+    public int currentHealth = 100;
+    public float invincibilityTime = 1f;
+    public float hitFlashDuration = 0.1f;
+    public float hitFlashIntensity = 0.7f;
+    public Color hurtFlashColor = Color.red;
+
+    [Header("Debug/Developer Options")]
+    public bool godMode = false;
+    public bool infiniteJumps = false;
+    public bool showDebugInfo = true;
+    
+    
+    [Header("Knockback Settings")]
+    public float knockbackForce = 10f;
+    public float knockbackDuration = 0.3f;
+    public float horizontalKnockbackMultiplier = 1.5f;
+    public float verticalKnockbackMultiplier = 0.8f;
+    
+    [Header("Death & Respawn")]
+    public float deathAnimationTime = 1.5f;
+    public float respawnInvincibilityTime = 3f;
+    public GameObject deathEffectPrefab;
+    
+    [Header("Health Visual Feedback")]
+    public GameObject damageNumberPrefab;
+    public float damageNumberYOffset = 1.5f;
+    public bool showDamageNumbers = true;
     
     // ====================================================================
     // SECTION 2: PRIVATE STATE VARIABLES
@@ -279,6 +309,26 @@ public class Kalb : MonoBehaviour
     private Vector2 pogoDirection = Vector2.down;
     private bool hasPogoedThisJump = false; 
 
+    // HEALTH & DAMAGE STATE
+    private bool isInvincible = false;
+    private bool isTakingDamage = false;
+    private bool isDead = false;
+    private float invincibilityTimer = 0f;
+    private float knockbackTimer = 0f;
+    private SpriteRenderer playerSprite;
+    private Color originalSpriteColor;
+    private Vector2 knockbackDirection = Vector2.right;
+    
+    // DEATH & RESPAWN
+    private Vector3 lastCheckpointPosition;
+    private float deathTimer = 0f;
+    private bool isRespawning = false;
+    private float respawnTimer = 0f;
+
+    // ANIMATION STATE
+    private bool isAnimationLocked = false;
+    private float animationLockTimer = 0f;
+
     //CAMERA
     private MetroidvaniaCamera metroidvaniaCamera;
     
@@ -294,8 +344,8 @@ public class Kalb : MonoBehaviour
     {
         InitializeComponents();
         CalculateScreenHeightInUnits();
-        //SetupCameraShake();
         SetupMissingObjects();
+        
     }
     
     /// <summary>
@@ -372,6 +422,8 @@ public class Kalb : MonoBehaviour
         {
             metroidvaniaCamera = Camera.main.gameObject.AddComponent<MetroidvaniaCamera>();
         }
+        // Initialize Health System
+        InitializeHealthSystem();
     }
     
     /// <summary>
@@ -393,23 +445,6 @@ public class Kalb : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Sets up the camera shake component on the main camera
-    /// Creates one if it doesn't exist
-    /// </summary>
-    /*private void SetupCameraShake()
-    {
-        if (Camera.main != null)
-        {
-            cameraShake = Camera.main.GetComponent<CameraShake>();
-            if (cameraShake == null)
-                cameraShake = Camera.main.gameObject.AddComponent<CameraShake>();
-        }
-        else
-        {
-            Debug.LogWarning("Main camera not found. Screen shake will not work.");
-        }
-    }*/
     
     /// <summary>
     /// Creates required child GameObjects if not assigned in Inspector
@@ -436,6 +471,35 @@ public class Kalb : MonoBehaviour
             obj.transform.localPosition = localPosition;
             transformRef = obj.transform;
         }
+    }
+
+    /// <summary>
+    /// Initializes health system components and state
+    /// </summary>
+    private void InitializeHealthSystem()
+    {
+        // Get sprite renderer for damage flash
+        playerSprite = GetComponent<SpriteRenderer>();
+        if (playerSprite != null)
+        {
+            originalSpriteColor = playerSprite.color;
+        }
+        
+        // Set initial health
+        currentHealth = Mathf.Clamp(currentHealth, 1, maxHealth);
+        
+        // Set initial checkpoint to starting position
+        lastCheckpointPosition = transform.position;
+        
+        // Initialize as alive
+        isDead = false;
+        isInvincible = false;
+        isTakingDamage = false;
+
+        // Initialize debug options
+        godMode = false;
+        
+        Debug.Log($"Health System Initialized: {currentHealth}/{maxHealth} HP");
     }
     
     // ====================================================================
@@ -491,6 +555,9 @@ public class Kalb : MonoBehaviour
         UpdateLedgeTimers();
         UpdateComboTimers();
         UpdatePogoTimers();
+
+        //Health & Damage timers
+        UpdateHealthTimers();
         
     }
     
@@ -673,6 +740,62 @@ public class Kalb : MonoBehaviour
             isPogoBouncing = false;
         }
     }
+
+    /// <summary>
+    /// Updates health-related timers (invincibility, knockback, death)
+    /// </summary>
+    private void UpdateHealthTimers()
+    {
+        // Invincibility timer
+        if (isInvincible)
+        {
+            invincibilityTimer -= Time.deltaTime;
+            if (invincibilityTimer <= 0)
+            {
+                EndInvincibility();
+            }
+        }
+        
+        // Knockback timer
+        if (isTakingDamage && knockbackTimer > 0)
+        {
+            knockbackTimer -= Time.deltaTime;
+            if (knockbackTimer <= 0)
+            {
+                EndKnockback();
+            }
+        }
+
+        // Animation lock timer
+        if (isAnimationLocked)
+        {
+            animationLockTimer -= Time.deltaTime;
+            if (animationLockTimer <= 0)
+            {
+                isAnimationLocked = false;
+            }
+        }
+        
+        // Death timer
+        if (isDead)
+        {
+            deathTimer -= Time.deltaTime;
+            if (deathTimer <= 0)
+            {
+                Respawn();
+            }
+        }
+        
+        // Respawn invincibility timer
+        if (isRespawning)
+        {
+            respawnTimer -= Time.deltaTime;
+            if (respawnTimer <= 0)
+            {
+                EndRespawnInvincibility();
+            }
+        }
+    }
     
     /// <summary>
     /// PHASE 3: Checks the environment around the player
@@ -680,6 +803,11 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void CheckEnvironment()
     {
+
+        
+        // DEATH BOUNDARY CHECK
+        CheckDeathBoundary();
+
         CheckWall();
         CheckWater();
         
@@ -696,6 +824,14 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void HandleStateBasedInputs()
     {
+        // BLOCK INPUT if dead, taking damage, or in hard landing
+        if (isDead || isTakingDamage || isHardLanding)
+        {
+            // Only allow minimal input during these states
+            HandleMinimalInputDuringDamage();
+            return;
+        }
+
         // Handle swimming inputs if swimming
         if (isSwimming && !isHardLanding)
         {
@@ -1110,6 +1246,16 @@ public class Kalb : MonoBehaviour
             return Mathf.Sign(moveInput.x);
         }
     }
+
+    /// <summary>
+    /// Handles minimal input allowed during damage/death states
+    /// </summary>
+    private void HandleMinimalInputDuringDamage()
+    {
+        // Allow pause menu input even when dead/taking damage
+        // (You'll implement this with your pause system)
+        // if (Input.GetKeyDown(KeyCode.Escape)) PauseGame();
+    }
     
     // ====================================================================
     // SECTION 8: MOVEMENT & PHYSICS METHODS
@@ -1120,6 +1266,14 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void HandleGroundAndAirMovement()
     {
+        // PRIORITY 1: Knockback movement (highest priority)
+        if (isTakingDamage && knockbackTimer > 0)
+        {
+            HandleKnockbackMovement();
+            return;
+        }
+        
+        // PRIORITY 2: Hard landing
         if (isHardLanding)
         {
             rb.linearVelocity = Vector2.zero;
@@ -1293,6 +1447,37 @@ public class Kalb : MonoBehaviour
         if (!isLedgeClimbing)
         {
             rb.linearVelocity = Vector2.zero;
+        }
+    }
+
+    /// <summary>
+    /// Handles movement during knockback with priority over other forces
+    /// </summary>
+    private void HandleKnockbackMovement()
+    {
+        // During knockback, NO player control - just physics
+        // Don't allow any player input influence
+        Vector2 currentVelocity = rb.linearVelocity;
+        
+        // Calculate knockback decay over time
+        float knockbackProgress = 1f - (knockbackTimer / knockbackDuration);
+        float currentKnockbackForce = knockbackForce * (1f - knockbackProgress);
+        
+        // Apply knockback direction with decay
+        Vector2 knockbackVelocity = knockbackDirection * currentKnockbackForce;
+        
+        // Immediately set velocity (no smoothing during knockback)
+        rb.linearVelocity = knockbackVelocity;
+        
+        // Apply gravity during knockback (but reduced)
+        if (!isGrounded)
+        {
+            rb.gravityScale = normalGravityScale * 0.5f;
+        }
+        else
+        {
+            // If grounded, stop vertical knockback
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         }
     }
     
@@ -1647,8 +1832,428 @@ public class Kalb : MonoBehaviour
         attackQueued = false; // NEW: Clear queued attacks
     }
 
-
+        /// <summary>
+    /// Core method for taking damage - call this from enemies, traps, etc.
+    /// </summary>
+    /// <param name="damageAmount">Amount of damage to take</param>
+    /// <param name="damageSource">Position where damage came from (for knockback direction)</param>
+    /// <param name="overrideKnockback">Optional custom knockback force</param>
+    public void TakeDamage(int damageAmount, Vector3 damageSource, float overrideKnockback = 0f)
+    {
+        // Don't take damage if invincible, dead, or in certain states
+        if (isInvincible || isDead || isRespawning || godMode) 
+            return;
+        
+        // Check for i-frame states (dash, wall jump, etc.)
+        if (CheckDamageImmunityStates()) 
+            return;
+        
+        // Apply damage
+        int actualDamage = Mathf.Clamp(damageAmount, 1, currentHealth);
+        currentHealth -= actualDamage;
+        
+        // Cancel any ongoing actions
+        CancelPlayerActions();
+        
+        // Calculate knockback direction
+        CalculateKnockbackDirection(damageSource);
+        
+        // Apply knockback
+        float knockbackForceToUse = overrideKnockback > 0 ? overrideKnockback : knockbackForce;
+        ApplyKnockback(knockbackForceToUse);
+        
+        // Start invincibility frames
+        StartInvincibility();
+        
+        // Visual and audio feedback
+        TriggerDamageFeedback(actualDamage);
+        
+        // Camera effects
+        TriggerDamageCameraEffects();
+        
+        // Check for death
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+        
+        Debug.Log($"Took {actualDamage} damage. Health: {currentHealth}/{maxHealth}");
+    }
     
+    /// <summary>
+    /// Checks if player is in a state that grants damage immunity
+    /// </summary>
+    private bool CheckDamageImmunityStates()
+    {
+        // States that grant temporary invincibility
+        if (isDashing) return true;
+        if (isWallJumping && wallJumpTimer > wallJumpDuration * 0.5f) return true;
+        if (isAttacking && currentCombo >= 2) return true; // Later combo hits might have armor
+        
+        // Add other immunity states as needed
+        return false;
+    }
+    
+    /// <summary>
+    /// Cancels all player actions when taking damage
+    /// </summary>
+    private void CancelPlayerActions()
+    {
+        // Cancel dash
+        if (isDashing) EndDash();
+        
+        // Cancel attacks
+        CancelCombo();
+        
+        // Cancel pogo
+        if (isPogoAttacking) EndPogoAttack();
+        
+        // Cancel wall slide
+        isWallSliding = false;
+        wallSlideState = WallSlideState.None;
+        
+        // Cancel ledge grab
+        if (isLedgeGrabbing || isLedgeClimbing)
+            ReleaseLedge();
+    }
+    
+    /// <summary>
+    /// Calculates direction for knockback based on damage source
+    /// </summary>
+    private void CalculateKnockbackDirection(Vector3 damageSource)
+    {
+        // Direction away from damage source
+        Vector2 direction = (transform.position - damageSource).normalized;
+        
+        // Ensure minimum vertical/horizontal components
+        if (Mathf.Abs(direction.x) < 0.3f) direction.x = Mathf.Sign(direction.x) * 0.3f;
+        if (Mathf.Abs(direction.y) < 0.1f) direction.y = 0.1f;
+        
+        // Normalize and apply multipliers
+        direction.Normalize();
+        knockbackDirection = new Vector2(
+            direction.x * horizontalKnockbackMultiplier,
+            direction.y * verticalKnockbackMultiplier
+        ).normalized;
+    }
+    
+    /// <summary>
+    /// Applies knockback force to the player
+    /// </summary>
+    private void ApplyKnockback(float force)
+    {
+        isTakingDamage = true;
+        knockbackTimer = knockbackDuration;
+        
+        // LOCK ANIMATION FOR DURATION OF KNOCKBACK
+        isAnimationLocked = true;
+        animationLockTimer = knockbackDuration;
+        
+        // Stop current velocity
+        rb.linearVelocity = Vector2.zero;
+        
+        // Apply knockback force
+        rb.AddForce(knockbackDirection * force, ForceMode2D.Impulse);
+        
+        // Cap maximum knockback velocity
+        float maxKnockbackSpeed = force * 1.5f;
+        if (rb.linearVelocity.magnitude > maxKnockbackSpeed)
+        {
+            rb.linearVelocity = rb.linearVelocity.normalized * maxKnockbackSpeed;
+        }
+        
+        // Force play hurt animation immediately
+        if (animator != null)
+        {
+            animator.Play("Kalb_hurt", -1, 0f);
+            animator.Update(0f); // Force immediate update
+        }
+    }
+    
+    /// <summary>
+    /// Starts invincibility frames after taking damage
+    /// </summary>
+    private void StartInvincibility()
+    {
+        isInvincible = true;
+        invincibilityTimer = invincibilityTime;
+        
+        // Start flashing effect
+        StartCoroutine(DamageFlashRoutine());
+    }
+    
+    /// <summary>
+    /// Ends invincibility frames
+    /// </summary>
+    private void EndInvincibility()
+    {
+        isInvincible = false;
+        invincibilityTimer = 0f;
+        
+        // Restore sprite color
+        if (playerSprite != null)
+        {
+            playerSprite.color = originalSpriteColor;
+        }
+    }
+    
+    /// <summary>
+    /// Ends knockback state
+    /// </summary>
+    private void EndKnockback()
+    {
+        isTakingDamage = false;
+        knockbackTimer = 0f;
+        isAnimationLocked = false; 
+        
+        // Smoothly stop horizontal movement
+        if (isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.5f, rb.linearVelocity.y);
+        }
+
+        // Return to idle animation if grounded
+        if (isGrounded && animator != null)
+        {
+            animator.Play("Kalb_idle", -1, 0f);
+        }
+    }
+
+        /// <summary>
+    /// Triggers visual and audio feedback for damage
+    /// </summary>
+    private void TriggerDamageFeedback(int damageAmount)
+    {
+        // Damage number popup
+        if (showDamageNumbers && damageNumberPrefab != null)
+        {
+            Vector3 spawnPosition = transform.position + Vector3.up * damageNumberYOffset;
+            GameObject damageNumber = Instantiate(damageNumberPrefab, spawnPosition, Quaternion.identity);
+            
+            // Set damage text (you'll need a DamageNumber script on the prefab)
+            // damageNumber.GetComponent<DamageNumber>().SetDamage(damageAmount);
+        }
+        
+        // Play hit sound
+        // if (audioSource != null && hitSound != null)
+        //     audioSource.PlayOneShot(hitSound);
+        
+        // Animation
+        if (animator != null && !isDead)
+        {
+            animator.Play("Kalb_hurt", -1, 0f);
+        }
+    }
+    
+    /// <summary>
+    /// Coroutine for damage flash effect
+    /// </summary>
+    private System.Collections.IEnumerator DamageFlashRoutine()
+    {
+        if (playerSprite == null) yield break;
+        
+        float flashInterval = 0.1f;
+        int flashCount = Mathf.FloorToInt(invincibilityTime / flashInterval);
+        
+        for (int i = 0; i < flashCount; i++)
+        {
+            // Alternate between flash color and original
+            playerSprite.color = (i % 2 == 0) ? hurtFlashColor : originalSpriteColor;
+            yield return new WaitForSeconds(flashInterval);
+        }
+        
+        // Ensure original color at the end
+        playerSprite.color = originalSpriteColor;
+    }
+    
+    /// <summary>
+    /// Triggers camera effects for damage
+    /// </summary>
+    private void TriggerDamageCameraEffects()
+    {
+        if (metroidvaniaCamera == null) return;
+        
+        // Screen shake based on damage taken
+        float shakeIntensity = Mathf.Clamp(knockbackForce * 0.01f, 0.05f, 0.2f);
+        float shakeDuration = Mathf.Clamp(knockbackDuration, 0.1f, 0.3f);
+        
+        metroidvaniaCamera.TriggerScreenShake(shakeIntensity, shakeDuration, knockbackDirection);
+        
+        // Optional: Hit pause (brief freeze frame)
+        // metroidvaniaCamera.TriggerHitPause(0.05f);
+    }
+
+    /// <summary>
+    /// Handles player death
+    /// </summary>
+    private void Die()
+    {
+        if (isDead) return;
+        
+        isDead = true;
+        deathTimer = deathAnimationTime;
+        
+        // STOP ALL PHYSICS IMMEDIATELY
+        rb.linearVelocity = Vector2.zero;
+        rb.gravityScale = 0f;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        
+        // Also set constraints to freeze all movement
+        rb.constraints = RigidbodyConstraints2D.FreezeAll;
+        
+        // Disable the Rigidbody2D component temporarily
+        rb.simulated = false;
+        
+        // Disable all movement inputs
+        moveInput = Vector2.zero;
+        
+        // Disable collisions
+        if (playerCollider != null)
+            playerCollider.enabled = false;
+        
+        // Cancel all active states
+        CancelPlayerActions();
+        
+        // Death animation - FORCE PLAY AND PREVENT INTERRUPTION
+        if (animator != null)
+        {
+            animator.Play("Kalb_death", -1, 0f);
+            animator.Update(0f); // Force immediate update
+            
+            // Set a parameter to prevent other animations
+            animator.SetBool("IsDead", true);
+        }
+        
+        // Death effect at current position
+        if (deathEffectPrefab != null)
+        {
+            Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
+        }
+        
+        Debug.Log("Player died!");
+    }
+    
+    private System.Collections.IEnumerator ResetTimeScaleAfter(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        Time.timeScale = 1f;
+    }
+    
+    /// <summary>
+    /// Respawns player at last checkpoint
+    /// </summary>
+    private void Respawn()
+    {
+        isDead = false;
+        isRespawning = true;
+        respawnTimer = respawnInvincibilityTime;
+        
+        // RESTORE PHYSICS PROPERLY
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation; // Only freeze rotation
+        rb.simulated = true; // Re-enable physics simulation
+        rb.gravityScale = normalGravityScale;
+        rb.linearVelocity = Vector2.zero;
+        
+        // Restore collisions
+        if (playerCollider != null)
+            playerCollider.enabled = true;
+        
+        // Reset animator death state
+        if (animator != null)
+        {
+            animator.SetBool("IsDead", false);
+        }
+        
+        // Reset health
+        currentHealth = maxHealth;
+        
+        // Teleport to checkpoint with safety offset
+        Vector3 safeSpawnPosition = lastCheckpointPosition + Vector3.up * 0.5f;
+        transform.position = safeSpawnPosition;
+        
+        // Reset input
+        moveInput = Vector2.zero;
+        
+        // Start respawn invincibility flashing
+        StartCoroutine(RespawnFlashRoutine());
+        
+        // Play respawn animation
+        if (animator != null)
+        {
+            animator.Play("Kalb_respawn", -1, 0f);
+        }
+        
+        Debug.Log($"Respawned at checkpoint. Health restored to {currentHealth}/{maxHealth}");
+    }
+    
+    /// <summary>
+    /// Sets a new checkpoint position
+    /// </summary>
+    public void SetCheckpoint(Vector3 checkpointPosition)
+    {
+        lastCheckpointPosition = checkpointPosition;
+        Debug.Log($"Checkpoint set at {checkpointPosition}");
+    }
+    
+    /// <summary>
+    /// Ends respawn invincibility
+    /// </summary>
+    private void EndRespawnInvincibility()
+    {
+        isRespawning = false;
+        respawnTimer = 0f;
+        
+        // Restore sprite color
+        if (playerSprite != null)
+        {
+            playerSprite.color = originalSpriteColor;
+        }
+    }
+    
+    /// <summary>
+    /// Coroutine for respawn flash effect
+    /// </summary>
+    private System.Collections.IEnumerator RespawnFlashRoutine()
+    {
+        if (playerSprite == null) yield break;
+        
+        float flashInterval = 0.15f;
+        int flashCount = Mathf.FloorToInt(respawnInvincibilityTime / flashInterval);
+        
+        for (int i = 0; i < flashCount; i++)
+        {
+            // Alternate between semi-transparent and normal
+            Color flashColor = originalSpriteColor;
+            flashColor.a = (i % 2 == 0) ? 0.3f : 1f;
+            playerSprite.color = flashColor;
+            yield return new WaitForSeconds(flashInterval);
+        }
+        
+        // Ensure full opacity at the end
+        playerSprite.color = originalSpriteColor;
+    }
+
+        /// <summary>
+    /// Checks if player has fallen out of bounds and kills them
+    /// </summary>
+    private void CheckDeathBoundary()
+    {
+        if (isDead || godMode) return;
+        
+        // Define death boundary (adjust based on your game)
+        float deathY = -20f; // Fall below this Y position = death
+        
+        if (transform.position.y < deathY)
+        {
+            // Instant death from falling
+            TakeDamage(currentHealth, transform.position + Vector3.up * 2f, 0f);
+            
+            // Optional: Special falling death effect
+            Debug.Log("Fell to death!");
+        }
+    }
+
     /// <summary>
     /// Enhanced hard landing detection with screen-height check
     /// Combines velocity and screen-height conditions based on settings
@@ -1879,7 +2484,7 @@ public class Kalb : MonoBehaviour
     private void HandlePogoHit(GameObject target, Vector2 hitPoint)
     {
         // Check if it's a spike tile
-        /*SpikeTile spikeTile = target.GetComponent<SpikeTile>();
+        SpikeTile spikeTile = target.GetComponent<SpikeTile>();
         if (spikeTile != null && enablePogoOnSpikes)
         {
             if (spikeTile.CanBePogoed())
@@ -1901,7 +2506,7 @@ public class Kalb : MonoBehaviour
                 
                 return;
             }
-        }*/
+        }
         
         // Check if it's an enemy (you'll need to adapt this to your enemy system)
         // Example:
@@ -2892,8 +3497,37 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void SetAnimation(float horizontalInput)
     {
+        if (isDead)
+        {
+            // Keep playing death animation without interruption
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Kalb_death"))
+            {
+                animator.Play("Kalb_death", -1, 0f);
+            }
+            return;
+        }
+        else if (isRespawning)
+        {
+            // Keep playing respawn animation without interruption
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Kalb_respawn"))
+            {
+                animator.Play("Kalb_respawn", -1, 0f);
+            }
+            return;
+        }
+        else if (isTakingDamage && knockbackTimer > 0)
+        {
+            // FORCE hurt animation to play completely
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Kalb_hurt"))
+            {
+                animator.Play("Kalb_hurt", -1, 0f);
+                // Lock the animation to prevent interruption
+                LockAnimationForDuration(0.3f);
+            }
+            return;
+        }
         // SPECIAL STATES (highest priority)
-        if (isLedgeClimbing)
+        else if (isLedgeClimbing)
         {
             animator.Play("Kalb_ledge_climb");
         }
@@ -2942,6 +3576,15 @@ public class Kalb : MonoBehaviour
         {
             HandleAirAnimations();
         }
+    }
+
+    /// <summary>
+    /// Locks animation for a specific duration to prevent interruption
+    /// </summary>
+    private void LockAnimationForDuration(float duration)
+    {
+        isAnimationLocked = true;
+        animationLockTimer = duration;
     }
     
     /// <summary>
@@ -3191,6 +3834,99 @@ public class Kalb : MonoBehaviour
         // Override bounce force
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         rb.AddForce(Vector2.up * bounceForce, ForceMode2D.Impulse);
+    }
+
+        // ====================================================================
+    // SECTION 14: PUBLIC API & ABILITY MANAGEMENT
+    // ====================================================================
+    
+    // ... existing public methods ...
+    
+    /// <summary>
+    /// Heals the player by specified amount
+    /// </summary>
+    public void Heal(int amount)
+    {
+        if (isDead) return;
+        
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+        Debug.Log($"Healed {amount}. Health: {currentHealth}/{maxHealth}");
+        
+        // Visual feedback for healing
+        // StartCoroutine(HealFlashRoutine());
+    }
+    
+    /// <summary>
+    /// Sets player health to specific value
+    /// </summary>
+    public void SetHealth(int health)
+    {
+        currentHealth = Mathf.Clamp(health, 0, maxHealth);
+        Debug.Log($"Health set to {currentHealth}/{maxHealth}");
+    }
+    
+    /// <summary>
+    /// Increases max health
+    /// </summary>
+    public void IncreaseMaxHealth(int increaseAmount)
+    {
+        maxHealth += increaseAmount;
+        currentHealth = Mathf.Clamp(currentHealth + increaseAmount, 0, maxHealth);
+        Debug.Log($"Max health increased to {maxHealth}");
+    }
+    
+    /// <summary>
+    /// DEBUG: Test damage from right side
+    /// </summary>
+    public void TestTakeDamage(int damage = 10)
+    {
+        Vector3 testDamageSource = transform.position + Vector3.right * 2f;
+        TakeDamage(damage, testDamageSource);
+    }
+    
+    /// <summary>
+    /// DEBUG: Test damage from left side
+    /// </summary>
+    public void TestTakeDamageLeft(int damage = 10)
+    {
+        Vector3 testDamageSource = transform.position + Vector3.left * 2f;
+        TakeDamage(damage, testDamageSource);
+    }
+    
+    /// <summary>
+    /// DEBUG: Kill player for testing
+    /// </summary>
+    public void TestKill()
+    {
+        TakeDamage(currentHealth, transform.position + Vector3.up * 2f);
+    }
+    
+    /// <summary>
+    /// DEBUG: Toggle god mode (invincibility)
+    /// </summary>
+    public void ToggleGodMode()
+    {
+        godMode = !godMode;
+        
+        // Visual feedback
+        if (playerSprite != null)
+        {
+            if (godMode)
+            {
+                // Golden tint for god mode
+                playerSprite.color = new Color(1f, 0.92f, 0.016f, 0.7f);
+            }
+            else
+            {
+                playerSprite.color = originalSpriteColor;
+            }
+        }
+        
+        Debug.Log($"God Mode: {(godMode ? "ON" : "OFF")}");
+        
+        // Optional: Play sound effect
+        // if (audioSource != null)
+        //     audioSource.PlayOneShot(godMode ? powerupSound : powerdownSound);
     }
     
     // ====================================================================
