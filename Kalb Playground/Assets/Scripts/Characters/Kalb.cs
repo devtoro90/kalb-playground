@@ -136,6 +136,28 @@ public class Kalb : MonoBehaviour
     public float minLedgeHoldTime = 0.3f;
     public float ledgeReleaseForce = 5f;
     public float ledgeReleaseCooldown = 0.2f;
+
+    [Header("Pogo Attack Settings")]
+    public bool pogoUnlocked = true;
+    public float pogoAttackDuration = 0.2f;
+    public float pogoAttackCooldown = 0.1f;
+    public float pogoBounceForce = 15f;
+    public float pogoDownwardForce = 5f;
+    public float pogoDetectionRange = 1f;
+    public LayerMask pogoLayers;
+    public float pogoDamage = 25f;
+    public float pogoKnockback = 8f;
+    public bool enablePogoOnSpikes = true;
+    public bool resetJumpOnPogo = true;
+    public bool canPogoInAir = true;
+    public int maxPogoChain = 3;
+    public float pogoChainWindow = 0.5f;
+
+    [Header("Pogo Visual Feedback")]
+    public GameObject pogoEffectPrefab;
+    public float pogoEffectDuration = 0.3f;
+    public Color pogoFlashColor = Color.yellow;
+    public float pogoFlashDuration = 0.1f;
     
     // ====================================================================
     // SECTION 2: PRIVATE STATE VARIABLES
@@ -242,13 +264,23 @@ public class Kalb : MonoBehaviour
     private Vector2 ledgePosition;
     private float ledgeClimbTimer = 0f;
     private int ledgeSide = 0;
-    private float ledgeGrabTime = 0f;
     private float currentLedgeHoldTime = 0f;
     private float ledgeReleaseTimer = 0f;
     private bool canGrabLedge = true;
-    private MetroidvaniaCamera metroidvaniaCamera;
+
+    //POGO ATTACK STATE
+    private bool isPogoAttacking = false;
+    private bool isPogoBouncing = false;
+    private float pogoAttackTimer = 0f;
+    private float pogoCooldownTimer = 0f;
+    private int currentPogoChain = 0;
+    private float pogoChainTimer = 0f;
+    private float lastPogoTime = 0f;
+    private Vector2 pogoDirection = Vector2.down;
+    private bool hasPogoedThisJump = false; 
 
     //CAMERA
+    private MetroidvaniaCamera metroidvaniaCamera;
     
     // ====================================================================
     // SECTION 3: UNITY LIFE CYCLE METHODS
@@ -458,6 +490,7 @@ public class Kalb : MonoBehaviour
         UpdateSwimTimers();
         UpdateLedgeTimers();
         UpdateComboTimers();
+        UpdatePogoTimers();
         
     }
     
@@ -508,6 +541,7 @@ public class Kalb : MonoBehaviour
         {
             coyoteTimeCounter = coyoteTime;
             hasDoubleJumped = false;
+            hasPogoedThisJump = false;
         }
         else if (coyoteTimeCounter > 0)
         {
@@ -551,12 +585,10 @@ public class Kalb : MonoBehaviour
         // Update grab time while holding ledge
         if (isLedgeGrabbing)
         {
-            ledgeGrabTime += Time.deltaTime;
             currentLedgeHoldTime += Time.deltaTime;
         }
         else
         {
-            ledgeGrabTime = 0f;
             currentLedgeHoldTime = 0f;
         }
         
@@ -601,6 +633,44 @@ public class Kalb : MonoBehaviour
             {
                 ResetCombo();
             }
+        }
+    }
+
+    /// <summary>
+    /// Updates pogo attack timers
+    /// </summary>
+    private void UpdatePogoTimers()
+    {
+        // Pogo attack duration timer
+        if (isPogoAttacking)
+        {
+            pogoAttackTimer -= Time.deltaTime;
+            if (pogoAttackTimer <= 0)
+            {
+                EndPogoAttack();
+            }
+        }
+        
+        // Pogo cooldown timer
+        if (pogoCooldownTimer > 0)
+        {
+            pogoCooldownTimer -= Time.deltaTime;
+        }
+        
+        // Pogo chain window timer
+        if (pogoChainTimer > 0)
+        {
+            pogoChainTimer -= Time.deltaTime;
+            if (pogoChainTimer <= 0)
+            {
+                ResetPogoChain();
+            }
+        }
+        
+        // Pogo bounce state timer (auto-cancel)
+        if (isPogoBouncing && Time.time - lastPogoTime > 0.3f)
+        {
+            isPogoBouncing = false;
         }
     }
     
@@ -661,6 +731,12 @@ public class Kalb : MonoBehaviour
         if (isLedgeClimbing)
         {
             HandleLedgeClimb();
+        }
+
+        // Handle pogo attack detection
+        if (isPogoAttacking && !isPogoBouncing)
+        {
+            CheckForPogoTargets();
         }
     }
     
@@ -753,6 +829,13 @@ public class Kalb : MonoBehaviour
         if (!isLedgeClimbing)
         {
             PreventWallStick();
+        }
+
+        // Apply pogo gravity if pogo bouncing
+        if (isPogoBouncing)
+        {
+            // Reduced gravity during pogo bounce for better control
+            rb.gravityScale = normalGravityScale * 0.7f;
         }
     }
     
@@ -888,6 +971,21 @@ public class Kalb : MonoBehaviour
     private void HandleAttackInput()
     {
         if (isHardLanding || isLedgeGrabbing || isLedgeClimbing || isInWater || isSwimming) return;
+
+        // Check for pogo attack (down + attack) - NEW
+        if (moveInput.y < -0.7f && attackAction.triggered && pogoUnlocked)
+        {
+            // Only allow pogo in air, not on ground
+            if (!isGrounded && !isWallSliding && canPogoInAir)
+            {
+                // Only allow one pogo per jump unless we've bounced
+                if (!isPogoAttacking && pogoCooldownTimer <= 0 && !isDashing && !hasPogoedThisJump)
+                {
+                    StartPogoAttack();
+                    return; // Exit to prevent regular attack
+                }
+            }
+        }
         
         // Check if attack button was pressed this frame
         bool attackPressed = attackAction.triggered;
@@ -1044,6 +1142,10 @@ public class Kalb : MonoBehaviour
         {
             HandleAttackMovement();
         }
+        else if (isPogoAttacking) // NEW: Pogo movement
+        {
+            HandlePogoMovement();
+        }
         else if (isWallSliding)
         {
             HandleWallSlideMovement();
@@ -1156,6 +1258,26 @@ public class Kalb : MonoBehaviour
                 Mathf.MoveTowards(rb.linearVelocity.x, 0, Time.deltaTime * 20f),
                 rb.linearVelocity.y
             );
+        }
+    }
+
+    /// <summary>
+    /// Handles movement during pogo attack
+    /// </summary>
+    private void HandlePogoMovement()
+    {
+        // During pogo attack, allow limited horizontal control
+        float controlMultiplier = isPogoBouncing ? 0.3f : 0.1f;
+        float targetXVelocity = moveInput.x * moveSpeed * controlMultiplier;
+        
+        // Apply horizontal movement with smoothing
+        Vector2 targetVelocity = new Vector2(targetXVelocity, rb.linearVelocity.y);
+        rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing * 2f);
+        
+        // Apply downward force during active pogo (not bouncing)
+        if (!isPogoBouncing && moveInput.y < -0.5f)
+        {
+            rb.AddForce(Vector2.down * pogoDownwardForce * 0.5f);
         }
     }
     
@@ -1288,6 +1410,7 @@ public class Kalb : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         ResetFallTracking();
+        hasPogoedThisJump = false;
     }
     
     /// <summary>
@@ -1326,6 +1449,7 @@ public class Kalb : MonoBehaviour
         
         airDashCount = 0;
         ResetFallTracking();
+        hasPogoedThisJump = false; 
         CancelCombo();
     }
     
@@ -1670,6 +1794,249 @@ public class Kalb : MonoBehaviour
         rb.gravityScale = normalGravityScale;
         animator.Play("Kalb_idle");
     }
+
+    /// <summary>
+    /// Starts a pogo attack
+    /// </summary>
+    private void StartPogoAttack()
+    {
+        isPogoAttacking = true;
+        isAttacking = true; // Also set regular attacking flag for compatibility
+        pogoAttackTimer = pogoAttackDuration;
+        pogoCooldownTimer = pogoAttackCooldown;
+        pogoDirection = moveInput.y < -0.7f ? Vector2.down : (Vector2)(attackPoint.position - transform.position).normalized;
+
+        // Mark that we've used our pogo for this jump
+        hasPogoedThisJump = true;
+        
+        // Apply initial downward force
+        if (moveInput.y < -0.7f)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, -pogoDownwardForce);
+        }
+        
+        // Play pogo animation
+        if (animator != null)
+        {
+            animator.Play("Kalb_pogo_attack");
+        }
+        
+        // Cancel combo if active
+        CancelCombo();
+        
+        // Detect pogo-able objects immediately
+        CheckForPogoTargets();
+    }
+
+    /// <summary>
+    /// Checks for pogo-able targets below the player
+    /// </summary>
+    private void CheckForPogoTargets()
+    {
+        Vector2 detectionPoint = transform.position;
+        float detectionRange = pogoDetectionRange;
+        
+        // Raycast downward for spikes/enemies
+        RaycastHit2D[] hits = Physics2D.RaycastAll(detectionPoint, Vector2.down, detectionRange, pogoLayers);
+        
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.collider != null)
+            {
+                HandlePogoHit(hit.collider.gameObject, hit.point);
+                break; // Only pogo on first valid target
+            }
+        }
+        
+        // Also check sphere cast for better detection
+        Collider2D[] sphereHits = Physics2D.OverlapCircleAll(detectionPoint + (Vector2.down * (detectionRange / 2f)), 
+                                                            detectionRange / 2f, pogoLayers);
+        
+        foreach (Collider2D collider in sphereHits)
+        {
+            // Skip if already handled by raycast
+            bool alreadyHit = false;
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.collider == collider)
+                {
+                    alreadyHit = true;
+                    break;
+                }
+            }
+            
+            if (!alreadyHit)
+            {
+                HandlePogoHit(collider.gameObject, collider.bounds.center);
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handles hitting a pogo-able target
+    /// </summary>
+    private void HandlePogoHit(GameObject target, Vector2 hitPoint)
+    {
+        // Check if it's a spike tile
+        /*SpikeTile spikeTile = target.GetComponent<SpikeTile>();
+        if (spikeTile != null && enablePogoOnSpikes)
+        {
+            if (spikeTile.CanBePogoed())
+            {
+                PerformPogoBounce();
+                currentPogoChain++;
+                pogoChainTimer = pogoChainWindow;
+                lastPogoTime = Time.time;
+                
+                // Spawn pogo effect
+                if (pogoEffectPrefab != null)
+                {
+                    GameObject effect = Instantiate(pogoEffectPrefab, hitPoint, Quaternion.identity);
+                    Destroy(effect, pogoEffectDuration);
+                }
+                
+                // Flash player sprite
+                StartCoroutine(PogoFlashEffect());
+                
+                return;
+            }
+        }*/
+        
+        // Check if it's an enemy (you'll need to adapt this to your enemy system)
+        // Example:
+        // EnemyHealth enemy = target.GetComponent<EnemyHealth>();
+        // if (enemy != null)
+        // {
+        //     enemy.TakeDamage(pogoDamage);
+        //     PerformPogoBounce();
+        //     currentPogoChain++;
+        //     pogoChainTimer = pogoChainWindow;
+        //     return;
+        // }
+    }
+
+    /// <summary>
+    /// Performs the pogo bounce
+    /// </summary>
+    private void PerformPogoBounce()
+    {
+        isPogoBouncing = true;
+        lastPogoTime = Time.time;
+        
+        // Apply bounce force
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0); // Reset vertical velocity
+        rb.AddForce(Vector2.up * pogoBounceForce, ForceMode2D.Impulse);
+        
+        // Reset jump states
+        if (resetJumpOnPogo)
+        {
+            hasDoubleJumped = false;
+            airDashCount = 0;
+            coyoteTimeCounter = coyoteTime;
+        }
+
+        // Reset pogo count so you can pogo again after successful bounce
+        hasPogoedThisJump = false; 
+        
+        // Apply slight horizontal movement based on input
+        if (Mathf.Abs(moveInput.x) > 0.1f)
+        {
+            rb.AddForce(new Vector2(moveInput.x * 3f, 0), ForceMode2D.Impulse);
+        }
+    }
+
+    /// <summary>
+    /// Applies pogo bounce from external sources (like SpikeTile)
+    /// </summary>
+    public void ApplyPogoBounce(float force)
+    {
+        if (!isPogoAttacking) return;
+        
+        isPogoBouncing = true;
+        lastPogoTime = Time.time;
+        
+        // Apply bounce force
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+        rb.AddForce(Vector2.up * force, ForceMode2D.Impulse);
+        
+        // Reset jump states
+        if (resetJumpOnPogo)
+        {
+            hasDoubleJumped = false;
+            airDashCount = 0;
+            coyoteTimeCounter = coyoteTime;
+        }
+
+        // Reset pogo count so you can pogo again after successful bounce
+        hasPogoedThisJump = false;
+    }
+
+    /// <summary>
+    /// Ends pogo attack
+    /// </summary>
+    private void EndPogoAttack()
+    {
+        isPogoAttacking = false;
+        isAttacking = false;
+        
+        // If we're still in bounce state, maintain it briefly
+        if (isPogoBouncing && rb.linearVelocity.y > 0)
+        {
+            // Let bounce continue naturally
+        }
+        else
+        {
+            isPogoBouncing = false;
+        }
+
+        // If pogo attack ended without bouncing, we've still used our pogo for this jump
+        // (This prevents spamming pogo attacks in air without hitting anything)
+        if (!isPogoBouncing)
+        {
+            hasPogoedThisJump = true; 
+        }
+    }
+
+    /// <summary>
+    /// Resets pogo chain
+    /// </summary>
+    private void ResetPogoChain()
+    {
+        currentPogoChain = 0;
+        pogoChainTimer = 0f;
+    }
+
+    /// <summary>
+    /// Coroutine for pogo flash effect
+    /// </summary>
+    private System.Collections.IEnumerator PogoFlashEffect()
+    {
+        SpriteRenderer playerSprite = GetComponent<SpriteRenderer>();
+        if (playerSprite != null)
+        {
+            Color original = playerSprite.color;
+            playerSprite.color = pogoFlashColor;
+            yield return new WaitForSeconds(pogoFlashDuration);
+            playerSprite.color = original;
+        }
+    }
+
+    /// <summary>
+    /// Checks if player is currently pogo attacking
+    /// </summary>
+    public bool IsPogoAttacking()
+    {
+        return isPogoAttacking;
+    }
+
+    /// <summary>
+    /// Gets current pogo chain count
+    /// </summary>
+    public int GetCurrentPogoChain()
+    {
+        return currentPogoChain;
+    }
     
     // ====================================================================
     // SECTION 10: SWIMMING SYSTEM
@@ -1721,6 +2088,7 @@ public class Kalb : MonoBehaviour
         isSwimming = false;
         rb.gravityScale = normalGravityScale;
         coyoteTimeCounter = coyoteTime; // Allow potential double jump
+        hasPogoedThisJump = false; 
         CancelCombo();
     }
     
@@ -1962,6 +2330,7 @@ public class Kalb : MonoBehaviour
         isWallSliding = false;
         airDashCount = 0;
         hasDoubleJumped = false;
+        hasPogoedThisJump = false;
         CancelCombo();
     }
     
@@ -2337,7 +2706,6 @@ public class Kalb : MonoBehaviour
         isLedgeGrabbing = true;
         isLedgeClimbing = false;
         ledgeClimbTimer = 0f;
-        ledgeGrabTime = 0f;
         currentLedgeHoldTime = 0f;
         
         // Stop movement and gravity
@@ -2509,6 +2877,9 @@ public class Kalb : MonoBehaviour
         // Reset air dash and track jump
         airDashCount = 0;
         ResetFallTracking();
+        coyoteTimeCounter = coyoteTime; // Allow potential double jump
+        hasPogoedThisJump = false; 
+        CancelCombo();
     }
     
     // ====================================================================
@@ -2537,6 +2908,10 @@ public class Kalb : MonoBehaviour
         else if (isSwimming)
         {
             HandleSwimmingAnimations(horizontalInput);
+        }
+        else if (isPogoAttacking && pogoUnlocked)
+        {
+            HandlePogoAnimations();
         }
         // COMBO ATTACK STATE (new priority - above regular attacks)
         else if (isAttacking && currentCombo > 0)
@@ -2672,6 +3047,22 @@ public class Kalb : MonoBehaviour
             animator.SetFloat("AttackSpeed", 1.0f);
         }
     }
+
+    /// <summary>
+    /// Handles pogo attack animations
+    /// </summary>
+    private void HandlePogoAnimations()
+    {
+        if (isPogoBouncing)
+        {
+            //animator.Play("Kalb_pogo_bounce");
+            animator.Play("Kalb_attack_reset");
+        }
+        else
+        {
+            animator.Play("Kalb_pogo_attack");
+        }
+    }
     
     // ====================================================================
     // SECTION 14: PUBLIC API & ABILITY MANAGEMENT
@@ -2718,6 +3109,7 @@ public class Kalb : MonoBehaviour
         UnlockRun();
         UnlockWallJump();
         UnlockDoubleJump();
+        UnlockPogo();
     }
     
     /// <summary>
@@ -2729,6 +3121,7 @@ public class Kalb : MonoBehaviour
         runUnlocked = false;
         wallJumpUnlocked = false;
         doubleJumpUnlocked = false;
+        pogoUnlocked = false;
     }
 
     /// <summary>
@@ -2772,6 +3165,33 @@ public class Kalb : MonoBehaviour
     {
         return isComboFinishing;
     }
+
+    /// <summary>
+    /// Unlocks the pogo attack ability - NEW
+    /// </summary>
+    public void UnlockPogo()
+    {
+        pogoUnlocked = true;
+    }
+
+    /// <summary>
+    /// Checks if pogo is unlocked - NEW
+    /// </summary>
+    public bool IsPogoUnlocked()
+    {
+        return pogoUnlocked;
+    }
+
+    /// <summary>
+    /// Forces a pogo bounce (for external triggers) - NEW
+    /// </summary>
+    public void ForcePogoBounce(float bounceForce)
+    {
+        PerformPogoBounce();
+        // Override bounce force
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+        rb.AddForce(Vector2.up * bounceForce, ForceMode2D.Impulse);
+    }
     
     // ====================================================================
     // SECTION 15: EDITOR & DEBUG VISUALIZATION
@@ -2793,6 +3213,7 @@ public class Kalb : MonoBehaviour
         DrawScreenBoundsGizmos();
         DrawSwimmingGizmos();
         DrawLedgeGizmos();
+        DrawPogoGizmos();
     }
     
     /// <summary>
@@ -2975,6 +3396,34 @@ public class Kalb : MonoBehaviour
                 new Vector3(ledgePosition.x - 0.5f, ledgePosition.y, 0),
                 new Vector3(ledgePosition.x + 0.5f, ledgePosition.y, 0)
             );
+        }
+    }
+
+    /// <summary>
+    /// Draws pogo attack detection gizmos - NEW
+    /// </summary>
+    private void DrawPogoGizmos()
+    {
+        if (pogoUnlocked)
+        {
+            // Pogo detection range
+            Gizmos.color = Color.magenta;
+            Vector2 detectionCenter = transform.position + (Vector3.down * (pogoDetectionRange / 2f));
+            Gizmos.DrawWireSphere(detectionCenter, pogoDetectionRange / 2f);
+            
+            // Pogo direction indicator
+            if (isPogoAttacking)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(transform.position, pogoDirection * pogoDetectionRange);
+            }
+            
+            // Pogo chain indicator
+            if (currentPogoChain > 0)
+            {
+                UnityEditor.Handles.Label(transform.position + Vector3.up * 1.5f, 
+                    $"Pogo Chain: {currentPogoChain}/{maxPogoChain}");
+            }
         }
     }
 }
