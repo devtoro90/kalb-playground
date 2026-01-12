@@ -2402,13 +2402,40 @@ MonoBehaviour:
   canAirDash: 1
   resetAirDashOnGround: 1
   maxAirDashes: 1
-  wallSlideSpeed: 2
+  wallSlideSpeed: 6
   wallJumpForce: 11
   wallJumpAngle: {x: 1, y: 2}
   wallJumpDuration: 0.2
   wallStickTime: 0.25
   wallClingTime: 0.2
   wallClingSlowdown: 0.3
+  wallSlideAccelerationTime: 2
+  wallSlideDecelerationTime: 0.2
+  wallSlideAccelerationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  enableWallSlideAcceleration: 1
   wallLockUnlocked: 1
   wallLockSpeed: 0.5
   wallLockReleaseSpeed: 2

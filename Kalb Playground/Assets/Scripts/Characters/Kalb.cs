@@ -41,13 +41,19 @@ public class Kalb : MonoBehaviour
     public int maxAirDashes = 1;
     
     [Header("Wall Interaction")]
-    public float wallSlideSpeed = 2f;
+    public float wallSlideSpeed = 6f;
     public float wallJumpForce = 11f;
     public Vector2 wallJumpAngle = new Vector2(1, 2);
     public float wallJumpDuration = 0.2f;
     public float wallStickTime = 0.25f;
     public float wallClingTime = 0.2f;
     public float wallClingSlowdown = 0.3f;
+
+    [Header("Wall Slide Acceleration")]
+    public float wallSlideAccelerationTime = 2f;        // Time to reach max slide speed
+    public float wallSlideDecelerationTime = 0.2f;        // Time to slow down when changing direction
+    public AnimationCurve wallSlideAccelerationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);  // Acceleration curve
+    public bool enableWallSlideAcceleration = true;       // Toggle for the feature
 
     [Header("Wall Lock Ability")]
     public bool wallLockUnlocked = false;
@@ -245,6 +251,12 @@ public class Kalb : MonoBehaviour
     public int wallSide = 0;
     private int lastWallSide = 0;
     private float wallNormalDistance = 0.05f;
+
+    // WALL SLIDE ACCELERATION
+    private float currentWallSlideSpeed = 0f;             // Current actual slide speed
+    private float wallSlideAccelerationTimer = 0f;        // Timer for acceleration
+    private bool isAcceleratingWallSlide = false;         // Flag for acceleration state
+    private float wallSlideAccelerationDirection = 1f;    // 1 = normal, -1 = decelerating
 
     // WALL LOCK STATE
     private bool isWallLocked = false;
@@ -445,6 +457,8 @@ public class Kalb : MonoBehaviour
         }
         // Initialize Health System
         InitializeHealthSystem();
+        InitializeWallSlideAcceleration();
+
     }
     
     /// <summary>
@@ -521,6 +535,159 @@ public class Kalb : MonoBehaviour
         godMode = false;
         
         
+    }
+
+    /// <summary>
+    /// Initializes wall slide acceleration system
+    /// </summary>
+    private void InitializeWallSlideAcceleration()
+    {
+        currentWallSlideSpeed = 0f;
+        wallSlideAccelerationTimer = 0f;
+        isAcceleratingWallSlide = false;
+        wallSlideAccelerationDirection = 1f;
+        
+        // Set default acceleration curve if null
+        if (wallSlideAccelerationCurve == null || wallSlideAccelerationCurve.keys.Length == 0)
+        {
+            wallSlideAccelerationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        }
+    }
+
+    /// <summary>
+    /// Resets wall slide acceleration to start from zero
+    /// </summary>
+    public void ResetWallSlideAcceleration()
+    {
+        if (!enableWallSlideAcceleration) return;
+        
+        currentWallSlideSpeed = 0f;
+        wallSlideAccelerationTimer = 0f;
+        isAcceleratingWallSlide = true;
+        wallSlideAccelerationDirection = 1f;  // Always start accelerating downward
+        
+        Debug.Log("Wall slide acceleration reset");
+    }
+
+    /// <summary>
+    /// Updates wall slide acceleration over time
+    /// </summary>
+    private void UpdateWallSlideAcceleration()
+    {
+        if (!enableWallSlideAcceleration || !isWallSliding || isWallLocked) return;
+        
+        // If we just started wall sliding, reset acceleration
+        if (wallSlideState == WallSlideState.Starting && !isAcceleratingWallSlide)
+        {
+            ResetWallSlideAcceleration();
+        }
+        
+        // Update acceleration timer
+        if (isAcceleratingWallSlide && wallSlideAccelerationTimer < 1f)
+        {
+            wallSlideAccelerationTimer += Time.deltaTime / wallSlideAccelerationTime;
+            wallSlideAccelerationTimer = Mathf.Clamp01(wallSlideAccelerationTimer);
+            
+            // Calculate speed based on acceleration curve
+            float curveValue = wallSlideAccelerationCurve.Evaluate(wallSlideAccelerationTimer);
+            currentWallSlideSpeed = Mathf.Lerp(0f, wallSlideSpeed, curveValue);
+            
+            // If we reached max speed, stop accelerating
+            if (wallSlideAccelerationTimer >= 1f)
+            {
+                isAcceleratingWallSlide = false;
+                currentWallSlideSpeed = wallSlideSpeed;  // Ensure exact max speed
+            }
+        }
+        // If not accelerating but speed is less than max, maintain current speed
+        else if (!isAcceleratingWallSlide && currentWallSlideSpeed < wallSlideSpeed)
+        {
+            currentWallSlideSpeed = wallSlideSpeed;
+        }
+        
+        // Apply deceleration if changing walls or slowing down
+        UpdateWallSlideDeceleration();
+    }
+
+    /// <summary>
+    /// Handles deceleration when changing walls or slowing down
+    /// </summary>
+    private void UpdateWallSlideDeceleration()
+    {
+        if (!enableWallSlideAcceleration) return;
+        
+        // Check if we're changing wall sides (this should cause deceleration)
+        bool changingWalls = false;
+        if (isTouchingWall && Mathf.Abs(moveInput.x) > 0.1f)
+        {
+            float inputDirection = Mathf.Sign(moveInput.x);
+            changingWalls = inputDirection == -wallSide && !isWallLockEngaging;
+        }
+        
+        // Decelerate when changing walls or when wall lock is engaging
+        if (changingWalls || isWallLockEngaging)
+        {
+            if (wallSlideAccelerationDirection > 0)  // Only if we were accelerating downward
+            {
+                wallSlideAccelerationDirection = -1f;  // Switch to deceleration
+                wallSlideAccelerationTimer = 1f - (currentWallSlideSpeed / wallSlideSpeed);
+            }
+            
+            // Update deceleration
+            if (wallSlideAccelerationDirection < 0)
+            {
+                wallSlideAccelerationTimer -= Time.deltaTime / wallSlideDecelerationTime;
+                wallSlideAccelerationTimer = Mathf.Clamp01(wallSlideAccelerationTimer);
+                
+                float curveValue = wallSlideAccelerationCurve.Evaluate(wallSlideAccelerationTimer);
+                currentWallSlideSpeed = Mathf.Lerp(0f, wallSlideSpeed, curveValue);
+                
+                // If fully decelerated, reset
+                if (wallSlideAccelerationTimer <= 0f)
+                {
+                    wallSlideAccelerationDirection = 1f;
+                    isAcceleratingWallSlide = false;
+                }
+            }
+        }
+        // Reset to acceleration if conditions change
+        else if (wallSlideAccelerationDirection < 0 && !changingWalls && !isWallLockEngaging)
+        {
+            wallSlideAccelerationDirection = 1f;
+            isAcceleratingWallSlide = true;
+            wallSlideAccelerationTimer = currentWallSlideSpeed / wallSlideSpeed;
+        }
+    }
+
+    /// <summary>
+    /// Applies the current wall slide speed to movement
+    /// </summary>
+    private void ApplyWallSlideAcceleration()
+    {
+        if (!enableWallSlideAcceleration || !isWallSliding || isWallLocked) return;
+        
+        // Get the target speed (use accelerated speed if enabled)
+        float targetSpeed = enableWallSlideAcceleration ? 
+            Mathf.Min(-currentWallSlideSpeed, rb.linearVelocity.y) : 
+            -wallSlideSpeed;
+        
+        // Only apply if we're falling (negative velocity)
+        if (rb.linearVelocity.y < 0)
+        {
+            // Apply jump button effect (slower fall when holding jump)
+            if (isJumpButtonHeld && rb.linearVelocity.y < targetSpeed * 0.3f)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, targetSpeed * 0.3f);
+            }
+            // Apply accelerated speed
+            else if (rb.linearVelocity.y < targetSpeed)
+            {
+                // Smoothly approach target speed
+                float newYSpeed = Mathf.MoveTowards(rb.linearVelocity.y, targetSpeed, 
+                    Time.fixedDeltaTime * wallSlideSpeed * 2f);
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, newYSpeed);
+            }
+        }
     }
     
     // ====================================================================
@@ -924,6 +1091,12 @@ public class Kalb : MonoBehaviour
         {
             isWallSlideEngaged = false;
             wallSlideDisengageTimer = 0f;
+
+            // Reset acceleration when landing
+            if (enableWallSlideAcceleration)
+            {
+                ResetWallSlideAcceleration();
+            }
         }
         
         // Reset ledge grab ability when grounded
@@ -1402,6 +1575,39 @@ public class Kalb : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         }
+
+        // Apply acceleration-based movement
+        if (enableWallSlideAcceleration && isWallSliding && !isWallLocked)
+        {
+            ApplyWallSlideAcceleration();
+        }
+        // Original wall slide speed limiting (fallback)
+        else if (isWallSliding)
+        {
+            float currentSlideSpeed = rb.linearVelocity.y;
+            
+            if (isWallClinging)
+            {
+                // Slower slide during wall cling
+                float clingSpeed = -wallSlideSpeed * wallClingSlowdown;
+                if (currentSlideSpeed < clingSpeed)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, clingSpeed);
+                }
+            }
+            else
+            {
+                // Normal wall slide with jump button effect
+                if (isJumpButtonHeld && currentSlideSpeed < 0)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, currentSlideSpeed * 0.7f);
+                }
+                else if (currentSlideSpeed < -wallSlideSpeed)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, -wallSlideSpeed);
+                }
+            }
+        }
     }
     
     /// <summary>
@@ -1670,6 +1876,12 @@ public class Kalb : MonoBehaviour
 
         // Reset wall lock when jumping
         ResetWallLockState();
+
+        // Reset acceleration when wall jumping
+        if (enableWallSlideAcceleration)
+        {
+            ResetWallSlideAcceleration();
+        }
         
         rb.linearVelocity = Vector2.zero;
         Vector2 jumpDir = new Vector2(-wallSide * wallJumpAngle.x, wallJumpAngle.y).normalized;
@@ -3125,7 +3337,20 @@ public class Kalb : MonoBehaviour
             wallSlideState = WallSlideState.None;
 
             ResetWallLockState();
+            // Reset acceleration when leaving wall slide
+            if (enableWallSlideAcceleration)
+            {
+                currentWallSlideSpeed = 0f;
+                wallSlideAccelerationTimer = 0f;
+                isAcceleratingWallSlide = false;
+            }
             return;
+        }
+
+        // Update wall slide acceleration
+        if (enableWallSlideAcceleration && isWallSliding)
+        {
+            UpdateWallSlideAcceleration();
         }
 
         // Handle wall lock if ability is unlocked
@@ -3296,6 +3521,14 @@ public class Kalb : MonoBehaviour
         
         // Store original wall slide speed
         originalWallSlideSpeed = wallSlideSpeed;
+
+        // Start deceleration for wall lock
+        if (enableWallSlideAcceleration)
+        {
+            // Set deceleration direction
+            wallSlideAccelerationDirection = -1f;
+            wallSlideAccelerationTimer = currentWallSlideSpeed / wallSlideSpeed;
+        }
         
         // Reset air dash if enabled
         if (resetAirDashOnWallLock)
@@ -3377,6 +3610,12 @@ public class Kalb : MonoBehaviour
         
         // Restore original wall slide speed
         wallSlideSpeed = originalWallSlideSpeed;
+
+        // Reset acceleration when leaving wall lock
+        if (enableWallSlideAcceleration)
+        {
+            ResetWallSlideAcceleration();
+        }
         
         // Restore gravity
         rb.gravityScale = normalGravityScale;
@@ -3436,6 +3675,14 @@ public class Kalb : MonoBehaviour
         if (originalWallSlideSpeed > 0)
         {
             wallSlideSpeed = originalWallSlideSpeed;
+        }
+
+        // Reset acceleration
+        if (enableWallSlideAcceleration)
+        {
+            currentWallSlideSpeed = 0f;
+            wallSlideAccelerationTimer = 0f;
+            isAcceleratingWallSlide = false;
         }
     }
 
@@ -4351,10 +4598,24 @@ public class Kalb : MonoBehaviour
         // Also reset wall lock
         ResetWallLockState();
         
+        // Reset acceleration
+        if (enableWallSlideAcceleration)
+        {
+            ResetWallSlideAcceleration();
+        }
+    
         // Reset wall contact state
         isTouchingWall = false;
         wallSide = 0;
         
+    }
+
+    /// <summary>
+    /// Gets the current wall slide speed (with acceleration applied)
+    /// </summary>
+    public float GetCurrentWallSlideSpeed()
+    {
+        return enableWallSlideAcceleration ? currentWallSlideSpeed : wallSlideSpeed;
     }
     
     // ====================================================================
@@ -4379,6 +4640,7 @@ public class Kalb : MonoBehaviour
         DrawLedgeGizmos();
         DrawPogoGizmos();
         DrawWallLockGizmos();
+        DrawWallSlideAccelerationGizmos();
     }
     
     /// <summary>
@@ -4626,6 +4888,51 @@ public class Kalb : MonoBehaviour
                 Gizmos.color = Color.blue;
                 Gizmos.DrawWireSphere(transform.position, 0.25f);
             }
+        }
+    }
+
+    /// <summary>
+    /// Draws wall slide acceleration visualization gizmos
+    /// </summary>
+    private void DrawWallSlideAccelerationGizmos()
+    {
+        if (!enableWallSlideAcceleration || !isWallSliding) return;
+        
+        // Draw acceleration meter
+        Vector3 startPos = transform.position + new Vector3(-0.5f, 0.8f, 0);
+        Vector3 endPos = transform.position + new Vector3(0.5f, 0.8f, 0);
+        
+        // Background bar
+        Gizmos.color = Color.gray;
+        Gizmos.DrawLine(startPos, endPos);
+        
+        // Current speed indicator
+        float speedRatio = currentWallSlideSpeed / wallSlideSpeed;
+        Vector3 speedPos = Vector3.Lerp(startPos, endPos, speedRatio);
+        
+        if (isAcceleratingWallSlide)
+        {
+            Gizmos.color = Color.Lerp(Color.yellow, Color.green, speedRatio);
+        }
+        else if (wallSlideAccelerationDirection < 0)
+        {
+            Gizmos.color = Color.blue;
+        }
+        else
+        {
+            Gizmos.color = Color.green;
+        }
+        
+        Gizmos.DrawLine(startPos, speedPos);
+        
+        // Text label
+        UnityEditor.Handles.Label(transform.position + Vector3.up * 1f, 
+            $"Slide Speed: {currentWallSlideSpeed:F1}/{wallSlideSpeed:F1}");
+        
+        if (isAcceleratingWallSlide)
+        {
+            UnityEditor.Handles.Label(transform.position + Vector3.up * 1.2f, 
+                $"Accelerating: {wallSlideAccelerationTimer:P0}");
         }
     }
 }
