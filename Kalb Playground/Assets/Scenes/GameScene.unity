@@ -2409,6 +2409,11 @@ MonoBehaviour:
   wallStickTime: 0.25
   wallClingTime: 0.2
   wallClingSlowdown: 0.3
+  wallLockUnlocked: 1
+  wallLockSpeed: 0.5
+  wallLockReleaseSpeed: 2
+  wallLockInputThreshold: 0.7
+  resetAirDashOnWallLock: 1
   maxFallSpeed: -20
   hardLandingThreshold: -15
   hardLandingStunTime: 0.3

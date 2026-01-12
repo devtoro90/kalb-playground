@@ -48,6 +48,13 @@ public class Kalb : MonoBehaviour
     public float wallStickTime = 0.25f;
     public float wallClingTime = 0.2f;
     public float wallClingSlowdown = 0.3f;
+
+    [Header("Wall Lock Ability")]
+    public bool wallLockUnlocked = false;
+    public float wallLockSpeed = 0.5f;  
+    public float wallLockReleaseSpeed = 2f;  
+    public float wallLockInputThreshold = 0.7f;  
+    public bool resetAirDashOnWallLock = true;  
     
     [Header("Falling & Landing")]
     public float maxFallSpeed = -20f;
@@ -238,6 +245,15 @@ public class Kalb : MonoBehaviour
     public int wallSide = 0;
     private int lastWallSide = 0;
     private float wallNormalDistance = 0.05f;
+
+    // WALL LOCK STATE
+    private bool isWallLocked = false;
+    private bool isWallLockEngaging = false;
+    private bool isWallLockDisengaging = false;
+    private float wallLockTimer = 0f;
+    private float wallLockEngageTime = 0.1f;  // Time to fully engage wall lock
+    private float wallLockDisengageTime = 0.05f;  // Time to disengage
+    private float originalWallSlideSpeed = 0f;  // Store original speed before lock
     
     // WALL SLIDE STATE MACHINE
     private enum WallSlideState { None, Starting, Sliding, Jumping }
@@ -1308,7 +1324,7 @@ public class Kalb : MonoBehaviour
         {
             HandleAttackMovement();
         }
-        else if (isPogoAttacking) // NEW: Pogo movement
+        else if (isPogoAttacking) // Pogo movement
         {
             HandlePogoMovement();
         }
@@ -1372,6 +1388,13 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void HandleWallSlideMovement()
     {
+        // Don't apply wall slide movement if wall locked
+        if (isWallLocked || isWallLockEngaging)
+        {
+            // Wall lock handles its own movement
+            return;
+        }
+        
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         
         // Stop upward movement during wall slide
@@ -1506,7 +1529,7 @@ public class Kalb : MonoBehaviour
     private void UpdateGravity()
     {
         // Skip gravity in these states
-        if (isDashing || isWallSliding || isHardLanding || isWallJumping || isSwimming)
+        if (isDashing || isWallSliding || isHardLanding || isWallJumping || isSwimming || isWallLocked || isWallLockEngaging)
             return;
         
         currentFallSpeed = rb.linearVelocity.y;
@@ -1644,6 +1667,9 @@ public class Kalb : MonoBehaviour
         // Disengage wall slide when jumping off
         isWallSlideEngaged = false;
         wallSlideDisengageTimer = 0f;
+
+        // Reset wall lock when jumping
+        ResetWallLockState();
         
         rb.linearVelocity = Vector2.zero;
         Vector2 jumpDir = new Vector2(-wallSide * wallJumpAngle.x, wallJumpAngle.y).normalized;
@@ -1841,7 +1867,7 @@ public class Kalb : MonoBehaviour
         comboResetTimer = 0f;
         comboAvailable = true;
         isComboFinishing = false;
-        attackQueued = false; // NEW: Clear any queued attacks
+        attackQueued = false; // Clear any queued attacks
         
         // Ensure attack state is cleared
         if (!isAttacking)
@@ -1858,7 +1884,7 @@ public class Kalb : MonoBehaviour
         ResetCombo();
         isAttacking = false;
         attackCooldownTimer = 0f;
-        attackQueued = false; // NEW: Clear queued attacks
+        attackQueued = false; // Clear queued attacks
     }
 
         /// <summary>
@@ -3097,7 +3123,15 @@ public class Kalb : MonoBehaviour
             isWallSliding = false;
             isWallClinging = false;
             wallSlideState = WallSlideState.None;
+
+            ResetWallLockState();
             return;
+        }
+
+        // Handle wall lock if ability is unlocked
+        if (wallLockUnlocked && isWallSliding)
+        {
+            HandleWallLock();
         }
 
         //Force wall slide when engaged, even without input
@@ -3220,6 +3254,192 @@ public class Kalb : MonoBehaviour
     }
 
     /// <summary>
+    /// Handles wall lock ability - locks player to wall position while holding input
+    /// </summary>
+    private void HandleWallLock()
+    {
+        if (!wallLockUnlocked || !isWallSliding || !isWallSlideEngaged) return;
+        
+        // Calculate input direction relative to wall
+        float inputDirection = Mathf.Sign(moveInput.x);
+        bool pressingIntoWall = Mathf.Abs(moveInput.x) > wallLockInputThreshold && 
+                            inputDirection == wallSide;
+        
+        // Handle wall lock engagement
+        if (pressingIntoWall && !isWallLocked && !isWallLockEngaging)
+        {
+            StartWallLock();
+        }
+        // Handle wall lock disengagement (releasing input)
+        else if (!pressingIntoWall && isWallLocked && !isWallLockDisengaging)
+        {
+            EndWallLock();
+        }
+        
+        // Update wall lock timers
+        UpdateWallLockTimers();
+        
+        // Apply wall lock movement
+        ApplyWallLockMovement();
+    }
+
+    /// <summary>
+    /// Starts the wall lock process
+    /// </summary>
+    private void StartWallLock()
+    {
+        if (isWallLocked || isWallLockEngaging) return;
+        
+        isWallLockEngaging = true;
+        isWallLockDisengaging = false;
+        wallLockTimer = wallLockEngageTime;
+        
+        // Store original wall slide speed
+        originalWallSlideSpeed = wallSlideSpeed;
+        
+        // Reset air dash if enabled
+        if (resetAirDashOnWallLock)
+        {
+            airDashCount = 0;
+        }
+        
+        // Reduce gravity to zero for smooth lock
+        rb.gravityScale = 0f;
+        
+        // Stop vertical movement immediately
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+    }
+
+    /// <summary>
+    /// Ends the wall lock and resumes normal wall slide
+    /// </summary>
+    private void EndWallLock()
+    {
+        if (!isWallLocked || isWallLockDisengaging) return;
+        
+        isWallLockDisengaging = true;
+        isWallLockEngaging = false;
+        wallLockTimer = wallLockDisengageTime;
+        
+        // Restore gravity
+        rb.gravityScale = normalGravityScale;
+        
+    }
+
+    /// <summary>
+/// Updates wall lock state timers
+/// </summary>
+    private void UpdateWallLockTimers()
+    {
+        if (wallLockTimer > 0)
+        {
+            wallLockTimer -= Time.deltaTime;
+            
+            if (wallLockTimer <= 0)
+            {
+                // Timer finished - complete the state transition
+                if (isWallLockEngaging)
+                {
+                    CompleteWallLockEngagement();
+                }
+                else if (isWallLockDisengaging)
+                {
+                    CompleteWallLockDisengagement();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Completes the wall lock engagement process
+    /// </summary>
+    private void CompleteWallLockEngagement()
+    {
+        isWallLocked = true;
+        isWallLockEngaging = false;
+        
+        // Completely stop movement
+        rb.linearVelocity = Vector2.zero;
+        rb.gravityScale = 0f;
+        
+        // Cancel any remaining slide speed
+        wallSlideSpeed = wallLockSpeed;
+        
+    }
+
+    /// <summary>
+    /// Completes the wall lock disengagement process
+    /// </summary>
+    private void CompleteWallLockDisengagement()
+    {
+        isWallLocked = false;
+        isWallLockDisengaging = false;
+        
+        // Restore original wall slide speed
+        wallSlideSpeed = originalWallSlideSpeed;
+        
+        // Restore gravity
+        rb.gravityScale = normalGravityScale;
+        
+        // Give a tiny downward nudge to resume sliding
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -0.1f);
+        
+    }
+
+    /// <summary>
+    /// Applies movement during wall lock states
+    /// </summary>
+    private void ApplyWallLockMovement()
+    {
+        if (!isWallLocked && !isWallLockEngaging && !isWallLockDisengaging) return;
+        
+        // During engagement: smoothly slow down to stop
+        if (isWallLockEngaging)
+        {
+            float progress = 1f - (wallLockTimer / wallLockEngageTime);
+            float currentSpeed = Mathf.Lerp(originalWallSlideSpeed, wallLockSpeed, progress);
+            
+            // Apply slowing down movement
+            rb.linearVelocity = new Vector2(0, -currentSpeed);
+        }
+        // During locked state: stay completely still
+        else if (isWallLocked)
+        {
+            rb.linearVelocity = Vector2.zero;
+            
+            // Optional: Apply a tiny force into the wall to prevent drifting
+            Vector2 wallPushForce = new Vector2(wallSide * 0.1f, 0);
+            rb.AddForce(wallPushForce);
+        }
+        // During disengagement: smoothly resume sliding
+        else if (isWallLockDisengaging)
+        {
+            float progress = 1f - (wallLockTimer / wallLockDisengageTime);
+            float currentSpeed = Mathf.Lerp(wallLockSpeed, originalWallSlideSpeed, progress);
+            
+            // Apply speeding up movement
+            rb.linearVelocity = new Vector2(0, -currentSpeed);
+        }
+    }
+
+    /// <summary>
+    /// Resets all wall lock state variables
+    /// </summary>
+    private void ResetWallLockState()
+    {
+        isWallLocked = false;
+        isWallLockEngaging = false;
+        isWallLockDisengaging = false;
+        wallLockTimer = 0f;
+        
+        // Restore original wall slide speed if it was changed
+        if (originalWallSlideSpeed > 0)
+        {
+            wallSlideSpeed = originalWallSlideSpeed;
+        }
+    }
+
+    /// <summary>
     /// Handles input that should disengage wall slide
     /// </summary>
     private void HandleWallSlideDisengagement()
@@ -3239,7 +3459,6 @@ public class Kalb : MonoBehaviour
                 // Apply a small force away from wall for responsiveness
                 rb.AddForce(new Vector2(inputDirection * 2f, 0), ForceMode2D.Impulse);
                 
-                Debug.Log("Wall slide disengaged by moving away from wall");
             }
         }
         
@@ -3916,6 +4135,7 @@ public class Kalb : MonoBehaviour
         UnlockWallJump();
         UnlockDoubleJump();
         UnlockPogo();
+        UnlockWallLock();
     }
     
     /// <summary>
@@ -3928,6 +4148,7 @@ public class Kalb : MonoBehaviour
         wallJumpUnlocked = false;
         doubleJumpUnlocked = false;
         pogoUnlocked = false;
+        wallLockUnlocked = false;
     }
 
     /// <summary>
@@ -3997,6 +4218,30 @@ public class Kalb : MonoBehaviour
         // Override bounce force
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         rb.AddForce(Vector2.up * bounceForce, ForceMode2D.Impulse);
+    }
+
+    /// <summary>
+    /// Unlocks the wall lock ability
+    /// </summary>
+    public void UnlockWallLock()
+    {
+        wallLockUnlocked = true;
+    }
+    
+    /// <summary>
+    /// Checks if wall lock is currently active
+    /// </summary>
+    public bool IsWallLocked()
+    {
+        return isWallLocked;
+    }
+    
+    /// <summary>
+    /// Checks if wall lock is engaging (transitioning to locked state)
+    /// </summary>
+    public bool IsWallLockEngaging()
+    {
+        return isWallLockEngaging;
     }
 
         // ====================================================================
@@ -4102,12 +4347,14 @@ public class Kalb : MonoBehaviour
         isWallClinging = false;
         wallSlideState = WallSlideState.None;
         wallSlideDisengageTimer = 0f;
+
+        // Also reset wall lock
+        ResetWallLockState();
         
         // Reset wall contact state
         isTouchingWall = false;
         wallSide = 0;
         
-        Debug.Log("Wall slide disengaged");
     }
     
     // ====================================================================
@@ -4131,6 +4378,7 @@ public class Kalb : MonoBehaviour
         DrawSwimmingGizmos();
         DrawLedgeGizmos();
         DrawPogoGizmos();
+        DrawWallLockGizmos();
     }
     
     /// <summary>
@@ -4345,13 +4593,39 @@ public class Kalb : MonoBehaviour
     }
 
     /// <summary>
-    /// Debug method to check wall slide state
+    /// Draws wall lock visualization gizmos
     /// </summary>
-    private void DebugWallSlideState()
+    private void DrawWallLockGizmos()
     {
-        if (showDebugInfo && isWallSliding)
+        if (wallLockUnlocked && isWallSliding)
         {
-            Debug.Log($"Wall Slide - Engaged: {isWallSlideEngaged}, Touching: {isTouchingWall}, Side: {wallSide}, Input: {moveInput.x}");
+            if (isWallLocked)
+            {
+                // Green circle when fully locked
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(transform.position, 0.3f);
+                
+                // Text label
+                UnityEditor.Handles.Label(transform.position + Vector3.up * 0.5f, 
+                    "WALL LOCKED");
+            }
+            else if (isWallLockEngaging)
+            {
+                // Yellow circle when engaging
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(transform.position, 0.25f);
+                
+                // Progress indicator
+                float progress = 1f - (wallLockTimer / wallLockEngageTime);
+                UnityEditor.Handles.Label(transform.position + Vector3.up * 0.5f, 
+                    $"Locking: {progress:P0}");
+            }
+            else if (isWallLockDisengaging)
+            {
+                // Blue circle when disengaging
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireSphere(transform.position, 0.25f);
+            }
         }
     }
 }
