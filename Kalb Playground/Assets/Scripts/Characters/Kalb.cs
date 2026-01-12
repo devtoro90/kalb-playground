@@ -242,6 +242,11 @@ public class Kalb : MonoBehaviour
     // WALL SLIDE STATE MACHINE
     private enum WallSlideState { None, Starting, Sliding, Jumping }
     private WallSlideState wallSlideState = WallSlideState.None;
+
+    // WALL SLIDE IMPROVEMENTS
+    private bool isWallSlideEngaged = false;
+    private float wallSlideDisengageTimer = 0f;
+    private float wallSlideDisengageDelay = 0.15f;
     
     // JUMP & AIR MOVEMENT STATE
     private float coyoteTimeCounter = 0f;
@@ -499,7 +504,7 @@ public class Kalb : MonoBehaviour
         // Initialize debug options
         godMode = false;
         
-        Debug.Log($"Health System Initialized: {currentHealth}/{maxHealth} HP");
+        
     }
     
     // ====================================================================
@@ -861,6 +866,7 @@ public class Kalb : MonoBehaviour
         if (wallJumpUnlocked && !isHardLanding && !isLedgeGrabbing && !isLedgeClimbing)
         {
             HandleWallSlide();
+            HandleWallSlideDisengagement();
         }
         
         // Handle ledge climbing if active
@@ -897,6 +903,12 @@ public class Kalb : MonoBehaviour
     {
         bool wasGrounded = isGrounded;
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, environmentLayer);
+
+        if (isGrounded && isWallSlideEngaged)
+        {
+            isWallSlideEngaged = false;
+            wallSlideDisengageTimer = 0f;
+        }
         
         // Reset ledge grab ability when grounded
         if (isGrounded)
@@ -1376,8 +1388,8 @@ public class Kalb : MonoBehaviour
     {
         float currentMoveInput = moveInput.x;
         
-        // Prevent input into walls
-        if (isAgainstWall && !isWallSliding && Mathf.Sign(currentMoveInput) == lastWallSide)
+        // Don't prevent input into walls if wall slide is engaged
+        if (isAgainstWall && !isWallSliding && Mathf.Sign(currentMoveInput) == lastWallSide && !isWallSlideEngaged)
         {
             currentMoveInput = 0;
         }
@@ -1395,8 +1407,15 @@ public class Kalb : MonoBehaviour
         {
             if (wallStickTimer > 0 && isTouchingWall)
             {
-                if (Mathf.Sign(moveInput.x) == -wallSide || moveInput.x == 0)
+                // Allow movement away from wall to disengage
+                if (Mathf.Sign(moveInput.x) == -wallSide)
                 {
+                    // Don't stick - allow movement away
+                    // This lets the player naturally move off the wall
+                }
+                else if (moveInput.x == 0 || Mathf.Sign(moveInput.x) == wallSide)
+                {
+                    // Stick when not moving or moving into wall
                     targetVelocity.x = 0;
                 }
             }
@@ -1621,6 +1640,10 @@ public class Kalb : MonoBehaviour
         wallSlideState = WallSlideState.Jumping;
         wallClingTimer = 0f;
         wallJumpTimer = wallJumpDuration;
+
+        // Disengage wall slide when jumping off
+        isWallSlideEngaged = false;
+        wallSlideDisengageTimer = 0f;
         
         rb.linearVelocity = Vector2.zero;
         Vector2 jumpDir = new Vector2(-wallSide * wallJumpAngle.x, wallJumpAngle.y).normalized;
@@ -1657,6 +1680,12 @@ public class Kalb : MonoBehaviour
         isDashing = true;
         dashTimer = dashDuration;
         dashCooldownTimer = dashCooldown;
+
+        //Disengage wall slide when dashing
+        if (isWallSlideEngaged)
+        {
+            DisengageWallSlide();
+        }
         
         // Determine dash direction
         dashDirection = facingRight ? Vector2.right : Vector2.left;
@@ -1877,7 +1906,7 @@ public class Kalb : MonoBehaviour
             Die();
         }
         
-        Debug.Log($"Took {actualDamage} damage. Health: {currentHealth}/{maxHealth}");
+        
     }
     
     /// <summary>
@@ -2130,7 +2159,7 @@ public class Kalb : MonoBehaviour
             Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
         }
         
-        Debug.Log("Player died!");
+        
     }
     
     private System.Collections.IEnumerator ResetTimeScaleAfter(float delay)
@@ -2184,7 +2213,7 @@ public class Kalb : MonoBehaviour
             animator.Play("Kalb_respawn", -1, 0f);
         }
         
-        Debug.Log($"Respawned at checkpoint. Health restored to {currentHealth}/{maxHealth}");
+        
     }
     
     /// <summary>
@@ -2193,7 +2222,7 @@ public class Kalb : MonoBehaviour
     public void SetCheckpoint(Vector3 checkpointPosition)
     {
         lastCheckpointPosition = checkpointPosition;
-        Debug.Log($"Checkpoint set at {checkpointPosition}");
+        
     }
     
     /// <summary>
@@ -2250,7 +2279,7 @@ public class Kalb : MonoBehaviour
             TakeDamage(currentHealth, transform.position + Vector3.up * 2f, 0f);
             
             // Optional: Special falling death effect
-            Debug.Log("Fell to death!");
+            
         }
     }
 
@@ -2659,6 +2688,12 @@ public class Kalb : MonoBehaviour
         
         preDashGravityScale = rb.gravityScale;
         rb.gravityScale = 0f;
+
+        // Disengage wall slide when dashing
+        if (isWallSlideEngaged)
+        {
+            DisengageWallSlide();
+        }
         
         // Determine dash direction
         if (Mathf.Abs(moveInput.x) > 0.1f)
@@ -3020,10 +3055,10 @@ public class Kalb : MonoBehaviour
                 isAgainstWall = true;
             }
             
-            // Prevent input into wall
+            // Prevent input into wall, but allow movement away
             if (Mathf.Sign(moveInput.x) == lastWallSide)
             {
-                if (!isWallSliding)
+                if (!isWallSliding || !isWallSlideEngaged)
                 {
                     moveInput = new Vector2(0, moveInput.y);
                     
@@ -3033,6 +3068,12 @@ public class Kalb : MonoBehaviour
                         float reduction = Mathf.Lerp(rb.linearVelocity.x, 0, Time.deltaTime * 15f);
                         rb.linearVelocity = new Vector2(reduction, rb.linearVelocity.y);
                     }
+                }
+                // If wall sliding and engaged, allow some movement away detection
+                else if (isWallSliding && isWallSlideEngaged)
+                {
+                    // Check if trying to move away (but input is still into wall due to smoothing)
+                    // This helps with the transition
                 }
             }
         }
@@ -3058,6 +3099,22 @@ public class Kalb : MonoBehaviour
             wallSlideState = WallSlideState.None;
             return;
         }
+
+        //Force wall slide when engaged, even without input
+        if (isWallSlideEngaged && isTouchingWall && !isWallSliding)
+        {
+            isWallSliding = true;
+            wallSlideState = WallSlideState.Sliding;
+        }
+
+         // Check if we should automatically disengage wall slide
+        if (isWallSlideEngaged && !isTouchingWall && wallSlideDisengageTimer <= 0)
+        {
+            isWallSlideEngaged = false;
+            isWallSliding = false;
+            wallSlideState = WallSlideState.None;
+            return;
+        }
         
         // Update wall cling timer
         if (wallClingTimer > 0)
@@ -3068,6 +3125,25 @@ public class Kalb : MonoBehaviour
         // Wall sliding logic
         if (isTouchingWall)
         {
+            if (isWallSlideEngaged && Mathf.Abs(moveInput.x) > 0.1f)
+    {
+                float inputDirection = Mathf.Sign(moveInput.x);
+                
+                // If player is pressing away from the wall, disengage
+                if (inputDirection != wallSide && inputDirection != 0)
+                {
+                    // Small grace period to prevent accidental disengagement
+                    if (wallSlideDisengageTimer <= 0)
+                    {
+                        wallSlideDisengageTimer = wallSlideDisengageDelay * 0.5f;
+                    }
+                }
+                // If player is pressing into the wall, reset disengage timer
+                else if (inputDirection == wallSide)
+                {
+                    wallSlideDisengageTimer = 0f;
+                }
+            }
             // State transitions
             if (wallSlideState == WallSlideState.None)
             {
@@ -3076,13 +3152,23 @@ public class Kalb : MonoBehaviour
                 {
                     rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
                 }
+
+                // Engage wall slide automatically
+                if (!isWallSlideEngaged)
+                {
+                    isWallSlideEngaged = true;
+                }
             }
             else if (wallSlideState == WallSlideState.Starting)
             {
                 wallSlideState = WallSlideState.Sliding;
             }
             
-            isWallSliding = true;
+            //Automatically slide if engaged, regardless of input
+            if (isWallSlideEngaged)
+            {
+                isWallSliding = true;
+            }
             
             // Apply wall slide speed limits
             float currentSlideSpeed = rb.linearVelocity.y;
@@ -3123,10 +3209,45 @@ public class Kalb : MonoBehaviour
         }
         else
         {
-            // Not touching wall - reset wall slide state
-            wallSlideState = WallSlideState.None;
-            isWallSliding = false;
-            isWallClinging = false;
+            //Only reset if not engaged (engagement handles disengagement timing)
+            if (!isWallSlideEngaged || wallSlideDisengageTimer <= 0)
+            {
+                wallSlideState = WallSlideState.None;
+                isWallSliding = false;
+                isWallClinging = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handles input that should disengage wall slide
+    /// </summary>
+    private void HandleWallSlideDisengagement()
+    {
+        if (!isWallSlideEngaged || !isWallSliding) return;
+        
+        // Check if player is trying to move away from wall
+        if (Mathf.Abs(moveInput.x) > 0.1f)
+        {
+            float inputDirection = Mathf.Sign(moveInput.x);
+            
+            // If pressing opposite direction from wall, disengage
+            if (inputDirection == -wallSide)
+            {
+                DisengageWallSlide();
+                
+                // Apply a small force away from wall for responsiveness
+                rb.AddForce(new Vector2(inputDirection * 2f, 0), ForceMode2D.Impulse);
+                
+                Debug.Log("Wall slide disengaged by moving away from wall");
+            }
+        }
+        
+        // Also disengage if jumping (but not wall jumping - that's handled elsewhere)
+        if (jumpAction.triggered && !isWallJumping)
+        {
+            // Small delay to prevent accidental re-engagement
+            wallSlideDisengageTimer = wallSlideDisengageDelay;
         }
     }
     
@@ -3159,23 +3280,57 @@ public class Kalb : MonoBehaviour
             wallCheckDistance, 
             environmentLayer
         ).collider != null && !isGrounded;
+
+        //Check if we should disengage wall slide
+        if (isWallSlideEngaged && wallSlideDisengageTimer > 0)
+        {
+            wallSlideDisengageTimer -= Time.deltaTime;
+            
+            // If timer runs out and we're not touching wall, disengage
+            if (wallSlideDisengageTimer <= 0 && !touchingRightWall && !touchingLeftWall)
+            {
+                isWallSlideEngaged = false;
+                isWallSliding = false;
+                wallSlideState = WallSlideState.None;
+            }
+        }
         
         // Reset wall state
         isTouchingWall = false;
         wallSide = 0;
         
         // Determine which wall is being touched and update state
-        if (touchingRightWall && moveInput.x > 0.1f)
+        if (touchingRightWall)
         {
-            SetWallTouchingState(1);
+            // If we're already engaged in wall slide, OR if we're pressing into wall
+            if (isWallSlideEngaged || moveInput.x > 0.1f || isWallClinging)
+            {
+                SetWallTouchingState(1);
+            }
+            else if (wallClingTimer > 0)
+            {
+                HandleWallCling(true, false);  // Right wall only
+            }
         }
-        else if (touchingLeftWall && moveInput.x < -0.1f)
+        else if (touchingLeftWall)
         {
-            SetWallTouchingState(-1);
+            // If we're already engaged in wall slide, OR if we're pressing into wall
+            if (isWallSlideEngaged || moveInput.x < -0.1f || isWallClinging)
+            {
+                SetWallTouchingState(-1);
+            }
+            else if (wallClingTimer > 0)
+            {
+                HandleWallCling(false, true);  // Left wall only
+            }
         }
-        else if ((touchingRightWall || touchingLeftWall) && wallClingTimer > 0)
+        else
         {
-            HandleWallCling(touchingRightWall, touchingLeftWall);
+            // If wall slide is engaged but we lost wall contact, start disengage timer
+            if (isWallSlideEngaged && wallSlideState == WallSlideState.Sliding)
+            {
+                wallSlideDisengageTimer = wallSlideDisengageDelay;
+            }
         }
     }
     
@@ -3189,6 +3344,8 @@ public class Kalb : MonoBehaviour
         isWallSliding = false;
         isWallClinging = false;
         wallSlideState = WallSlideState.None;
+        isWallSlideEngaged = false;
+        wallSlideDisengageTimer = 0f; 
     }
     
     /// <summary>
@@ -3200,6 +3357,12 @@ public class Kalb : MonoBehaviour
         wallSide = side;
         wallClingTimer = wallClingTime;
         isWallClinging = false;
+
+        //Reset disengage timer when we establish wall contact
+        if (isWallSlideEngaged)
+        {
+            wallSlideDisengageTimer = 0f;
+        }
     }
     
     /// <summary>
@@ -3850,7 +4013,7 @@ public class Kalb : MonoBehaviour
         if (isDead) return;
         
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-        Debug.Log($"Healed {amount}. Health: {currentHealth}/{maxHealth}");
+        
         
         // Visual feedback for healing
         // StartCoroutine(HealFlashRoutine());
@@ -3862,7 +4025,7 @@ public class Kalb : MonoBehaviour
     public void SetHealth(int health)
     {
         currentHealth = Mathf.Clamp(health, 0, maxHealth);
-        Debug.Log($"Health set to {currentHealth}/{maxHealth}");
+        
     }
     
     /// <summary>
@@ -3872,7 +4035,7 @@ public class Kalb : MonoBehaviour
     {
         maxHealth += increaseAmount;
         currentHealth = Mathf.Clamp(currentHealth + increaseAmount, 0, maxHealth);
-        Debug.Log($"Max health increased to {maxHealth}");
+        
     }
     
     /// <summary>
@@ -3922,11 +4085,29 @@ public class Kalb : MonoBehaviour
             }
         }
         
-        Debug.Log($"God Mode: {(godMode ? "ON" : "OFF")}");
+        
         
         // Optional: Play sound effect
         // if (audioSource != null)
         //     audioSource.PlayOneShot(godMode ? powerupSound : powerdownSound);
+    }
+
+    /// <summary>
+    /// Manually disengages wall slide (useful for external systems)
+    /// </summary>
+    public void DisengageWallSlide()
+    {
+        isWallSlideEngaged = false;
+        isWallSliding = false;
+        isWallClinging = false;
+        wallSlideState = WallSlideState.None;
+        wallSlideDisengageTimer = 0f;
+        
+        // Reset wall contact state
+        isTouchingWall = false;
+        wallSide = 0;
+        
+        Debug.Log("Wall slide disengaged");
     }
     
     // ====================================================================
@@ -4160,6 +4341,17 @@ public class Kalb : MonoBehaviour
                 UnityEditor.Handles.Label(transform.position + Vector3.up * 1.5f, 
                     $"Pogo Chain: {currentPogoChain}/{maxPogoChain}");
             }
+        }
+    }
+
+    /// <summary>
+    /// Debug method to check wall slide state
+    /// </summary>
+    private void DebugWallSlideState()
+    {
+        if (showDebugInfo && isWallSliding)
+        {
+            Debug.Log($"Wall Slide - Engaged: {isWallSlideEngaged}, Touching: {isTouchingWall}, Side: {wallSide}, Input: {moveInput.x}");
         }
     }
 }
