@@ -2360,51 +2360,57 @@ public class Kalb : MonoBehaviour
         isDead = true;
         deathTimer = deathAnimationTime;
         
-        // STOP ALL PHYSICS IMMEDIATELY
-        rb.linearVelocity = Vector2.zero;
-        rb.gravityScale = 0f;
-        rb.bodyType = RigidbodyType2D.Kinematic;
-        
-        // Also set constraints to freeze all movement
-        rb.constraints = RigidbodyConstraints2D.FreezeAll;
-        
-        // Disable the Rigidbody2D component temporarily
-        rb.simulated = false;
-        
-        // Disable all movement inputs
-        moveInput = Vector2.zero;
-        
-        // Disable collisions
-        if (playerCollider != null)
-            playerCollider.enabled = false;
+        // CLEAN APPROACH: Just one method to stop physics
+        DisablePlayerPhysics();
         
         // Cancel all active states
         CancelPlayerActions();
         
-        // Death animation - FORCE PLAY AND PREVENT INTERRUPTION
+        // Death animation
         if (animator != null)
         {
             animator.Play("Kalb_death", -1, 0f);
-            animator.Update(0f); // Force immediate update
-            
-            // Set a parameter to prevent other animations
+            animator.Update(0f);
             animator.SetBool("IsDead", true);
         }
         
-        // Death effect at current position
+        // Death effect
         if (deathEffectPrefab != null)
         {
             Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
         }
+    }
+
+    private void DisablePlayerPhysics()
+    {
+        // Stop all movement
+        rb.linearVelocity = Vector2.zero;
         
+        // Disable physics simulation but keep body dynamic
+        // This prevents conflicts while maintaining transform control
+        rb.simulated = false;
         
+        // Optional: Add slight upward force for death animation
+        rb.linearVelocity = new Vector2(0, 3f);
+        
+        // Disable collider for death animation
+        if (playerCollider != null)
+            playerCollider.enabled = false;
+    }
+
+    private void RestorePlayerPhysics()
+    {
+        // Re-enable everything in Respawn()
+        rb.simulated = true;
+        if (playerCollider != null)
+            playerCollider.enabled = true;
+        
+        // Reset velocity
+        rb.linearVelocity = Vector2.zero;
+        rb.gravityScale = normalGravityScale;
     }
     
-    private System.Collections.IEnumerator ResetTimeScaleAfter(float delay)
-    {
-        yield return new WaitForSecondsRealtime(delay);
-        Time.timeScale = 1f;
-    }
+    
     
     /// <summary>
     /// Respawns player at last checkpoint
