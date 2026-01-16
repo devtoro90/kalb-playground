@@ -2533,6 +2533,7 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void CheckForHardLanding(float fallSpeed, float fallDistance)
     {
+        
         bool meetsVelocityCondition = fallSpeed <= hardLandingThreshold;
         bool meetsHeightCondition = CheckScreenHeightFall(fallDistance);
         
@@ -3370,6 +3371,8 @@ public class Kalb : MonoBehaviour
         {
             isWallSliding = true;
             wallSlideState = WallSlideState.Sliding;
+
+            ResetHardLandingTracking();
         }
 
          // Check if we should automatically disengage wall slide
@@ -3391,7 +3394,7 @@ public class Kalb : MonoBehaviour
         if (isTouchingWall)
         {
             if (isWallSlideEngaged && Mathf.Abs(moveInput.x) > 0.1f)
-    {
+            {
                 float inputDirection = Mathf.Sign(moveInput.x);
                 
                 // If player is pressing away from the wall, disengage
@@ -3422,6 +3425,8 @@ public class Kalb : MonoBehaviour
                 if (!isWallSlideEngaged)
                 {
                     isWallSlideEngaged = true;
+
+                    ResetHardLandingTracking();
                 }
             }
             else if (wallSlideState == WallSlideState.Starting)
@@ -3835,6 +3840,28 @@ public class Kalb : MonoBehaviour
         {
             wallSlideDisengageTimer = 0f;
         }
+        ResetHardLandingTracking();
+    }
+
+    /// <summary>
+    /// Resets all hard landing tracking variables
+    /// </summary>
+    private void ResetHardLandingTracking()
+    {
+        // Reset fall start height to current position so any fall from wall slide
+        // is measured from when we started sliding, not from original jump height
+        fallStartHeight = transform.position.y;
+        totalFallDistance = 0f;
+        peakHeight = transform.position.y;
+        fellFromOffScreen = false;
+        
+        // Also reset any active hard landing
+        if (isHardLanding)
+        {
+            EndHardLanding();
+        }
+        
+        Debug.Log("Hard landing tracking reset - wall slide started");
     }
     
     /// <summary>
@@ -3860,6 +3887,8 @@ public class Kalb : MonoBehaviour
         {
             isWallClinging = true;
             isTouchingWall = true;
+
+            ResetHardLandingTracking();
         }
     }
     
