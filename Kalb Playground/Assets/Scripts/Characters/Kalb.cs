@@ -1568,6 +1568,14 @@ public class Kalb : MonoBehaviour
             return;
         }
         
+        // CRITICAL FIX: Only apply wall slide movement if we're actually touching a wall
+        if (!isTouchingWall && isWallSliding)
+        {
+            // We lost wall contact - let normal falling physics take over
+            // Don't apply any special wall slide movement
+            return;
+        }
+        
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         
         // Stop upward movement during wall slide
@@ -3366,7 +3374,15 @@ public class Kalb : MonoBehaviour
             HandleWallLock();
         }
 
-        //Force wall slide when engaged, even without input
+        // CRITICAL FIX: Check if wall slide should end due to lost wall contact
+        if (isWallSliding && !isTouchingWall && !isWallSlideEngaged)
+        {
+            // Platform ended - transition to falling
+            EndWallSlide();
+            return;
+        }
+
+        // Force wall slide when engaged, even without input
         if (isWallSlideEngaged && isTouchingWall && !isWallSliding)
         {
             isWallSliding = true;
@@ -3375,7 +3391,7 @@ public class Kalb : MonoBehaviour
             ResetHardLandingTracking();
         }
 
-         // Check if we should automatically disengage wall slide
+        // Check if we should automatically disengage wall slide
         if (isWallSlideEngaged && !isTouchingWall && wallSlideDisengageTimer <= 0)
         {
             isWallSlideEngaged = false;
@@ -3393,26 +3409,7 @@ public class Kalb : MonoBehaviour
         // Wall sliding logic
         if (isTouchingWall)
         {
-            if (isWallSlideEngaged && Mathf.Abs(moveInput.x) > 0.1f)
-            {
-                float inputDirection = Mathf.Sign(moveInput.x);
-                
-                // If player is pressing away from the wall, disengage
-                if (inputDirection != wallSide && inputDirection != 0)
-                {
-                    // Small grace period to prevent accidental disengagement
-                    if (wallSlideDisengageTimer <= 0)
-                    {
-                        wallSlideDisengageTimer = wallSlideDisengageDelay * 0.5f;
-                    }
-                }
-                // If player is pressing into the wall, reset disengage timer
-                else if (inputDirection == wallSide)
-                {
-                    wallSlideDisengageTimer = 0f;
-                }
-            }
-            // State transitions
+            // CRITICAL FIX: Ensure wall slide state is properly set when touching wall
             if (wallSlideState == WallSlideState.None)
             {
                 wallSlideState = WallSlideState.Starting;
@@ -3425,7 +3422,6 @@ public class Kalb : MonoBehaviour
                 if (!isWallSlideEngaged)
                 {
                     isWallSlideEngaged = true;
-
                     ResetHardLandingTracking();
                 }
             }
@@ -3479,13 +3475,66 @@ public class Kalb : MonoBehaviour
         }
         else
         {
-            //Only reset if not engaged (engagement handles disengagement timing)
+            // CRITICAL FIX: When not touching wall, only reset if not engaged 
+            // AND after disengage timer expires
             if (!isWallSlideEngaged || wallSlideDisengageTimer <= 0)
             {
-                wallSlideState = WallSlideState.None;
-                isWallSliding = false;
-                isWallClinging = false;
+                // Actually losing wall contact - transition properly
+                if (isWallSliding)
+                {
+                    EndWallSlide();
+                }
+                else
+                {
+                    wallSlideState = WallSlideState.None;
+                    isWallSliding = false;
+                    isWallClinging = false;
+                }
             }
+        }
+    }
+
+    /// <summary>
+    /// Ends wall slide and transitions to falling state
+    /// </summary>
+    private void EndWallSlide()
+    {
+        // Reset all wall slide states
+        isWallSliding = false;
+        isWallClinging = false;
+        isWallSlideEngaged = false;
+        wallSlideState = WallSlideState.None;
+        wallSlideDisengageTimer = 0f;
+        
+        // Reset wall lock when ending wall slide
+        ResetWallLockState();
+        
+        // Reset acceleration
+        if (enableWallSlideAcceleration)
+        {
+            currentWallSlideSpeed = 0f;
+            wallSlideAccelerationTimer = 0f;
+            isAcceleratingWallSlide = false;
+        }
+        
+        // Allow normal falling physics to apply
+        // Don't zero out velocity - let gravity take over naturally
+        // This ensures smooth transition to falling animation
+        
+        // Reset wall contact state
+        isTouchingWall = false;
+        wallSide = 0;
+        
+        // CRITICAL: Restore normal gravity immediately
+        if (!isDashing && !isWallJumping && !isHardLanding)
+        {
+            rb.gravityScale = normalGravityScale;
+        }
+        
+        // Debug log for testing
+        if (showDebugInfo)
+        {
+            Debug.Log("Wall slide ended - transitioning to falling");
         }
     }
 
@@ -3758,6 +3807,9 @@ public class Kalb : MonoBehaviour
             environmentLayer
         ).collider != null && !isGrounded;
 
+        // Store previous wall touching state
+        bool wasTouchingWall = isTouchingWall;
+        
         //Check if we should disengage wall slide
         if (isWallSlideEngaged && wallSlideDisengageTimer > 0)
         {
@@ -3767,8 +3819,16 @@ public class Kalb : MonoBehaviour
             if (wallSlideDisengageTimer <= 0 && !touchingRightWall && !touchingLeftWall)
             {
                 isWallSlideEngaged = false;
-                isWallSliding = false;
-                wallSlideState = WallSlideState.None;
+                
+                // CRITICAL FIX: Use EndWallSlide() instead of direct state changes
+                if (isWallSliding)
+                {
+                    EndWallSlide();
+                }
+                else
+                {
+                    wallSlideState = WallSlideState.None;
+                }
             }
         }
         
@@ -3803,10 +3863,29 @@ public class Kalb : MonoBehaviour
         }
         else
         {
-            // If wall slide is engaged but we lost wall contact, start disengage timer
-            if (isWallSlideEngaged && wallSlideState == WallSlideState.Sliding)
+            // CRITICAL FIX: When losing wall contact while wall sliding
+            if (isWallSliding && wasTouchingWall)
+            {
+                // Start disengage timer to give a small grace period
+                wallSlideDisengageTimer = wallSlideDisengageDelay * 0.3f; // Shorter grace period
+            }
+            else if (isWallSlideEngaged && wallSlideState == WallSlideState.Sliding)
             {
                 wallSlideDisengageTimer = wallSlideDisengageDelay;
+            }
+        }
+        
+        // CRITICAL FIX: Additional check for losing wall contact
+        if (wasTouchingWall && !isTouchingWall && isWallSliding)
+        {
+            // If we're falling and not trying to re-engage, end wall slide
+            if (rb.linearVelocity.y < 0 && Mathf.Abs(moveInput.x) < 0.1f)
+            {
+                // Small delay before ending to prevent flickering on uneven walls
+                if (wallSlideDisengageTimer <= 0)
+                {
+                    EndWallSlide();
+                }
             }
         }
     }
@@ -4222,7 +4301,7 @@ public class Kalb : MonoBehaviour
         {
             animator.Play("Kalb_dash");
         }
-        else if (isWallSliding && wallJumpUnlocked)
+        else if (isWallSliding && wallJumpUnlocked && isTouchingWall)
         {
             animator.Play("Kalb_wallslide");
         }
