@@ -6,423 +6,416 @@ public class Kalb : MonoBehaviour
     // ====================================================================
     // SECTION 1: INSPECTOR CONFIGURATION VARIABLES
     // ====================================================================
-    
-    // All public variables that can be configured in the Unity Inspector
+    // These are public variables that can be configured in the Unity Inspector
+    // Organized by system for easy editing and balancing
     
     [Header("Ability Unlocks")]
-    public bool runUnlocked = false;
-    public bool dashUnlocked = false;
-    public bool wallJumpUnlocked = false;
-    public bool doubleJumpUnlocked = false;
+    public bool runUnlocked = false;        // Can the player run/sprint?
+    public bool dashUnlocked = false;       // Can the player dash horizontally?
+    public bool wallJumpUnlocked = false;   // Can the player jump off walls?
+    public bool doubleJumpUnlocked = false; // Can the player jump a second time in mid-air?
+    public bool wallLockUnlocked = false;   // Can the player lock onto walls to stop sliding?
+    public bool pogoUnlocked = true;        // Can the player perform pogo attacks downward?
     
     [Header("Basic Movement")]
-    public float moveSpeed = 5f;
-    public float runSpeed = 8f;
-    public float jumpForce = 12f;
-    [Range(0, 0.3f)] public float movementSmoothing = 0.05f;
-    public bool facingRight = true;
+    public float moveSpeed = 5f;            // Normal walking speed
+    public float runSpeed = 8f;             // Speed when running/sprinting
+    public float jumpForce = 12f;           // Force applied for normal jumps
+    [Range(0, 0.3f)] public float movementSmoothing = 0.05f; // Smoothing factor for movement transitions
+    public bool facingRight = true;         // Is the player currently facing right?
     
     [Header("Jump & Air Movement")]
-    public float coyoteTime = 0.15f;
-    public float jumpBufferTime = 0.1f;
-    public float jumpCutMultiplier = 0.5f;
-    public bool hasDoubleJump = true;
-    public float doubleJumpForce = 10f;
-    public float airControlMultiplier = 0.5f;
-    public float maxAirSpeed = 10f;
-    public float airAcceleration = 15f;
+    public float coyoteTime = 0.15f;        // Time after leaving ground where player can still jump
+    public float jumpBufferTime = 0.1f;     // Time window where jump input is remembered before landing
+    public float jumpCutMultiplier = 0.5f;  // Multiplier applied to jump when button is released early
+    public bool hasDoubleJump = true;       // Does the player have access to double jump mechanic?
+    public float doubleJumpForce = 10f;     // Force applied for double jumps
+    public float airControlMultiplier = 0.5f; // How much control player has in air (0-1)
+    public float maxAirSpeed = 10f;         // Maximum horizontal speed while in air
+    public float airAcceleration = 15f;     // How quickly player accelerates horizontally in air
     
     [Header("Dash Settings")]
-    public float dashSpeed = 20f;
-    public float dashDuration = 0.2f;
-    public float dashCooldown = 0.5f;
-    public bool canAirDash = true;
-    public bool resetAirDashOnGround = true;
-    public int maxAirDashes = 1;
+    public float dashSpeed = 20f;           // Speed during dash
+    public float dashDuration = 0.2f;       // How long dash lasts
+    public float dashCooldown = 0.5f;       // Time before player can dash again
+    public bool canAirDash = true;          // Can player dash while in air?
+    public bool resetAirDashOnGround = true; // Reset air dash count when landing?
+    public int maxAirDashes = 1;            // Maximum number of air dashes before landing
     
     [Header("Wall Interaction")]
-    public float wallSlideSpeed = 6f;
-    public float wallJumpForce = 11f;
-    public Vector2 wallJumpAngle = new Vector2(1, 2);
-    public float wallJumpDuration = 0.2f;
-    public float wallStickTime = 0.25f;
-    public float wallClingTime = 0.2f;
-    public float wallClingSlowdown = 0.3f;
+    public float wallSlideSpeed = 6f;       // Maximum downward speed while sliding on wall
+    public float wallJumpForce = 11f;       // Force applied when jumping off wall
+    public Vector2 wallJumpAngle = new Vector2(1, 2); // Direction of wall jump (x=horizontal, y=vertical)
+    public float wallJumpDuration = 0.2f;   // How long wall jump state lasts
+    public float wallStickTime = 0.25f;     // Time player sticks to wall before sliding
+    public float wallClingTime = 0.2f;      // Time player clings to wall when changing direction
+    public float wallClingSlowdown = 0.3f;  // Speed reduction while wall clinging
 
     [Header("Wall Slide Acceleration")]
-    public float wallSlideAccelerationTime = 2f;        // Time to reach max slide speed
-    public float wallSlideDecelerationTime = 0.2f;        // Time to slow down when changing direction
+    public float wallSlideAccelerationTime = 2f;        // Time to reach max slide speed from standstill
+    public float wallSlideDecelerationTime = 0.2f;      // Time to slow down when changing walls
     public AnimationCurve wallSlideAccelerationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);  // Acceleration curve
-    public bool enableWallSlideAcceleration = true;       // Toggle for the feature
+    public bool enableWallSlideAcceleration = true;     // Enable progressive wall slide speed?
 
     [Header("Wall Lock Ability")]
-    public bool wallLockUnlocked = false;
-    public float wallLockSpeed = 0.5f;  
-    public float wallLockReleaseSpeed = 2f;  
-    public float wallLockInputThreshold = 0.7f;  
-    public bool resetAirDashOnWallLock = true;  
+    public float wallLockSpeed = 0.5f;      // Speed while wall locked (should be very slow)
+    public float wallLockReleaseSpeed = 2f; // Speed when releasing from wall lock
+    public float wallLockInputThreshold = 0.7f; // How much input needed to engage wall lock
+    public bool resetAirDashOnWallLock = true; // Reset air dash when engaging wall lock?
     
     [Header("Falling & Landing")]
-    public float maxFallSpeed = -20f;
-    public float hardLandingThreshold = -15f;
-    public float hardLandingStunTime = 0.3f;
-    public float fallingGravityScale = 2.5f;
-    public float normalGravityScale = 2f;
-    public float quickFallGravityMultiplier = 1.2f;
+    public float maxFallSpeed = -20f;       // Maximum downward speed (terminal velocity)
+    public float hardLandingThreshold = -15f; // Fall speed that triggers hard landing
+    public float hardLandingStunTime = 0.3f; // Time player is stunned after hard landing
+    public float fallingGravityScale = 2.5f; // Gravity multiplier when falling
+    public float normalGravityScale = 2f;   // Normal gravity multiplier
+    public float quickFallGravityMultiplier = 1.2f; // Extra gravity when jump button released
     
     [Header("Screen-Height Hard Landing")]
-    public bool useScreenHeightForHardLanding = true;
-    public float minScreenHeightForHardLanding = 0.8f;
-    public float screenHeightDetectionOffset = 1.0f;
-    [Tooltip("If false, uses velocity threshold only")]
-    public bool requireBothConditions = true;
+    public bool useScreenHeightForHardLanding = true; // Use screen height for hard landing detection?
+    public float minScreenHeightForHardLanding = 0.8f; // Minimum screen height to trigger hard landing
+    public float screenHeightDetectionOffset = 1.0f;   // Offset for detecting off-screen falls
+    public bool requireBothConditions = true; // Require both velocity AND height for hard landing?
     
     [Header("Screen Shake")]
-    public bool enableScreenShake = true;
-    public float hardLandingShakeIntensity = 0.15f;
-    public float hardLandingShakeDuration = 0.25f;
+    public bool enableScreenShake = true;   // Enable screen shake effects?
+    public float hardLandingShakeIntensity = 0.15f; // Screen shake intensity for hard landings
+    public float hardLandingShakeDuration = 0.25f; // Screen shake duration for hard landings
     
     [Header("Attack")]
-    public float attackCooldown = 0.1f;
-    public float attackDuration = 0.2f;
-    public Transform attackPoint;
-    public float attackRange = 0.5f;
-    public LayerMask enemyLayers;
-    public int attackDamage = 20;
+    public float attackCooldown = 0.1f;     // Base cooldown between attacks
+    public float attackDuration = 0.2f;     // Base duration of attack animation
+    public Transform attackPoint;           // Position where attack originates
+    public float attackRange = 0.5f;        // Base range of attacks
+    public LayerMask enemyLayers;           // Which layers can be damaged by attacks
+    public int attackDamage = 20;           // Base attack damage
 
     [Header("Combo Attack System")]
-    public int maxComboHits = 3;                     // Maximum combo hits
-    public float comboWindow = 0.2f;                 // Time window to continue combo
-    public float comboResetTime = 0.6f;              // Time before combo resets
-    public bool enableAirCombo = true;               // Can combo in air
-    public bool enableWallCombo = true;              // Can combo while wall sliding
+    public int maxComboHits = 3;            // Maximum number of hits in a combo chain
+    public float comboWindow = 0.2f;        // Time window to continue combo
+    public float comboResetTime = 0.6f;     // Time before combo resets completely
+    public bool enableAirCombo = true;      // Can player combo while in air?
+    public bool enableWallCombo = true;     // Can player combo while wall sliding?
 
     [Header("Combo Attack Settings")]
-    public float[] comboDamage = new float[] { 20f, 25f, 35f };     // Damage per combo hit
-    public float[] comboKnockback = new float[] { 5f, 7f, 12f };    // Knockback per hit
-    public float[] comboRange = new float[] { 0.2f, 0.2f, 0.2f };   // Range per hit
-    public float[] comboAttackDurations = new float[] { 0.2f, 0.2f, 0.2f };  // Duration per attack
-    public float[] comboCooldowns = new float[] { 0.3f, 0.4f, 0.6f };         // Cooldown per attack
+    public float[] comboDamage = new float[] { 20f, 25f, 35f };     // Damage for each combo hit
+    public float[] comboKnockback = new float[] { 5f, 7f, 12f };    // Knockback for each combo hit
+    public float[] comboRange = new float[] { 0.2f, 0.2f, 0.2f };   // Range for each combo hit
+    public float[] comboAttackDurations = new float[] { 0.2f, 0.2f, 0.2f };  // Duration for each attack
+    public float[] comboCooldowns = new float[] { 0.3f, 0.4f, 0.6f };        // Cooldown after each attack
 
     [Header("Combo Animation Names")]
     public string[] comboAnimations = new string[] { "Kalb_attack1", "Kalb_attack2", "Kalb_attack3" };
-    public string comboResetAnimation = "Kalb_attack_reset";
+    public string comboResetAnimation = "Kalb_attack_reset"; // Animation when combo resets
     
     [Header("Environment Detection")]
-    public Transform groundCheck;
-    public float groundCheckRadius = 0.2f;
-    public Transform wallCheck;
-    public float wallCheckDistance = 0.05f;
-    public float wallCheckOffset = 0.02f;
-    public LayerMask environmentLayer;
+    public Transform groundCheck;           // Position to check for ground
+    public float groundCheckRadius = 0.2f;  // Radius for ground detection
+    public Transform wallCheck;             // Position to check for walls
+    public float wallCheckDistance = 0.05f; // Distance to check for walls
+    public float wallCheckOffset = 0.02f;   // Offset for wall checks
+    public LayerMask environmentLayer;      // Which layers count as environment
     
     [Header("Swimming")]
-    public float swimSpeed = 3f;
-    public float swimFastSpeed = 5f;
-    public float swimDashSpeed = 10f;
-    public float swimJumpForce = 8f;
-    public float waterSurfaceOffset = 1.20f;
-    public float waterEntrySpeedReduction = 0.5f;
-    public LayerMask waterLayer;
-    public float waterCheckRadius = 0.5f;
-    public Transform waterCheckPoint;
-    public float waterEntryGravity = 0.5f;
-    public float buoyancyStrength = 50f;
-    public float buoyancyDamping = 10f;
-    public float maxBuoyancyForce = 20f;
+    public float swimSpeed = 3f;            // Normal swimming speed
+    public float swimFastSpeed = 5f;        // Fast swimming speed (when holding dash)
+    public float swimDashSpeed = 10f;       // Speed during swim dash
+    public float swimJumpForce = 8f;        // Force when jumping out of water
+    public float waterSurfaceOffset = 1.20f; // How far above water surface player floats
+    public float waterEntrySpeedReduction = 0.5f; // Speed reduction when entering water
+    public LayerMask waterLayer;            // Which layers count as water
+    public float waterCheckRadius = 0.5f;   // Radius for water detection
+    public Transform waterCheckPoint;       // Position to check for water
+    public float waterEntryGravity = 0.5f;  // Gravity while in water
+    public float buoyancyStrength = 50f;    // Strength of buoyancy force
+    public float buoyancyDamping = 10f;     // Damping to prevent buoyancy oscillations
+    public float maxBuoyancyForce = 20f;    // Maximum buoyancy force applied
     
     [Header("Floating Effect")]
-    public float floatAmplitude = 0.05f;
-    public float floatFrequency = 1f;
-    public float floatSmoothness = 5f;
-    public bool enableFloating = true;
+    public float floatAmplitude = 0.05f;    // How much player bobs up/down in water
+    public float floatFrequency = 1f;       // How fast player bobs in water
+    public float floatSmoothness = 5f;      // Smoothness of floating transition
+    public bool enableFloating = true;      // Enable water bobbing effect?
     
     [Header("Ledge System")]
-    public float ledgeDetectionDistance = 0.5f;
-    public float ledgeGrabOffsetY = 0.15f;
-    public float ledgeGrabOffsetX = 0.55f;
-    public float ledgeClimbTime = 0.5f;
-    public float ledgeJumpForce = 12f;
-    public Vector2 ledgeJumpAngle = new Vector2(1, 2);
-    public float ledgeClimbCheckRadius = 0.2f;
-    public Transform ledgeCheckPoint;
-    public float minLedgeHoldTime = 0.3f;
-    public float ledgeReleaseForce = 5f;
-    public float ledgeReleaseCooldown = 0.2f;
+    public float ledgeDetectionDistance = 0.5f; // How far to check for ledges
+    public float ledgeGrabOffsetY = 0.15f;  // Vertical offset when grabbing ledge
+    public float ledgeGrabOffsetX = 0.55f;  // Horizontal offset when grabbing ledge
+    public float ledgeClimbTime = 0.5f;     // Time it takes to climb onto ledge
+    public float ledgeJumpForce = 12f;      // Force when jumping from ledge
+    public Vector2 ledgeJumpAngle = new Vector2(1, 2); // Direction of ledge jump
+    public float ledgeClimbCheckRadius = 0.2f; // Radius for checking if ledge is climbable
+    public Transform ledgeCheckPoint;       // Position to check for ledges
+    public float minLedgeHoldTime = 0.3f;   // Minimum time player must hold ledge before climbing
+    public float ledgeReleaseForce = 5f;    // Force applied when releasing from ledge
+    public float ledgeReleaseCooldown = 0.2f; // Time before player can grab ledge again
 
     [Header("Pogo Attack Settings")]
-    public bool pogoUnlocked = true;
-    public float pogoAttackDuration = 0.2f;
-    public float pogoAttackCooldown = 0.1f;
-    public float pogoBounceForce = 15f;
-    public float pogoDownwardForce = 5f;
-    public float pogoDetectionRange = 1f;
-    public LayerMask pogoLayers;
-    public float pogoDamage = 25f;
-    public float pogoKnockback = 8f;
-    public bool enablePogoOnSpikes = true;
-    public bool resetJumpOnPogo = true;
-    public bool canPogoInAir = true;
-    public int maxPogoChain = 3;
-    public float pogoChainWindow = 0.5f;
+    public float pogoAttackDuration = 0.2f; // How long pogo attack lasts
+    public float pogoAttackCooldown = 0.1f; // Cooldown between pogo attacks
+    public float pogoBounceForce = 15f;     // Force applied when pogo bouncing
+    public float pogoDownwardForce = 5f;    // Force applied downward during pogo attack
+    public float pogoDetectionRange = 1f;   // How far below player to detect pogo-able objects
+    public LayerMask pogoLayers;            // Which layers can be pogo'd on
+    public float pogoDamage = 25f;          // Damage dealt by pogo attack
+    public float pogoKnockback = 8f;        // Knockback dealt by pogo attack
+    public bool enablePogoOnSpikes = true;  // Can player pogo on spike tiles?
+    public bool resetJumpOnPogo = true;     // Reset jump/dash abilities after pogo bounce?
+    public bool canPogoInAir = true;        // Can player pogo while in air?
+    public int maxPogoChain = 3;            // Maximum consecutive pogo bounces
+    public float pogoChainWindow = 0.5f;    // Time window to continue pogo chain
 
     [Header("Pogo Visual Feedback")]
-    public GameObject pogoEffectPrefab;
-    public float pogoEffectDuration = 0.3f;
-    public Color pogoFlashColor = Color.yellow;
-    public float pogoFlashDuration = 0.1f;
+    public GameObject pogoEffectPrefab;     // Visual effect when pogo hits something
+    public float pogoEffectDuration = 0.3f; // How long pogo effect lasts
+    public Color pogoFlashColor = Color.yellow; // Color to flash player when pogo hits
+    public float pogoFlashDuration = 0.1f;  // How long pogo flash lasts
 
     [Header("Health & Damage System")]
-    public int maxHealth = 100;
-    public int currentHealth = 100;
-    public float invincibilityTime = 1f;
-    public float hitFlashDuration = 0.1f;
-    public float hitFlashIntensity = 0.7f;
-    public Color hurtFlashColor = Color.red;
-
-    [Header("Debug/Developer Options")]
-    public bool godMode = false;
-    public bool infiniteJumps = false;
-    public bool showDebugInfo = true;
-    
+    public int maxHealth = 100;             // Player's maximum health
+    public int currentHealth = 100;         // Player's current health
+    public float invincibilityTime = 1f;    // Time player is invincible after taking damage
+    public float hitFlashDuration = 0.1f;   // How long damage flash lasts per pulse
+    public float hitFlashIntensity = 0.7f;  // Intensity of damage flash
+    public Color hurtFlashColor = Color.red; // Color to flash when hurt
     
     [Header("Knockback Settings")]
-    public float knockbackForce = 10f;
-    public float knockbackDuration = 0.3f;
-    public float horizontalKnockbackMultiplier = 1.5f;
-    public float verticalKnockbackMultiplier = 0.8f;
+    public float knockbackForce = 10f;      // Base knockback force when hit
+    public float knockbackDuration = 0.3f;  // How long knockback lasts
+    public float horizontalKnockbackMultiplier = 1.5f; // Multiplier for horizontal knockback
+    public float verticalKnockbackMultiplier = 0.8f;   // Multiplier for vertical knockback
     
     [Header("Death & Respawn")]
-    public float deathAnimationTime = 1.5f;
-    public float respawnInvincibilityTime = 3f;
-    public GameObject deathEffectPrefab;
+    public float deathAnimationTime = 1.5f; // How long death animation plays
+    public float respawnInvincibilityTime = 3f; // Time player is invincible after respawning
+    public GameObject deathEffectPrefab;    // Visual effect when player dies
     
     [Header("Health Visual Feedback")]
-    public GameObject damageNumberPrefab;
-    public float damageNumberYOffset = 1.5f;
-    public bool showDamageNumbers = true;
+    public GameObject damageNumberPrefab;   // Prefab for showing damage numbers
+    public float damageNumberYOffset = 1.5f; // Height above player to show damage numbers
+    public bool showDamageNumbers = true;   // Show floating damage numbers?
+    
+    [Header("Debug/Developer Options")]
+    public bool godMode = false;            // Player takes no damage
+    public bool infiniteJumps = false;      // Player can jump infinitely
+    public bool showDebugInfo = true;       // Show debug information in editor
     
     // ====================================================================
     // SECTION 2: PRIVATE STATE VARIABLES
     // ====================================================================
+    // These variables track the player's current state and are not exposed in inspector
     
-    // Organized into logical groups for clarity
+    // Component References - cached for performance
+    private Rigidbody2D rb;                 // Physics body component
+    private PlayerInput playerInput;        // Input system component
+    private InputAction moveAction;         // Action for movement input
+    private InputAction jumpAction;         // Action for jump input
+    private InputAction dashAction;         // Action for dash/run input
+    private InputAction attackAction;       // Action for attack input
+    private Animator animator;              // Animation controller
+    private Camera mainCamera;              // Main camera reference
+    private Collider2D playerCollider;      // Player's collider
+    private MetroidvaniaCamera metroidvaniaCamera; // Custom camera controller
+    private SpriteRenderer playerSprite;    // For visual effects like flashing
+    private Color originalSpriteColor;      // Original sprite color for resetting
     
-    // COMPONENT REFERENCES
-    private Rigidbody2D rb;
-    private PlayerInput playerInput;
-    private InputAction moveAction;
-    private InputAction jumpAction;
-    private InputAction dashAction;
-    private InputAction attackAction;
-    private Animator animator;
-    private Camera mainCamera;
-    private Collider2D playerCollider;
+    // Input State - tracks current input values
+    public Vector2 moveInput;               // Current movement input (-1 to 1)
+    private bool isJumpButtonHeld = false;  // Is jump button currently held?
+    private bool isRunning = false;         // Is player running/sprinting?
+    private bool attackQueued = false;      // Is an attack queued for combo?
     
-    // INPUT STATE
-    public Vector2 moveInput;
-    private bool isJumpButtonHeld = false;
-    private bool isRunning = false;
-    private bool attackQueued = false; 
+    // Movement State - tracks physics and movement
+    private Vector3 velocity = Vector3.zero; // Used for movement smoothing
+    private bool isGrounded;                // Is player touching ground?
+    private float currentFallSpeed = 0f;    // Current vertical speed (negative = falling)
     
-    // MOVEMENT STATE
-    private Vector3 velocity = Vector3.zero;
-    private bool isGrounded;
-    private float currentFallSpeed = 0f;
+    // Action State Flags - tracks which actions player is performing
+    public bool isDashing = false;          // Is player currently dashing?
+    private bool isAttacking = false;       // Is player currently attacking?
+    public bool isWallJumping = false;      // Is player currently wall jumping?
+    private bool isHardLanding = false;     // Is player stunned from hard landing?
+    private bool isSwimming = false;        // Is player swimming in water?
+    private bool isSwimDashing = false;     // Is player dashing in water?
+    private bool isLedgeGrabbing = false;   // Is player currently grabbing a ledge?
+    private bool isLedgeClimbing = false;   // Is player currently climbing onto ledge?
+    private bool isWallSliding;             // Is player sliding down a wall?
+    private bool isTouchingWall;            // Is player touching a wall?
+    private bool isWallClinging = false;    // Is player clinging to wall (changing direction)?
+    private bool isAgainstWall = false;     // Is player pressed against a wall (not sliding)?
+    public int wallSide = 0;                // Which side wall is on (-1=left, 1=right, 0=none)
+    private int lastWallSide = 0;           // Last wall side touched
     
-    // ACTION STATE FLAGS (organized by system)
-    public bool isDashing = false;
-    private bool isAttacking = false;
-    public bool isWallJumping = false;
-    private bool isHardLanding = false;
-    private bool isSwimming = false;
-    private bool isSwimDashing = false;
-    private bool isLedgeGrabbing = false;
-    private bool isLedgeClimbing = false;
-    private int currentCombo = 0;                   // Current combo count (0 = no combo)
-    private bool comboAvailable = true;            // Can start/combo attacks
-    private bool isComboFinishing = false;         // Final combo attack is active
+    // Wall Interaction State
+    private float wallNormalDistance = 0.05f; // Distance to maintain from wall to prevent sticking
     
-    // WALL INTERACTION STATE
-    private bool isWallSliding;
-    private bool isTouchingWall;
-    private bool isWallClinging = false;
-    private bool isAgainstWall = false;
-    public int wallSide = 0;
-    private int lastWallSide = 0;
-    private float wallNormalDistance = 0.05f;
-
-    // WALL SLIDE ACCELERATION
-    private float currentWallSlideSpeed = 0f;             // Current actual slide speed
-    private float wallSlideAccelerationTimer = 0f;        // Timer for acceleration
-    private bool isAcceleratingWallSlide = false;         // Flag for acceleration state
-    private float wallSlideAccelerationDirection = 1f;    // 1 = normal, -1 = decelerating
-
-    // WALL LOCK STATE
-    private bool isWallLocked = false;
-    private bool isWallLockEngaging = false;
-    private bool isWallLockDisengaging = false;
-    private float wallLockTimer = 0f;
-    private float wallLockEngageTime = 0.1f;  // Time to fully engage wall lock
-    private float wallLockDisengageTime = 0.05f;  // Time to disengage
-    private float originalWallSlideSpeed = 0f;  // Store original speed before lock
-    
-    // WALL SLIDE STATE MACHINE
+    // Wall Slide State Machine - tracks wall slide progression
     private enum WallSlideState { None, Starting, Sliding, Jumping }
     private WallSlideState wallSlideState = WallSlideState.None;
-
-    // WALL SLIDE IMPROVEMENTS
-    private bool isWallSlideEngaged = false;
-    private float wallSlideDisengageTimer = 0f;
-    private float wallSlideDisengageDelay = 0.15f;
+    private bool isWallSlideEngaged = false; // Has wall slide been properly engaged?
+    private float wallSlideDisengageTimer = 0f; // Timer for wall slide disengagement
+    private float wallSlideDisengageDelay = 0.15f; // Delay before disengaging wall slide
     
-    // JUMP & AIR MOVEMENT STATE
-    private float coyoteTimeCounter = 0f;
-    private float jumpBufferCounter = 0f;
-    private bool hasDoubleJumped = false;
-    private int airDashCount = 0;
+    // Wall Slide Acceleration State - for progressive wall slide speed
+    private float currentWallSlideSpeed = 0f;        // Current actual slide speed
+    private float wallSlideAccelerationTimer = 0f;   // Timer for acceleration curve
+    private bool isAcceleratingWallSlide = false;    // Is player currently accelerating slide?
+    private float wallSlideAccelerationDirection = 1f; // Direction of acceleration (1=down, -1=up)
     
-    // FALLING & LANDING TRACKING
-    private float peakHeight = 0f;
-    private float fallStartHeight = 0f;
-    private float totalFallDistance = 0f;
-    private float screenHeightInUnits = 0f;
-    private bool fellFromOffScreen = false;
+    // Wall Lock State - for wall locking ability
+    private bool isWallLocked = false;              // Is player fully locked to wall?
+    private bool isWallLockEngaging = false;        // Is player engaging wall lock?
+    private bool isWallLockDisengaging = false;     // Is player disengaging wall lock?
+    private float wallLockTimer = 0f;               // Timer for wall lock transitions
+    private float wallLockEngageTime = 0.1f;        // Time to fully engage wall lock
+    private float wallLockDisengageTime = 0.05f;    // Time to disengage wall lock
+    private float originalWallSlideSpeed = 0f;      // Stores original speed before lock
     
-    // TIMERS & COOLDOWNS (organized alphabetically)
-    private float attackCooldownTimer = 0f;
-    private float attackTimer = 0f;
-    private float dashCooldownTimer = 0f;
-    private float dashTimer = 0f;
-    private float hardLandingTimer = 0f;
-    private float wallClingTimer = 0f;
-    private float wallJumpTimer = 0f;
-    private float wallStickTimer = 0f;
-    private float comboWindowTimer = 0f;           // Already declared above, just note it's here
-    private float comboResetTimer = 0f;           // Already declared above
+    // Jump & Air Movement State
+    private float coyoteTimeCounter = 0f;           // Timer for coyote time
+    private float jumpBufferCounter = 0f;           // Timer for jump buffering
+    private bool hasDoubleJumped = false;           // Has player used double jump this jump?
+    private int airDashCount = 0;                   // How many air dashes used this jump?
     
-    // DASH VARIABLES
-    private Vector2 dashDirection = Vector2.right;
+    // Falling & Landing Tracking - for hard landing detection
+    private float peakHeight = 0f;                  // Highest point reached this jump
+    private float fallStartHeight = 0f;             // Height where fall started
+    private float totalFallDistance = 0f;           // Total distance fallen
+    private float screenHeightInUnits = 0f;         // Height of screen in world units
+    private bool fellFromOffScreen = false;         // Did fall start off-screen?
     
-    // SWIMMING STATE
-    private bool isInWater = false;
-    private bool wasInWater = false;
-    private float swimDashTimer = 0f;
-    private float swimDashCooldownTimer = 0f;
-    private float swimDashDuration = 0.15f;
-    private float swimDashCooldown = 0.3f;
-    private Vector2 swimDashDirection = Vector2.right;
-    private float waterSurfaceY = 0f;
-    private Collider2D currentWaterCollider = null;
-    private float preDashGravityScale;
+    // Timers & Cooldowns - track durations of various actions
+    private float attackCooldownTimer = 0f;         // Time until next attack
+    private float attackTimer = 0f;                 // Time left in current attack
+    private float dashCooldownTimer = 0f;           // Time until next dash
+    private float dashTimer = 0f;                   // Time left in current dash
+    private float hardLandingTimer = 0f;            // Time left in hard landing stun
+    private float wallClingTimer = 0f;              // Time left in wall cling
+    private float wallJumpTimer = 0f;               // Time left in wall jump state
+    private float wallStickTimer = 0f;              // Time left in wall stick
+    private float comboWindowTimer = 0f;            // Time left to continue combo
+    private float comboResetTimer = 0f;             // Time before combo resets
     
-    // FLOATING EFFECT
-    private float floatTimer = 0f;
-    private float currentFloatOffset = 0f;
-    private float targetFloatOffset = 0f;
-    private Vector3 originalPosition;
+    // Dash Variables
+    private Vector2 dashDirection = Vector2.right;  // Direction player is dashing
     
-    // LEDGE SYSTEM STATE
-    private bool ledgeDetected = false;
-    private Vector2 ledgePosition;
-    private float ledgeClimbTimer = 0f;
-    private int ledgeSide = 0;
-    private float currentLedgeHoldTime = 0f;
-    private float ledgeReleaseTimer = 0f;
-    private bool canGrabLedge = true;
-
-    //POGO ATTACK STATE
-    private bool isPogoAttacking = false;
-    private bool isPogoBouncing = false;
-    private float pogoAttackTimer = 0f;
-    private float pogoCooldownTimer = 0f;
-    private int currentPogoChain = 0;
-    private float pogoChainTimer = 0f;
-    private float lastPogoTime = 0f;
-    private Vector2 pogoDirection = Vector2.down;
-    private bool hasPogoedThisJump = false; 
-
-    // HEALTH & DAMAGE STATE
-    private bool isInvincible = false;
-    private bool isTakingDamage = false;
-    private bool isDead = false;
-    private float invincibilityTimer = 0f;
-    private float knockbackTimer = 0f;
-    private SpriteRenderer playerSprite;
-    private Color originalSpriteColor;
-    private Vector2 knockbackDirection = Vector2.right;
+    // Swimming State
+    private bool isInWater = false;                 // Is player currently in water?
+    private bool wasInWater = false;                // Was player in water last frame?
+    private float swimDashTimer = 0f;               // Time left in swim dash
+    private float swimDashCooldownTimer = 0f;       // Time until next swim dash
+    private float swimDashDuration = 0.15f;         // How long swim dash lasts
+    private float swimDashCooldown = 0.3f;          // Cooldown between swim dashes
+    private Vector2 swimDashDirection = Vector2.right; // Direction of swim dash
+    private float waterSurfaceY = 0f;               // Y position of water surface
+    private Collider2D currentWaterCollider = null; // Reference to current water collider
+    private float preDashGravityScale;              // Gravity before dash (to restore)
     
-    // DEATH & RESPAWN
-    private Vector3 lastCheckpointPosition;
-    private float deathTimer = 0f;
-    private bool isRespawning = false;
-    private float respawnTimer = 0f;
-
-    // ANIMATION STATE
-    private bool isAnimationLocked = false;
-    private float animationLockTimer = 0f;
-
-    //CAMERA
-    private MetroidvaniaCamera metroidvaniaCamera;
+    // Floating Effect - for water bobbing
+    private float floatTimer = 0f;                  // Timer for floating animation
+    private float currentFloatOffset = 0f;          // Current vertical offset from floating
+    private float targetFloatOffset = 0f;           // Target vertical offset for smooth transition
+    private Vector3 originalPosition;               // Original position before floating offset
+    
+    // Ledge System State
+    private bool ledgeDetected = false;             // Is a ledge currently detected?
+    private Vector2 ledgePosition;                  // Position of detected ledge
+    private float ledgeClimbTimer = 0f;             // Time left in ledge climb animation
+    private int ledgeSide = 0;                      // Which side ledge is on (-1=left, 1=right)
+    private float currentLedgeHoldTime = 0f;        // How long player has held ledge
+    private float ledgeReleaseTimer = 0f;           // Time until player can grab ledge again
+    private bool canGrabLedge = true;               // Can player currently grab ledges?
+    
+    // Pogo Attack State
+    private bool isPogoAttacking = false;           // Is player performing pogo attack?
+    private bool isPogoBouncing = false;            // Is player bouncing from pogo hit?
+    private float pogoAttackTimer = 0f;             // Time left in pogo attack
+    private float pogoCooldownTimer = 0f;           // Time until next pogo attack
+    private int currentPogoChain = 0;               // Current number of consecutive pogo bounces
+    private float pogoChainTimer = 0f;              // Time left to continue pogo chain
+    private float lastPogoTime = 0f;                // Time of last pogo bounce
+    private Vector2 pogoDirection = Vector2.down;   // Direction of pogo attack
+    private bool hasPogoedThisJump = false;         // Has player used pogo this jump?
+    
+    // Combo System State
+    private int currentCombo = 0;                   // Current combo count (0 = no combo)
+    private bool comboAvailable = true;             // Can player start/continue combo?
+    private bool isComboFinishing = false;          // Is player performing final combo attack?
+    
+    // Health & Damage State
+    private bool isInvincible = false;              // Is player currently invincible?
+    private bool isTakingDamage = false;            // Is player currently being knocked back?
+    private bool isDead = false;                    // Is player dead?
+    private float invincibilityTimer = 0f;          // Time left of invincibility
+    private float knockbackTimer = 0f;              // Time left of knockback
+    private Vector2 knockbackDirection = Vector2.right; // Direction of current knockback
+    
+    // Death & Respawn
+    private Vector3 lastCheckpointPosition;         // Position to respawn at
+    private float deathTimer = 0f;                  // Time left in death animation
+    private bool isRespawning = false;              // Is player currently respawning?
+    private float respawnTimer = 0f;                // Time left of respawn invincibility
+    
+    // Animation State
+    private bool isAnimationLocked = false;         // Is animation locked (preventing changes)?
+    private float animationLockTimer = 0f;          // Time left of animation lock
     
     // ====================================================================
     // SECTION 3: UNITY LIFE CYCLE METHODS
     // ====================================================================
     
     /// <summary>
-    /// Called when the script instance is loaded
-    /// Sets up all component references and initializes systems
+    /// Called once when the script instance is loaded
+    /// Initializes all components and systems
     /// </summary>
     void Start()
     {
         InitializeComponents();
         CalculateScreenHeightInUnits();
         SetupMissingObjects();
-        
     }
     
     /// <summary>
     /// Called every frame
     /// Handles input reading, timer updates, and non-physics logic
-    /// Execution order is carefully maintained for proper state management
     /// </summary>
     void Update()
     {
-        // PHASE 1: INPUT READING
+        // Read all player inputs
         ReadInputs();
         
-        // PHASE 2: TIMER UPDATES
+        // Update all active timers and cooldowns
         UpdateAllTimers();
         
-        // PHASE 3: ENVIRONMENT CHECKS
+        // Check environment (walls, water, ledges, etc.)
         CheckEnvironment();
         
-        // PHASE 4: STATE-BASED INPUT HANDLING
+        // Process inputs based on current state
         HandleStateBasedInputs();
         
-        // PHASE 5: STATE MANAGEMENT
+        // Manage state transitions and updates
         ManagePlayerStates();
         
-        // PHASE 6: VISUAL FEEDBACK
+        // Update animation states
         UpdateAnimations();
     }
     
     /// <summary>
-    /// Called at fixed time intervals for physics calculations
-    /// Handles movement, collisions, and physics-based state changes
+    /// Called at fixed time intervals (for physics)
+    /// Handles movement, collisions, and physics calculations
     /// </summary>
     void FixedUpdate()
     {
-        // PHASE 1: UPDATE ENVIRONMENT STATE
+        // Update ground detection and landing logic
         UpdateGroundCheck();
         
-        // PHASE 2: APPLY PHYSICS
+        // Apply physics systems (gravity, knockback, etc.)
         ApplyPhysicsBasedSystems();
         
-        // PHASE 3: EXECUTE MOVEMENT
+        // Execute movement based on current state
         ExecuteMovement();
         
-        // PHASE 4: UPDATE ORIENTATION
+        // Update player orientation (facing direction)
         UpdatePlayerOrientation();
     }
     
@@ -431,62 +424,69 @@ public class Kalb : MonoBehaviour
     // ====================================================================
     
     /// <summary>
-    /// Gets references to all required components
-    /// Sets up input system actions
+    /// Gets references to all required components and sets up input system
     /// </summary>
     private void InitializeComponents()
     {
+        // Get physics body and configure it
         rb = GetComponent<Rigidbody2D>();
-        rb.freezeRotation = true;
+        rb.freezeRotation = true; // Prevent rotation from physics
         
+        // Set up input system actions
         playerInput = GetComponent<PlayerInput>();
         moveAction = playerInput.actions["Move"];
         jumpAction = playerInput.actions["Jump"];
         dashAction = playerInput.actions["Dash/Run"];
         attackAction = playerInput.actions["Attack"];
         
+        // Get animation and collider components
         animator = GetComponent<Animator>();
         playerCollider = GetComponent<Collider2D>();
         
+        // Store original position for floating effect
         originalPosition = transform.position;
+        
+        // Get camera references
         mainCamera = Camera.main;
         metroidvaniaCamera = FindFirstObjectByType<MetroidvaniaCamera>();
         if (metroidvaniaCamera == null && Camera.main != null)
         {
             metroidvaniaCamera = Camera.main.gameObject.AddComponent<MetroidvaniaCamera>();
         }
-        // Initialize Health System
+        
+        // Initialize specialized systems
         InitializeHealthSystem();
         InitializeWallSlideAcceleration();
-
     }
     
     /// <summary>
-    /// Calculates screen height in world units for fall detection
-    /// Used for screen-height based hard landing system
+    /// Calculates screen height in world units for fall detection system
     /// </summary>
     private void CalculateScreenHeightInUnits()
     {
         if (mainCamera != null)
         {
+            // Convert screen top and bottom to world positions
             Vector3 topOfScreen = mainCamera.ViewportToWorldPoint(new Vector3(0.5f, 1f, 0));
             Vector3 bottomOfScreen = mainCamera.ViewportToWorldPoint(new Vector3(0.5f, 0f, 0));
+            
+            // Calculate distance between them
             screenHeightInUnits = Vector3.Distance(topOfScreen, bottomOfScreen);
         }
         else
         {
+            // Fallback value if no camera found
             screenHeightInUnits = 10f;
-            Debug.LogWarning("Main camera not found. Using default screen height.");
         }
     }
     
-    
     /// <summary>
     /// Creates required child GameObjects if not assigned in Inspector
-    /// Prevents null reference errors
+    /// Prevents null reference errors at runtime
     /// </summary>
     private void SetupMissingObjects()
     {
+        // Create all necessary check points if missing
         CreateIfMissing(ref groundCheck, "GroundCheck", new Vector3(0, -0.65f, 0));
         CreateIfMissing(ref wallCheck, "WallCheck", new Vector3(0.5f, 0, 0));
         CreateIfMissing(ref attackPoint, "AttackPoint", new Vector3(0.5f, 0, 0));
@@ -507,38 +507,33 @@ public class Kalb : MonoBehaviour
             transformRef = obj.transform;
         }
     }
-
+    
     /// <summary>
     /// Initializes health system components and state
     /// </summary>
     private void InitializeHealthSystem()
     {
-        // Get sprite renderer for damage flash
+        // Get sprite renderer for damage flash effects
         playerSprite = GetComponent<SpriteRenderer>();
         if (playerSprite != null)
         {
             originalSpriteColor = playerSprite.color;
         }
         
-        // Set initial health
+        // Ensure health is within valid range
         currentHealth = Mathf.Clamp(currentHealth, 1, maxHealth);
         
         // Set initial checkpoint to starting position
         lastCheckpointPosition = transform.position;
         
-        // Initialize as alive
+        // Initialize player as alive and vulnerable
         isDead = false;
         isInvincible = false;
         isTakingDamage = false;
-
-        // Initialize debug options
-        godMode = false;
-        
-        
     }
-
+    
     /// <summary>
-    /// Initializes wall slide acceleration system
+    /// Initializes wall slide acceleration system with default values
     /// </summary>
     private void InitializeWallSlideAcceleration()
     {
@@ -547,15 +542,16 @@ public class Kalb : MonoBehaviour
         isAcceleratingWallSlide = false;
         wallSlideAccelerationDirection = 1f;
         
-        // Set default acceleration curve if null
+        // Set default acceleration curve if none provided
         if (wallSlideAccelerationCurve == null || wallSlideAccelerationCurve.keys.Length == 0)
         {
             wallSlideAccelerationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
         }
     }
-
+    
     /// <summary>
     /// Resets wall slide acceleration to start from zero
+    /// Called when starting new wall slide
     /// </summary>
     public void ResetWallSlideAcceleration()
     {
@@ -565,50 +561,50 @@ public class Kalb : MonoBehaviour
         wallSlideAccelerationTimer = 0f;
         isAcceleratingWallSlide = true;
         wallSlideAccelerationDirection = 1f;  // Always start accelerating downward
-        
-        Debug.Log("Wall slide acceleration reset");
     }
-
+    
     /// <summary>
     /// Updates wall slide acceleration over time
+    /// Controls progressive speed buildup during wall slide
     /// </summary>
     private void UpdateWallSlideAcceleration()
     {
         if (!enableWallSlideAcceleration || !isWallSliding || isWallLocked) return;
         
-        // If we just started wall sliding, reset acceleration
+        // Reset acceleration when starting new wall slide
         if (wallSlideState == WallSlideState.Starting && !isAcceleratingWallSlide)
         {
             ResetWallSlideAcceleration();
         }
         
-        // Update acceleration timer
+        // Update acceleration timer and calculate speed
         if (isAcceleratingWallSlide && wallSlideAccelerationTimer < 1f)
         {
+            // Increase timer based on acceleration time
             wallSlideAccelerationTimer += Time.deltaTime / wallSlideAccelerationTime;
             wallSlideAccelerationTimer = Mathf.Clamp01(wallSlideAccelerationTimer);
             
-            // Calculate speed based on acceleration curve
+            // Get speed from acceleration curve
             float curveValue = wallSlideAccelerationCurve.Evaluate(wallSlideAccelerationTimer);
             currentWallSlideSpeed = Mathf.Lerp(0f, wallSlideSpeed, curveValue);
             
-            // If we reached max speed, stop accelerating
+            // Stop accelerating when at max speed
             if (wallSlideAccelerationTimer >= 1f)
             {
                 isAcceleratingWallSlide = false;
                 currentWallSlideSpeed = wallSlideSpeed;  // Ensure exact max speed
             }
         }
-        // If not accelerating but speed is less than max, maintain current speed
+        // Maintain max speed if not accelerating
         else if (!isAcceleratingWallSlide && currentWallSlideSpeed < wallSlideSpeed)
         {
             currentWallSlideSpeed = wallSlideSpeed;
         }
         
-        // Apply deceleration if changing walls or slowing down
+        // Handle deceleration when needed
         UpdateWallSlideDeceleration();
     }
-
+    
     /// <summary>
     /// Handles deceleration when changing walls or slowing down
     /// </summary>
@@ -616,7 +612,7 @@ public class Kalb : MonoBehaviour
     {
         if (!enableWallSlideAcceleration) return;
         
-        // Check if we're changing wall sides (this should cause deceleration)
+        // Check if player is trying to change wall sides
         bool changingWalls = false;
         if (isTouchingWall && Mathf.Abs(moveInput.x) > 0.1f)
         {
@@ -624,7 +620,7 @@ public class Kalb : MonoBehaviour
             changingWalls = inputDirection == -wallSide && !isWallLockEngaging;
         }
         
-        // Decelerate when changing walls or when wall lock is engaging
+        // Decelerate when changing walls or engaging wall lock
         if (changingWalls || isWallLockEngaging)
         {
             if (wallSlideAccelerationDirection > 0)  // Only if we were accelerating downward
@@ -642,7 +638,7 @@ public class Kalb : MonoBehaviour
                 float curveValue = wallSlideAccelerationCurve.Evaluate(wallSlideAccelerationTimer);
                 currentWallSlideSpeed = Mathf.Lerp(0f, wallSlideSpeed, curveValue);
                 
-                // If fully decelerated, reset
+                // Reset when fully decelerated
                 if (wallSlideAccelerationTimer <= 0f)
                 {
                     wallSlideAccelerationDirection = 1f;
@@ -650,7 +646,7 @@ public class Kalb : MonoBehaviour
                 }
             }
         }
-        // Reset to acceleration if conditions change
+        // Switch back to acceleration when conditions change
         else if (wallSlideAccelerationDirection < 0 && !changingWalls && !isWallLockEngaging)
         {
             wallSlideAccelerationDirection = 1f;
@@ -658,20 +654,21 @@ public class Kalb : MonoBehaviour
             wallSlideAccelerationTimer = currentWallSlideSpeed / wallSlideSpeed;
         }
     }
-
+    
     /// <summary>
     /// Applies the current wall slide speed to movement
+    /// Controls actual downward velocity during wall slide
     /// </summary>
     private void ApplyWallSlideAcceleration()
     {
         if (!enableWallSlideAcceleration || !isWallSliding || isWallLocked) return;
         
-        // Get the target speed (use accelerated speed if enabled)
+        // Get target speed (accelerated or normal)
         float targetSpeed = enableWallSlideAcceleration ? 
             Mathf.Min(-currentWallSlideSpeed, rb.linearVelocity.y) : 
             -wallSlideSpeed;
         
-        // Only apply if we're falling (negative velocity)
+        // Only apply if falling (negative velocity)
         if (rb.linearVelocity.y < 0)
         {
             // Apply jump button effect (slower fall when holding jump)
@@ -693,10 +690,10 @@ public class Kalb : MonoBehaviour
     // ====================================================================
     // SECTION 5: UPDATE PHASE METHODS
     // ====================================================================
+    // These methods are called in Update() in a specific order
     
     /// <summary>
-    /// PHASE 1: Reads all player inputs
-    /// Called in Update()
+    /// Phase 1: Reads all player inputs from input system
     /// </summary>
     private void ReadInputs()
     {
@@ -706,7 +703,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Tracks jump button state for variable jump height
-    /// Also handles jump cut when button is released
+    /// Also handles jump cut when button is released early
     /// </summary>
     private void UpdateJumpButtonState()
     {
@@ -727,26 +724,31 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// PHASE 2: Updates all active timers and cooldowns
-    /// Called in Update()
+    /// Phase 2: Updates all active timers and cooldowns
+    /// Called every frame to decrement timers
     /// </summary>
     private void UpdateAllTimers()
     {
-        // General action timers
+        // Update timers for actions and cooldowns
         UpdateActionTimers();
         
-        // Jump & air movement timers
+        // Update jump-related timers (coyote time, buffer)
         UpdateJumpTimers();
         
-        // Special system timers
+        // Update swimming system timers
         UpdateSwimTimers();
+        
+        // Update ledge system timers
         UpdateLedgeTimers();
+        
+        // Update combo system timers
         UpdateComboTimers();
+        
+        // Update pogo attack timers
         UpdatePogoTimers();
 
-        //Health & Damage timers
+        // Update health and damage timers
         UpdateHealthTimers();
-        
     }
     
     /// <summary>
@@ -788,6 +790,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Updates timers related to jumping and air movement
+    /// Includes coyote time and jump buffering
     /// </summary>
     private void UpdateJumpTimers()
     {
@@ -811,7 +814,7 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// Updates swimming-related timers
+    /// Updates swimming-related timers (dash duration and cooldown)
     /// </summary>
     private void UpdateSwimTimers()
     {
@@ -824,11 +827,11 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// Updates ledge system timers
+    /// Updates ledge system timers (grab time, climb time, cooldowns)
     /// </summary>
     private void UpdateLedgeTimers()
     {
-        // Ledge release cooldown
+        // Ledge release cooldown timer
         if (ledgeReleaseTimer > 0) ledgeReleaseTimer -= Time.deltaTime;
         
         // Reset ledge grab ability after cooldown
@@ -837,7 +840,7 @@ public class Kalb : MonoBehaviour
             canGrabLedge = true;
         }
         
-        // Update grab time while holding ledge
+        // Track how long player has been holding ledge
         if (isLedgeGrabbing)
         {
             currentLedgeHoldTime += Time.deltaTime;
@@ -847,7 +850,7 @@ public class Kalb : MonoBehaviour
             currentLedgeHoldTime = 0f;
         }
         
-        // Ledge climb timer
+        // Ledge climb animation timer
         if (isLedgeClimbing)
         {
             ledgeClimbTimer -= Time.deltaTime;
@@ -858,13 +861,13 @@ public class Kalb : MonoBehaviour
             }
         }
     }
-
+    
     /// <summary>
-    /// Updates combo system timers
+    /// Updates combo system timers (window to continue combo, reset timer)
     /// </summary>
     private void UpdateComboTimers()
     {
-        // Combo window timer (time to continue combo)
+        // Combo window timer - time to continue combo
         if (comboWindowTimer > 0)
         {
             comboWindowTimer -= Time.deltaTime;
@@ -872,7 +875,7 @@ public class Kalb : MonoBehaviour
             {
                 comboWindowTimer = 0;
                 
-                // If we're not attacking and combo window closed, start reset timer
+                // If not attacking and window closed, start reset timer
                 if (!isAttacking && currentCombo > 0)
                 {
                     comboResetTimer = comboResetTime;
@@ -880,7 +883,7 @@ public class Kalb : MonoBehaviour
             }
         }
         
-        // Combo reset timer (time before combo resets to 0)
+        // Combo reset timer - time before combo resets to 0
         if (comboResetTimer > 0)
         {
             comboResetTimer -= Time.deltaTime;
@@ -890,9 +893,9 @@ public class Kalb : MonoBehaviour
             }
         }
     }
-
+    
     /// <summary>
-    /// Updates pogo attack timers
+    /// Updates pogo attack timers (attack duration, cooldown, chain window)
     /// </summary>
     private void UpdatePogoTimers()
     {
@@ -922,19 +925,19 @@ public class Kalb : MonoBehaviour
             }
         }
         
-        // Pogo bounce state timer (auto-cancel)
+        // Auto-cancel bounce state after timeout
         if (isPogoBouncing && Time.time - lastPogoTime > 0.3f)
         {
             isPogoBouncing = false;
         }
     }
-
+    
     /// <summary>
-    /// Updates health-related timers (invincibility, knockback, death)
+    /// Updates health-related timers (invincibility, knockback, death, respawn)
     /// </summary>
     private void UpdateHealthTimers()
     {
-        // Invincibility timer
+        // Invincibility timer after taking damage
         if (isInvincible)
         {
             invincibilityTimer -= Time.deltaTime;
@@ -944,7 +947,7 @@ public class Kalb : MonoBehaviour
             }
         }
         
-        // Knockback timer
+        // Knockback duration timer
         if (isTakingDamage && knockbackTimer > 0)
         {
             knockbackTimer -= Time.deltaTime;
@@ -954,7 +957,7 @@ public class Kalb : MonoBehaviour
             }
         }
 
-        // Animation lock timer
+        // Animation lock timer (prevents animation changes)
         if (isAnimationLocked)
         {
             animationLockTimer -= Time.deltaTime;
@@ -964,7 +967,7 @@ public class Kalb : MonoBehaviour
             }
         }
         
-        // Death timer
+        // Death animation timer
         if (isDead)
         {
             deathTimer -= Time.deltaTime;
@@ -986,20 +989,21 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// PHASE 3: Checks the environment around the player
-    /// Called in Update()
+    /// Phase 3: Checks the environment around the player
+    /// Detects walls, water, ledges, and death boundaries
     /// </summary>
     private void CheckEnvironment()
     {
-
-        
-        // DEATH BOUNDARY CHECK
+        // Check if player has fallen out of bounds
         CheckDeathBoundary();
 
+        // Detect walls for sliding and wall jumps
         CheckWall();
+        
+        // Detect water for swimming
         CheckWater();
         
-        // Only detect ledges if we can grab them and aren't already grabbing/climbing
+        // Detect ledges if able to grab them
         if (canGrabLedge && !isLedgeGrabbing && !isLedgeClimbing)
         {
             ledgeDetected = CheckForLedge();
@@ -1007,26 +1011,25 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// PHASE 4: Handles inputs based on current player state
-    /// Called in Update()
+    /// Phase 4: Handles inputs based on current player state
+    /// Different inputs are processed depending on state (swimming, attacking, etc.)
     /// </summary>
     private void HandleStateBasedInputs()
     {
-        // BLOCK INPUT if dead, taking damage, or in hard landing
+        // Block most inputs if dead, taking damage, or hard landing
         if (isDead || isTakingDamage || isHardLanding)
         {
-            // Only allow minimal input during these states
             HandleMinimalInputDuringDamage();
             return;
         }
 
-        // Handle swimming inputs if swimming
+        // Handle swimming-specific inputs
         if (isSwimming && !isHardLanding)
         {
             HandleSwimInput();
         }
         
-        // Handle other inputs if not in special states
+        // Handle normal inputs if not in special states
         if (!isHardLanding && !isLedgeGrabbing && !isLedgeClimbing)
         {
             HandleDashInput();
@@ -1040,8 +1043,8 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// PHASE 5: Manages player state transitions and updates
-    /// Called in Update()
+    /// Phase 5: Manages player state transitions and updates
+    /// Handles ongoing state behaviors like wall sliding and climbing
     /// </summary>
     private void ManagePlayerStates()
     {
@@ -1058,7 +1061,7 @@ public class Kalb : MonoBehaviour
             HandleLedgeClimb();
         }
 
-        // Handle pogo attack detection
+        // Handle pogo attack detection during attack
         if (isPogoAttacking && !isPogoBouncing)
         {
             CheckForPogoTargets();
@@ -1066,8 +1069,8 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// PHASE 6: Updates animations based on current state
-    /// Called in Update()
+    /// Phase 6: Updates animations based on current state
+    /// Controls which animation plays based on player actions
     /// </summary>
     private void UpdateAnimations()
     {
@@ -1077,16 +1080,20 @@ public class Kalb : MonoBehaviour
     // ====================================================================
     // SECTION 6: FIXEDUPDATE PHASE METHODS
     // ====================================================================
+    // These methods are called in FixedUpdate() in a specific order
     
     /// <summary>
-    /// PHASE 1: Updates ground detection and landing logic
-    /// Called in FixedUpdate()
+    /// Phase 1: Updates ground detection and landing logic
+    /// Called in FixedUpdate for physics accuracy
     /// </summary>
     private void UpdateGroundCheck()
     {
         bool wasGrounded = isGrounded;
+        
+        // Check if player is grounded using circle cast
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, environmentLayer);
 
+        // Reset wall slide when landing
         if (isGrounded && isWallSlideEngaged)
         {
             isWallSlideEngaged = false;
@@ -1112,7 +1119,7 @@ public class Kalb : MonoBehaviour
             ReleaseLedge();
         }
         
-        // Track peak height during ascent
+        // Track peak height during ascent for fall distance calculation
         if (!isGrounded && !wasGrounded && rb.linearVelocity.y > 0)
         {
             peakHeight = transform.position.y;
@@ -1124,7 +1131,7 @@ public class Kalb : MonoBehaviour
             // Calculate fall distance for hard landing detection
             totalFallDistance = fallStartHeight - transform.position.y;
             
-            // Check for hard landing (screen-height or velocity based)
+            // Check if landing was hard enough to stun player
             CheckForHardLanding(currentFallSpeed, totalFallDistance);
             
             // Reset fall tracking
@@ -1151,8 +1158,8 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// PHASE 2: Applies physics-based systems like gravity
-    /// Called in FixedUpdate()
+    /// Phase 2: Applies physics-based systems like gravity
+    /// Controls gravity based on player state
     /// </summary>
     private void ApplyPhysicsBasedSystems()
     {
@@ -1168,17 +1175,16 @@ public class Kalb : MonoBehaviour
             PreventWallStick();
         }
 
-        // Apply pogo gravity if pogo bouncing
+        // Apply reduced gravity during pogo bounce for better control
         if (isPogoBouncing)
         {
-            // Reduced gravity during pogo bounce for better control
             rb.gravityScale = normalGravityScale * 0.7f;
         }
     }
     
     /// <summary>
-    /// PHASE 3: Executes movement based on current state
-    /// Called in FixedUpdate()
+    /// Phase 3: Executes movement based on current state
+    /// Applies forces and velocities to the rigidbody
     /// </summary>
     private void ExecuteMovement()
     {
@@ -1198,8 +1204,8 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// PHASE 4: Updates player orientation (facing direction)
-    /// Called in FixedUpdate()
+    /// Phase 4: Updates player orientation (facing direction)
+    /// Flips sprite based on movement direction
     /// </summary>
     private void UpdatePlayerOrientation()
     {
@@ -1218,11 +1224,14 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles dash input with all required checks
+    /// Validates ability unlock, cooldowns, and state conditions
     /// </summary>
     private void HandleDashInput()
     {
+        // Check if dash is available
         if (!dashUnlocked || isHardLanding || isSwimming) return;
         
+        // Check if dash button was pressed and conditions are met
         if (dashAction.triggered && !isDashing && dashCooldownTimer <= 0 && 
             !isAttacking && !isWallSliding)
         {
@@ -1234,6 +1243,7 @@ public class Kalb : MonoBehaviour
                 canDash = airDashCount < maxAirDashes;
             }
             
+            // Execute dash if allowed
             if (canDash)
             {
                 StartDash();
@@ -1247,6 +1257,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Determines if player is running based on input and state
+    /// Running requires holding dash button while grounded
     /// </summary>
     private void HandleRunInput()
     {
@@ -1256,7 +1267,7 @@ public class Kalb : MonoBehaviour
             return;
         }
         
-        // Running requires holding dash button while grounded
+        // Running requires holding dash button while grounded and not in other actions
         isRunning = dashAction.IsPressed() && isGrounded && !isDashing && 
                    !isAttacking && !isWallSliding;
     }
@@ -1269,30 +1280,30 @@ public class Kalb : MonoBehaviour
     {
         if (isHardLanding || isSwimming) return;
         
-        // Buffer jump input
+        // Buffer jump input (store input for later processing)
         if (jumpAction.triggered)
         {
             jumpBufferCounter = jumpBufferTime;
         }
         
-        // Process buffered jump
+        // Process buffered jump if available
         if (jumpBufferCounter > 0)
         {
-            // Priority 1: Wall jump
+            // Priority 1: Wall jump (highest priority)
             if (isWallSliding && wallJumpUnlocked)
             {
                 WallJump();
                 jumpBufferCounter = 0;
                 hasDoubleJumped = false;
             }
-            // Priority 2: Double jump
+            // Priority 2: Double jump (if in air and haven't double jumped)
             else if (!isGrounded && coyoteTimeCounter <= 0 && doubleJumpUnlocked && 
                     hasDoubleJump && !hasDoubleJumped && !isDashing && !isAttacking)
             {
                 DoubleJump();
                 jumpBufferCounter = 0;
             }
-            // Priority 3: Normal jump (coyote time or grounded)
+            // Priority 3: Normal jump (using coyote time or grounded)
             else if (coyoteTimeCounter > 0)
             {
                 NormalJump();
@@ -1303,13 +1314,15 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// Enhanced attack input handler with combo system
+    /// Enhanced attack input handler with combo system and pogo attack
+    /// Handles regular attacks, combos, and downward pogo attacks
     /// </summary>
     private void HandleAttackInput()
     {
+        // Don't allow attacks in these states
         if (isHardLanding || isLedgeGrabbing || isLedgeClimbing || isInWater || isSwimming) return;
 
-        // Check for pogo attack (down + attack) - NEW
+        // Check for pogo attack (down + attack)
         if (moveInput.y < -0.7f && attackAction.triggered && pogoUnlocked)
         {
             // Only allow pogo in air, not on ground
@@ -1329,7 +1342,7 @@ public class Kalb : MonoBehaviour
         
         if (!attackPressed) return; // No attack input this frame
         
-        // If we're currently attacking, queue the next attack if within combo window
+        // If currently attacking, queue next attack if within combo window
         if (isAttacking)
         {
             if (comboWindowTimer > 0 && currentCombo > 0 && currentCombo < maxComboHits)
@@ -1355,6 +1368,7 @@ public class Kalb : MonoBehaviour
             ResetCombo();
         }
         
+        // Start attack if allowed
         if (canAttack)
         {
             StartComboAttack();
@@ -1368,13 +1382,13 @@ public class Kalb : MonoBehaviour
     {
         if (!isSwimming || isHardLanding) return;
         
-        // Swim dash
+        // Swim dash input
         if (dashAction.triggered && !isSwimDashing && swimDashCooldownTimer <= 0)
         {
             StartSwimDash();
         }
         
-        // Jump out of water
+        // Jump out of water input
         if (jumpAction.triggered && !isSwimDashing)
         {
             SwimJump();
@@ -1383,6 +1397,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles all ledge-related inputs including grab, climb, jump, and release
+    /// Includes auto-grab when falling past ledges
     /// </summary>
     private void HandleLedgeInput()
     {   
@@ -1434,7 +1449,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Calculates the dominant input direction for ledge actions
-    /// Prioritizes vertical input over horizontal
+    /// Prioritizes vertical input over horizontal for ledge climbing decisions
     /// </summary>
     private float CalculateLedgeInputDirection()
     {
@@ -1450,12 +1465,12 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Handles minimal input allowed during damage/death states
+    /// Currently allows pause menu input (to be implemented)
     /// </summary>
     private void HandleMinimalInputDuringDamage()
     {
         // Allow pause menu input even when dead/taking damage
-        // (You'll implement this with your pause system)
-        // if (Input.GetKeyDown(KeyCode.Escape)) PauseGame();
+        // Example: if (Input.GetKeyDown(KeyCode.Escape)) PauseGame();
     }
     
     // ====================================================================
@@ -1464,27 +1479,28 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Main movement handler for ground and air movement (excluding swimming)
+    /// Routes to appropriate movement handler based on current state
     /// </summary>
     private void HandleGroundAndAirMovement()
     {
-        // PRIORITY 1: Knockback movement (highest priority)
+        // PRIORITY 1: Knockback movement (highest priority - overrides everything)
         if (isTakingDamage && knockbackTimer > 0)
         {
             HandleKnockbackMovement();
             return;
         }
         
-        // PRIORITY 2: Hard landing
+        // PRIORITY 2: Hard landing (player is stunned)
         if (isHardLanding)
         {
             rb.linearVelocity = Vector2.zero;
             return;
         }
         
-        // Determine current movement speed
+        // Determine current movement speed (running or walking)
         float currentSpeed = isRunning && isGrounded ? runSpeed : moveSpeed;
         
-        // STATE-SPECIFIC MOVEMENT HANDLERS
+        // STATE-SPECIFIC MOVEMENT HANDLERS (in priority order)
         if (isDashing)
         {
             HandleDashMovement();
@@ -1497,7 +1513,7 @@ public class Kalb : MonoBehaviour
         {
             HandleAttackMovement();
         }
-        else if (isPogoAttacking) // Pogo movement
+        else if (isPogoAttacking)
         {
             HandlePogoMovement();
         }
@@ -1513,6 +1529,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles movement during dash state
+    /// Applies constant velocity in dash direction with no gravity
     /// </summary>
     private void HandleDashMovement()
     {
@@ -1522,9 +1539,11 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles movement during wall jump state with limited control
+    /// Allows some horizontal influence during wall jump
     /// </summary>
     private void HandleWallJumpMovement()
     {
+        // Allow limited horizontal control during wall jump
         float controlForce = 5f;
         rb.AddForce(new Vector2(moveInput.x * controlForce, 0));
         
@@ -1538,6 +1557,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles movement during attack state with combo considerations
+    /// Allows slight movement during first two combo hits, stops for final hit
     /// </summary>
     private void HandleAttackMovement()
     {
@@ -1557,25 +1577,25 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// Handles wall slide movement with speed limits
+    /// Handles wall slide movement with speed limits and acceleration
+    /// Controls downward velocity while sliding on walls
     /// </summary>
     private void HandleWallSlideMovement()
     {
         // Don't apply wall slide movement if wall locked
         if (isWallLocked || isWallLockEngaging)
         {
-            // Wall lock handles its own movement
             return;
         }
         
-        // CRITICAL FIX: Only apply wall slide movement if we're actually touching a wall
+        // CRITICAL: Only apply wall slide movement if actually touching a wall
         if (!isTouchingWall && isWallSliding)
         {
-            // We lost wall contact - let normal falling physics take over
-            // Don't apply any special wall slide movement
+            // Lost wall contact - let normal falling physics take over
             return;
         }
         
+        // Stop horizontal movement while wall sliding
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         
         // Stop upward movement during wall slide
@@ -1584,7 +1604,7 @@ public class Kalb : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         }
 
-        // Apply acceleration-based movement
+        // Apply acceleration-based movement if enabled
         if (enableWallSlideAcceleration && isWallSliding && !isWallLocked)
         {
             ApplyWallSlideAcceleration();
@@ -1620,17 +1640,19 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles normal ground and air movement with all systems applied
+    /// Main movement logic for walking, running, and air control
     /// </summary>
     private void HandleNormalMovement(float currentSpeed)
     {
         float currentMoveInput = moveInput.x;
         
-        // Don't prevent input into walls if wall slide is engaged
+        // Don't allow input into walls unless wall sliding is engaged
         if (isAgainstWall && !isWallSliding && Mathf.Sign(currentMoveInput) == lastWallSide && !isWallSlideEngaged)
         {
             currentMoveInput = 0;
         }
         
+        // Calculate target velocity based on input
         Vector2 targetVelocity = new Vector2(currentMoveInput * currentSpeed, rb.linearVelocity.y);
         
         // Apply air control if in air
@@ -1648,7 +1670,6 @@ public class Kalb : MonoBehaviour
                 if (Mathf.Sign(moveInput.x) == -wallSide)
                 {
                     // Don't stick - allow movement away
-                    // This lets the player naturally move off the wall
                 }
                 else if (moveInput.x == 0 || Mathf.Sign(moveInput.x) == wallSide)
                 {
@@ -1658,7 +1679,7 @@ public class Kalb : MonoBehaviour
             }
         }
         
-        // Smooth movement
+        // Smooth movement using velocity smoothing
         rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing);
         
         // Slow down when pushing against a wall
@@ -1673,6 +1694,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Handles movement during pogo attack
+    /// Allows limited horizontal control and applies downward force
     /// </summary>
     private void HandlePogoMovement()
     {
@@ -1684,7 +1706,7 @@ public class Kalb : MonoBehaviour
         Vector2 targetVelocity = new Vector2(targetXVelocity, rb.linearVelocity.y);
         rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, movementSmoothing * 2f);
         
-        // Apply downward force during active pogo (not bouncing)
+        // Apply additional downward force during active pogo (not bouncing)
         if (!isPogoBouncing && moveInput.y < -0.5f)
         {
             rb.AddForce(Vector2.down * pogoDownwardForce * 0.5f);
@@ -1693,13 +1715,14 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles movement while grabbing or climbing a ledge
+    /// Freezes movement during grab, handles climbing animation
     /// </summary>
     private void HandleLedgeMovement()
     {
         rb.linearVelocity = Vector2.zero;
         
         // Only zero velocity if grabbing, not climbing
-        // Climbing movement is handled in HandleLedgeClimb()
+        // Climbing movement is handled separately in HandleLedgeClimb()
         if (!isLedgeClimbing)
         {
             rb.linearVelocity = Vector2.zero;
@@ -1708,14 +1731,14 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Handles movement during knockback with priority over other forces
+    /// Applies knockback force and prevents player control during knockback
     /// </summary>
     private void HandleKnockbackMovement()
     {
         // During knockback, NO player control - just physics
-        // Don't allow any player input influence
         Vector2 currentVelocity = rb.linearVelocity;
         
-        // Calculate knockback decay over time
+        // Calculate knockback decay over time (stronger at start, weaker at end)
         float knockbackProgress = 1f - (knockbackTimer / knockbackDuration);
         float currentKnockbackForce = knockbackForce * (1f - knockbackProgress);
         
@@ -1725,7 +1748,7 @@ public class Kalb : MonoBehaviour
         // Immediately set velocity (no smoothing during knockback)
         rb.linearVelocity = knockbackVelocity;
         
-        // Apply gravity during knockback (but reduced)
+        // Apply reduced gravity during knockback
         if (!isGrounded)
         {
             rb.gravityScale = normalGravityScale * 0.5f;
@@ -1739,27 +1762,28 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Controls gravity based on player state
+    /// Applies different gravity scales for falling, ascending, and normal states
     /// </summary>
     private void UpdateGravity()
     {
-        // Skip gravity in these states
+        // Skip gravity in these states (they handle gravity separately)
         if (isDashing || isWallSliding || isHardLanding || isWallJumping || isSwimming || isWallLocked || isWallLockEngaging)
             return;
         
         currentFallSpeed = rb.linearVelocity.y;
         
-        // FALLING: Apply falling gravity
+        // FALLING: Apply increased falling gravity
         if (rb.linearVelocity.y < 0)
         {
             rb.gravityScale = fallingGravityScale;
             
-            // Clamp to maximum fall speed
+            // Clamp to maximum fall speed (terminal velocity)
             if (rb.linearVelocity.y < maxFallSpeed)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxFallSpeed);
             }
         }
-        // ASCENDING (JUMP RELEASED): Apply quick fall gravity
+        // ASCENDING (JUMP RELEASED): Apply quick fall gravity for faster descent
         else if (rb.linearVelocity.y > 0 && !isJumpButtonHeld)
         {
             rb.gravityScale = fallingGravityScale * quickFallGravityMultiplier;
@@ -1773,15 +1797,17 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Applies air control physics for precise aerial movement
+    /// Allows limited horizontal control while in air
     /// </summary>
     private void ApplyAirControl()
     {
         if (isGrounded || isWallSliding || isDashing || isHardLanding) return;
         
+        // Calculate target velocity based on input
         float targetXVelocity = moveInput.x * moveSpeed * airControlMultiplier;
         float velocityDifference = targetXVelocity - rb.linearVelocity.x;
         
-        // Apply acceleration force
+        // Apply acceleration force toward target velocity
         rb.AddForce(Vector2.right * velocityDifference * airAcceleration);
         
         // Clamp to maximum air speed
@@ -1796,11 +1822,13 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Flips player sprite based on movement direction
+    /// Controls which way the character is facing
     /// </summary>
     private void HandleFlip()
     {
         if (Mathf.Abs(moveInput.x) < 0.1f || isHardLanding) return;
             
+        // Flip to face movement direction
         if (moveInput.x > 0 && !facingRight)
         {
             Flip();
@@ -1814,7 +1842,7 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// Flips the player sprite horizontally
+    /// Flips the player sprite horizontally by inverting X scale
     /// </summary>
     private void Flip()
     {
@@ -1826,6 +1854,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Updates attack point position to match facing direction
+    /// Ensures attacks come from correct side of character
     /// </summary>
     private void UpdateAttackPointPosition()
     {
@@ -1842,10 +1871,11 @@ public class Kalb : MonoBehaviour
     // ====================================================================
     // SECTION 9: ACTION IMPLEMENTATION METHODS
     // ====================================================================
+    // These methods execute specific player actions
     
     /// <summary>
     /// Executes a normal ground jump
-    /// Resets fall tracking for next jump
+    /// Applies upward force and resets fall tracking
     /// </summary>
     private void NormalJump()
     {
@@ -1856,7 +1886,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Executes a double jump
-    /// Tracks that double jump has been used
+    /// Tracks that double jump has been used for this jump sequence
     /// </summary>
     private void DoubleJump()
     {
@@ -1867,10 +1897,11 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Executes a wall jump with force applied away from wall
-    /// Resets air dash count and fall tracking
+    /// Resets various states and applies wall jump force
     /// </summary>
     private void WallJump()
     {
+        // Set wall jump state
         isWallJumping = true;
         isWallSliding = false;
         isWallClinging = false;
@@ -1891,6 +1922,7 @@ public class Kalb : MonoBehaviour
             ResetWallSlideAcceleration();
         }
         
+        // Stop current velocity and apply wall jump force
         rb.linearVelocity = Vector2.zero;
         Vector2 jumpDir = new Vector2(-wallSide * wallJumpAngle.x, wallJumpAngle.y).normalized;
         rb.AddForce(jumpDir * wallJumpForce, ForceMode2D.Impulse);
@@ -1901,6 +1933,7 @@ public class Kalb : MonoBehaviour
             Flip();
         }
         
+        // Reset air abilities
         airDashCount = 0;
         ResetFallTracking();
         hasPogoedThisJump = false; 
@@ -1909,6 +1942,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Resets fall tracking variables after a jump
+    /// Prepares for new fall distance measurement
     /// </summary>
     private void ResetFallTracking()
     {
@@ -1919,7 +1953,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Starts dash movement
-    /// Determines dash direction based on input and facing
+    /// Determines dash direction based on input and facing direction
     /// </summary>
     private void StartDash()
     {
@@ -1927,13 +1961,13 @@ public class Kalb : MonoBehaviour
         dashTimer = dashDuration;
         dashCooldownTimer = dashCooldown;
 
-        //Disengage wall slide when dashing
+        // Disengage wall slide when dashing
         if (isWallSlideEngaged)
         {
             DisengageWallSlide();
         }
         
-        // Determine dash direction
+        // Determine dash direction (default to facing direction)
         dashDirection = facingRight ? Vector2.right : Vector2.left;
         
         // Use input direction if in air and moving
@@ -1947,6 +1981,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Ends dash movement and restores normal physics
+    /// Called when dash timer expires
     /// </summary>
     private void EndDash()
     {
@@ -1960,21 +1995,21 @@ public class Kalb : MonoBehaviour
         }
     }
     
-
     /// <summary>
     /// Starts or continues a combo attack
+    /// Manages combo state and executes appropriate attack
     /// </summary>
     private void StartComboAttack()
     {
         // Determine combo index (0-based)
         int comboIndex = Mathf.Clamp(currentCombo, 0, maxComboHits - 1);
         
-        // Start attack
+        // Start attack state
         isAttacking = true;
         attackTimer = comboAttackDurations[comboIndex];
         attackCooldownTimer = comboCooldowns[comboIndex];
         
-        // Set combo state
+        // Update combo state
         currentCombo++;
         comboWindowTimer = comboWindow;  // Open window for next attack
         comboResetTimer = comboResetTime; // Reset overall combo timer
@@ -1995,6 +2030,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Executes attack logic for specific combo hit
+    /// Checks for enemies in range and applies damage/knockback
     /// </summary>
     private void ExecuteComboAttack(int comboIndex)
     {
@@ -2009,8 +2045,8 @@ public class Kalb : MonoBehaviour
         // Apply damage and knockback to each enemy
         foreach (Collider2D enemy in hitEnemies)
         {
-            // Example damage application - adjust based on your enemy system
-            // enemy.GetComponent<EnemyHealth>().TakeDamage(damage);
+            // Enemy damage logic would go here
+            // Example: enemy.GetComponent<EnemyHealth>().TakeDamage(damage);
             
             // Apply knockback
             Vector2 knockbackDirection = facingRight ? Vector2.right : Vector2.left;
@@ -2023,6 +2059,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Applies movement effects during combo attacks
+    /// Adds forward momentum for first two hits, upward lift for final hit
     /// </summary>
     private void ApplyComboMovement(int comboIndex)
     {
@@ -2045,12 +2082,13 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Ends attack and manages combo continuation
+    /// Checks for queued attacks and manages combo reset
     /// </summary>
     private void EndAttack()
     {
         isAttacking = false;
         
-        // Check if we have a queued attack
+        // Check if we have a queued attack to execute
         if (attackQueued && comboWindowTimer > 0 && currentCombo < maxComboHits)
         {
             attackQueued = false; // Clear the queue
@@ -2078,7 +2116,8 @@ public class Kalb : MonoBehaviour
     }
 
     /// <summary>
-    /// Resets combo state
+    /// Resets combo state completely
+    /// Called when combo times out or is cancelled
     /// </summary>
     private void ResetCombo()
     {
@@ -2098,6 +2137,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Cancels combo (called when taking damage, etc.)
+    /// Immediately resets combo and stops attacking
     /// </summary>
     public void CancelCombo()
     {
@@ -2107,8 +2147,9 @@ public class Kalb : MonoBehaviour
         attackQueued = false; // Clear queued attacks
     }
 
-        /// <summary>
+    /// <summary>
     /// Core method for taking damage - call this from enemies, traps, etc.
+    /// Handles damage application, knockback, invincibility, and death
     /// </summary>
     /// <param name="damageAmount">Amount of damage to take</param>
     /// <param name="damageSource">Position where damage came from (for knockback direction)</param>
@@ -2130,10 +2171,10 @@ public class Kalb : MonoBehaviour
         // Cancel any ongoing actions
         CancelPlayerActions();
         
-        // Calculate knockback direction
+        // Calculate knockback direction away from damage source
         CalculateKnockbackDirection(damageSource);
         
-        // Apply knockback
+        // Apply knockback force
         float knockbackForceToUse = overrideKnockback > 0 ? overrideKnockback : knockbackForce;
         ApplyKnockback(knockbackForceToUse);
         
@@ -2143,7 +2184,7 @@ public class Kalb : MonoBehaviour
         // Visual and audio feedback
         TriggerDamageFeedback(actualDamage);
         
-        // Camera effects
+        // Camera effects (screen shake)
         TriggerDamageCameraEffects();
         
         // Check for death
@@ -2151,12 +2192,11 @@ public class Kalb : MonoBehaviour
         {
             Die();
         }
-        
-        
     }
     
     /// <summary>
     /// Checks if player is in a state that grants damage immunity
+    /// Some actions provide temporary invincibility
     /// </summary>
     private bool CheckDamageImmunityStates()
     {
@@ -2165,12 +2205,12 @@ public class Kalb : MonoBehaviour
         if (isWallJumping && wallJumpTimer > wallJumpDuration * 0.5f) return true;
         if (isAttacking && currentCombo >= 2) return true; // Later combo hits might have armor
         
-        // Add other immunity states as needed
         return false;
     }
     
     /// <summary>
     /// Cancels all player actions when taking damage
+    /// Stops dashes, attacks, wall slides, etc.
     /// </summary>
     private void CancelPlayerActions()
     {
@@ -2194,13 +2234,14 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Calculates direction for knockback based on damage source
+    /// Knocks player away from where damage came from
     /// </summary>
     private void CalculateKnockbackDirection(Vector3 damageSource)
     {
         // Direction away from damage source
         Vector2 direction = (transform.position - damageSource).normalized;
         
-        // Ensure minimum vertical/horizontal components
+        // Ensure minimum vertical/horizontal components for consistent knockback
         if (Mathf.Abs(direction.x) < 0.3f) direction.x = Mathf.Sign(direction.x) * 0.3f;
         if (Mathf.Abs(direction.y) < 0.1f) direction.y = 0.1f;
         
@@ -2214,20 +2255,21 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Applies knockback force to the player
+    /// Sets up knockback state and animation lock
     /// </summary>
     private void ApplyKnockback(float force)
     {
         isTakingDamage = true;
         knockbackTimer = knockbackDuration;
         
-        // LOCK ANIMATION FOR DURATION OF KNOCKBACK
+        // Lock animation to prevent interruption during knockback
         isAnimationLocked = true;
         animationLockTimer = knockbackDuration;
         
         // Stop current velocity
         rb.linearVelocity = Vector2.zero;
         
-        // Apply knockback force
+        // Apply knockback force as impulse
         rb.AddForce(knockbackDirection * force, ForceMode2D.Impulse);
         
         // Cap maximum knockback velocity
@@ -2247,18 +2289,20 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Starts invincibility frames after taking damage
+    /// Sets up invincibility timer and starts flashing effect
     /// </summary>
     private void StartInvincibility()
     {
         isInvincible = true;
         invincibilityTimer = invincibilityTime;
         
-        // Start flashing effect
+        // Start flashing effect coroutine
         StartCoroutine(DamageFlashRoutine());
     }
     
     /// <summary>
     /// Ends invincibility frames
+    /// Restores normal vulnerability and sprite color
     /// </summary>
     private void EndInvincibility()
     {
@@ -2274,6 +2318,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Ends knockback state
+    /// Restores player control and returns to appropriate animation
     /// </summary>
     private void EndKnockback()
     {
@@ -2294,8 +2339,9 @@ public class Kalb : MonoBehaviour
         }
     }
 
-        /// <summary>
+    /// <summary>
     /// Triggers visual and audio feedback for damage
+    /// Shows damage numbers, plays sounds, triggers animations
     /// </summary>
     private void TriggerDamageFeedback(int damageAmount)
     {
@@ -2305,15 +2351,15 @@ public class Kalb : MonoBehaviour
             Vector3 spawnPosition = transform.position + Vector3.up * damageNumberYOffset;
             GameObject damageNumber = Instantiate(damageNumberPrefab, spawnPosition, Quaternion.identity);
             
-            // Set damage text (you'll need a DamageNumber script on the prefab)
+            // Damage number script would set the text here
             // damageNumber.GetComponent<DamageNumber>().SetDamage(damageAmount);
         }
         
-        // Play hit sound
+        // Play hit sound (commented out - implement as needed)
         // if (audioSource != null && hitSound != null)
         //     audioSource.PlayOneShot(hitSound);
         
-        // Animation
+        // Play hurt animation
         if (animator != null && !isDead)
         {
             animator.Play("Kalb_hurt", -1, 0f);
@@ -2322,6 +2368,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Coroutine for damage flash effect
+    /// Flashes sprite between hurt color and original color
     /// </summary>
     private System.Collections.IEnumerator DamageFlashRoutine()
     {
@@ -2330,9 +2377,9 @@ public class Kalb : MonoBehaviour
         float flashInterval = 0.1f;
         int flashCount = Mathf.FloorToInt(invincibilityTime / flashInterval);
         
+        // Alternate colors for flashing effect
         for (int i = 0; i < flashCount; i++)
         {
-            // Alternate between flash color and original
             playerSprite.color = (i % 2 == 0) ? hurtFlashColor : originalSpriteColor;
             yield return new WaitForSeconds(flashInterval);
         }
@@ -2342,24 +2389,23 @@ public class Kalb : MonoBehaviour
     }
     
     /// <summary>
-    /// Triggers camera effects for damage
+    /// Triggers camera effects for damage (screen shake)
     /// </summary>
     private void TriggerDamageCameraEffects()
     {
         if (metroidvaniaCamera == null) return;
         
-        // Screen shake based on damage taken
+        // Calculate screen shake based on damage taken
         float shakeIntensity = Mathf.Clamp(knockbackForce * 0.01f, 0.05f, 0.2f);
         float shakeDuration = Mathf.Clamp(knockbackDuration, 0.1f, 0.3f);
         
+        // Trigger screen shake in knockback direction
         metroidvaniaCamera.TriggerScreenShake(shakeIntensity, shakeDuration, knockbackDirection);
-        
-        // Optional: Hit pause (brief freeze frame)
-        // metroidvaniaCamera.TriggerHitPause(0.05f);
     }
 
     /// <summary>
     /// Handles player death
+    /// Stops physics, plays death animation, triggers death effects
     /// </summary>
     private void Die()
     {
@@ -2368,13 +2414,13 @@ public class Kalb : MonoBehaviour
         isDead = true;
         deathTimer = deathAnimationTime;
         
-        // CLEAN APPROACH: Just one method to stop physics
+        // Disable physics and stop movement
         DisablePlayerPhysics();
         
         // Cancel all active states
         CancelPlayerActions();
         
-        // Death animation
+        // Play death animation
         if (animator != null)
         {
             animator.Play("Kalb_death", -1, 0f);
@@ -2382,23 +2428,26 @@ public class Kalb : MonoBehaviour
             animator.SetBool("IsDead", true);
         }
         
-        // Death effect
+        // Spawn death visual effect
         if (deathEffectPrefab != null)
         {
             Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
         }
     }
 
+    /// <summary>
+    /// Disables player physics for death animation
+    /// Stops movement and disables collisions
+    /// </summary>
     private void DisablePlayerPhysics()
     {
         // Stop all movement
         rb.linearVelocity = Vector2.zero;
         
         // Disable physics simulation but keep body dynamic
-        // This prevents conflicts while maintaining transform control
         rb.simulated = false;
         
-        // Optional: Add slight upward force for death animation
+        // Add slight upward force for death animation
         rb.linearVelocity = new Vector2(0, 3f);
         
         // Disable collider for death animation
@@ -2406,6 +2455,10 @@ public class Kalb : MonoBehaviour
             playerCollider.enabled = false;
     }
 
+    /// <summary>
+    /// Restores player physics after respawn
+    /// Re-enables all physics components
+    /// </summary>
     private void RestorePlayerPhysics()
     {
         // Re-enable everything in Respawn()
@@ -2413,15 +2466,14 @@ public class Kalb : MonoBehaviour
         if (playerCollider != null)
             playerCollider.enabled = true;
         
-        // Reset velocity
+        // Reset velocity and gravity
         rb.linearVelocity = Vector2.zero;
         rb.gravityScale = normalGravityScale;
     }
     
-    
-    
     /// <summary>
     /// Respawns player at last checkpoint
+    /// Restores health, physics, and sets up respawn invincibility
     /// </summary>
     private void Respawn()
     {
@@ -2446,7 +2498,7 @@ public class Kalb : MonoBehaviour
             animator.SetBool("IsDead", false);
         }
         
-        // Reset health
+        // Reset health to full
         currentHealth = maxHealth;
         
         // Teleport to checkpoint with safety offset
@@ -2464,21 +2516,20 @@ public class Kalb : MonoBehaviour
         {
             animator.Play("Kalb_respawn", -1, 0f);
         }
-        
-        
     }
     
     /// <summary>
-    /// Sets a new checkpoint position
+    /// Sets a new checkpoint position for respawning
+    /// Called when player touches checkpoints
     /// </summary>
     public void SetCheckpoint(Vector3 checkpointPosition)
     {
         lastCheckpointPosition = checkpointPosition;
-        
     }
     
     /// <summary>
     /// Ends respawn invincibility
+    /// Restores normal vulnerability and sprite appearance
     /// </summary>
     private void EndRespawnInvincibility()
     {
@@ -2494,6 +2545,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Coroutine for respawn flash effect
+    /// Flashes player between semi-transparent and normal during respawn invincibility
     /// </summary>
     private System.Collections.IEnumerator RespawnFlashRoutine()
     {
@@ -2502,9 +2554,9 @@ public class Kalb : MonoBehaviour
         float flashInterval = 0.15f;
         int flashCount = Mathf.FloorToInt(respawnInvincibilityTime / flashInterval);
         
+        // Alternate between semi-transparent and normal
         for (int i = 0; i < flashCount; i++)
         {
-            // Alternate between semi-transparent and normal
             Color flashColor = originalSpriteColor;
             flashColor.a = (i % 2 == 0) ? 0.3f : 1f;
             playerSprite.color = flashColor;
@@ -2515,8 +2567,9 @@ public class Kalb : MonoBehaviour
         playerSprite.color = originalSpriteColor;
     }
 
-        /// <summary>
+    /// <summary>
     /// Checks if player has fallen out of bounds and kills them
+    /// Detects falling below death boundary
     /// </summary>
     private void CheckDeathBoundary()
     {
@@ -2529,9 +2582,6 @@ public class Kalb : MonoBehaviour
         {
             // Instant death from falling
             TakeDamage(currentHealth, transform.position + Vector3.up * 2f, 0f);
-            
-            // Optional: Special falling death effect
-            
         }
     }
 
@@ -2541,7 +2591,6 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void CheckForHardLanding(float fallSpeed, float fallDistance)
     {
-        
         bool meetsVelocityCondition = fallSpeed <= hardLandingThreshold;
         bool meetsHeightCondition = CheckScreenHeightFall(fallDistance);
         
@@ -2581,13 +2630,14 @@ public class Kalb : MonoBehaviour
         }
         else if (fallDistance > 0.5f)
         {
-            // Soft landing
+            // Soft landing animation
             animator.Play("Kalb_land");
         }
     }
     
     /// <summary>
     /// Checks if fall distance is at least one screen height
+    /// Used for screen-height based hard landing detection
     /// </summary>
     private bool CheckScreenHeightFall(float fallDistance)
     {
@@ -2597,6 +2647,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Checks if fall started from off-screen (above camera view)
+    /// Used for detecting dramatic falls from off-screen platforms
     /// </summary>
     private bool CheckIfFellFromOffScreen(float fallStartY)
     {
@@ -2609,14 +2660,17 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Calculates visible screen bounds in world units
+    /// Used for off-screen fall detection
     /// </summary>
     private Bounds GetScreenBounds()
     {
         if (mainCamera == null) return new Bounds(transform.position, new Vector3(20, 10, 0));
         
+        // Convert screen corners to world positions
         Vector3 bottomLeft = mainCamera.ViewportToWorldPoint(new Vector3(0, 0, mainCamera.nearClipPlane));
         Vector3 topRight = mainCamera.ViewportToWorldPoint(new Vector3(1, 1, mainCamera.nearClipPlane));
         
+        // Create bounds from corners
         Bounds bounds = new Bounds();
         bounds.SetMinMax(bottomLeft, topRight);
         return bounds;
@@ -2624,22 +2678,28 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Initiates hard landing state with screen shake
+    /// Stuns player and triggers camera effects
     /// </summary>
     private void StartHardLanding()
     {
         isHardLanding = true;
         hardLandingTimer = hardLandingStunTime;
         
+        // Stop all movement
         rb.linearVelocity = Vector2.zero;
         rb.gravityScale = 0f;
         
+        // Play hard landing animation
         animator.Play("Kalb_hard_land");
         
-        // Screen shake for hard landing
+        // Trigger camera effects (screen shake)
         TriggerCameraEffects();
-
     }
 
+    /// <summary>
+    /// Triggers camera effects based on player actions
+    /// Handles screen shake for hard landings, dashes, and wall jumps
+    /// </summary>
     private void TriggerCameraEffects()
     {
         if (metroidvaniaCamera == null) return;
@@ -2647,13 +2707,8 @@ public class Kalb : MonoBehaviour
         // Hard landing camera shake
         if (isHardLanding)
         {
-            // Use the enhanced hard landing shake
-            //metroidvaniaCamera.TriggerHardLandingShake(currentFallSpeed, totalFallDistance);
-            
-            // OR for even more dramatic effect (with optional time freeze):
+            // Use enhanced hard landing shake with optional time freeze
             metroidvaniaCamera.TriggerHardLandingWithFreeze(currentFallSpeed, totalFallDistance);
-
-           
         }
         
         // Dash camera shake
@@ -2674,6 +2729,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Ends hard landing recovery
+    /// Restores movement and returns to idle animation
     /// </summary>
     private void EndHardLanding()
     {
@@ -2683,7 +2739,8 @@ public class Kalb : MonoBehaviour
     }
 
     /// <summary>
-    /// Starts a pogo attack
+    /// Starts a pogo attack (downward attack that can bounce off enemies/spikes)
+    /// Sets up pogo state and applies initial downward force
     /// </summary>
     private void StartPogoAttack()
     {
@@ -2696,7 +2753,7 @@ public class Kalb : MonoBehaviour
         // Mark that we've used our pogo for this jump
         hasPogoedThisJump = true;
         
-        // Apply initial downward force
+        // Apply initial downward force for pogo
         if (moveInput.y < -0.7f)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, -pogoDownwardForce);
@@ -2717,6 +2774,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Checks for pogo-able targets below the player
+    /// Uses raycasting and sphere casting for detection
     /// </summary>
     private void CheckForPogoTargets()
     {
@@ -2726,6 +2784,7 @@ public class Kalb : MonoBehaviour
         // Raycast downward for spikes/enemies
         RaycastHit2D[] hits = Physics2D.RaycastAll(detectionPoint, Vector2.down, detectionRange, pogoLayers);
         
+        // Process raycast hits
         foreach (RaycastHit2D hit in hits)
         {
             if (hit.collider != null)
@@ -2735,10 +2794,11 @@ public class Kalb : MonoBehaviour
             }
         }
         
-        // Also check sphere cast for better detection
+        // Also check sphere cast for better detection of wider targets
         Collider2D[] sphereHits = Physics2D.OverlapCircleAll(detectionPoint + (Vector2.down * (detectionRange / 2f)), 
                                                             detectionRange / 2f, pogoLayers);
         
+        // Process sphere cast hits (skip if already handled by raycast)
         foreach (Collider2D collider in sphereHits)
         {
             // Skip if already handled by raycast
@@ -2762,6 +2822,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Handles hitting a pogo-able target
+    /// Processes spike tiles and enemies, triggers bounce and effects
     /// </summary>
     private void HandlePogoHit(GameObject target, Vector2 hitPoint)
     {
@@ -2776,14 +2837,14 @@ public class Kalb : MonoBehaviour
                 pogoChainTimer = pogoChainWindow;
                 lastPogoTime = Time.time;
                 
-                // Spawn pogo effect
+                // Spawn pogo visual effect
                 if (pogoEffectPrefab != null)
                 {
                     GameObject effect = Instantiate(pogoEffectPrefab, hitPoint, Quaternion.identity);
                     Destroy(effect, pogoEffectDuration);
                 }
                 
-                // Flash player sprite
+                // Flash player sprite for visual feedback
                 StartCoroutine(PogoFlashEffect());
                 
                 return;
@@ -2805,17 +2866,18 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Performs the pogo bounce
+    /// Applies upward force and resets jump/dash abilities
     /// </summary>
     private void PerformPogoBounce()
     {
         isPogoBouncing = true;
         lastPogoTime = Time.time;
         
-        // Apply bounce force
+        // Apply bounce force upward
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0); // Reset vertical velocity
         rb.AddForce(Vector2.up * pogoBounceForce, ForceMode2D.Impulse);
         
-        // Reset jump states
+        // Reset jump states for additional mobility after bounce
         if (resetJumpOnPogo)
         {
             hasDoubleJumped = false;
@@ -2826,7 +2888,7 @@ public class Kalb : MonoBehaviour
         // Reset pogo count so you can pogo again after successful bounce
         hasPogoedThisJump = false; 
         
-        // Apply slight horizontal movement based on input
+        // Apply slight horizontal movement based on input for control during bounce
         if (Mathf.Abs(moveInput.x) > 0.1f)
         {
             rb.AddForce(new Vector2(moveInput.x * 3f, 0), ForceMode2D.Impulse);
@@ -2835,6 +2897,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Applies pogo bounce from external sources (like SpikeTile)
+    /// Allows external objects to trigger pogo bounce
     /// </summary>
     public void ApplyPogoBounce(float force)
     {
@@ -2861,6 +2924,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Ends pogo attack
+    /// Cleans up pogo state and manages bounce continuation
     /// </summary>
     private void EndPogoAttack()
     {
@@ -2878,7 +2942,7 @@ public class Kalb : MonoBehaviour
         }
 
         // If pogo attack ended without bouncing, we've still used our pogo for this jump
-        // (This prevents spamming pogo attacks in air without hitting anything)
+        // This prevents spamming pogo attacks in air without hitting anything
         if (!isPogoBouncing)
         {
             hasPogoedThisJump = true; 
@@ -2886,7 +2950,8 @@ public class Kalb : MonoBehaviour
     }
 
     /// <summary>
-    /// Resets pogo chain
+    /// Resets pogo chain count
+    /// Called when chain window expires
     /// </summary>
     private void ResetPogoChain()
     {
@@ -2896,6 +2961,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Coroutine for pogo flash effect
+    /// Flashes player sprite when pogo hits something
     /// </summary>
     private System.Collections.IEnumerator PogoFlashEffect()
     {
@@ -2911,6 +2977,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Checks if player is currently pogo attacking
+    /// Public method for other scripts to check pogo state
     /// </summary>
     public bool IsPogoAttacking()
     {
@@ -2919,6 +2986,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Gets current pogo chain count
+    /// Public method for tracking consecutive pogo bounces
     /// </summary>
     public int GetCurrentPogoChain()
     {
@@ -2939,6 +3007,7 @@ public class Kalb : MonoBehaviour
         swimDashTimer = swimDashDuration;
         swimDashCooldownTimer = swimDashCooldown;
         
+        // Save and disable gravity during swim dash
         preDashGravityScale = rb.gravityScale;
         rb.gravityScale = 0f;
 
@@ -2948,7 +3017,7 @@ public class Kalb : MonoBehaviour
             DisengageWallSlide();
         }
         
-        // Determine dash direction
+        // Determine dash direction based on input or facing direction
         if (Mathf.Abs(moveInput.x) > 0.1f)
         {
             swimDashDirection = new Vector2(Mathf.Sign(moveInput.x), 0);
@@ -2961,38 +3030,45 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Ends swim dash and restores previous gravity
+    /// Applies slowdown to prevent abrupt stops
     /// </summary>
     private void EndSwimDash()
     {
         isSwimDashing = false;
         rb.gravityScale = preDashGravityScale;
+        
+        // Slow down gradually after dash
         rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.5f, rb.linearVelocity.y * 0.5f);
     }
     
     /// <summary>
     /// Jumps out of water
-    /// Exits swimming state and restores normal gravity
+    /// Exits swimming state and restores normal gravity and jump abilities
     /// </summary>
     private void SwimJump()
     {
         if (!isSwimming || isSwimDashing) return;
         
+        // Apply upward force for water jump
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, swimJumpForce);
         isSwimming = false;
         rb.gravityScale = normalGravityScale;
-        coyoteTimeCounter = coyoteTime; // Allow potential double jump
+        
+        // Allow potential double jump after water jump
+        coyoteTimeCounter = coyoteTime;
         hasPogoedThisJump = false; 
         CancelCombo();
     }
     
     /// <summary>
     /// Main swimming movement handler with buoyancy and floating
+    /// Handles horizontal movement, buoyancy, and bobbing effects
     /// </summary>
     private void HandleSwimMovement()
     {
         if (!isSwimming || isHardLanding) return;
         
-        // Handle swim dash first
+        // Handle swim dash first (highest priority)
         if (isSwimDashing)
         {
             rb.linearVelocity = swimDashDirection * swimDashSpeed;
@@ -3003,7 +3079,7 @@ public class Kalb : MonoBehaviour
         // Apply fast buoyancy FIRST (most important) - always active
         ApplyBuoyancy();
         
-        // Calculate horizontal movement
+        // Calculate horizontal movement speed
         float currentSwimSpeed = swimSpeed;
         
         // Check for fast swimming (when holding dash button)
@@ -3012,16 +3088,16 @@ public class Kalb : MonoBehaviour
             currentSwimSpeed = swimFastSpeed;
         }
         
-        // Apply horizontal movement with velocity control instead of forces
+        // Apply horizontal movement with velocity control
         float targetXVelocity = moveInput.x * currentSwimSpeed;
         float currentXVelocity = rb.linearVelocity.x;
         
         // Smooth horizontal movement but prioritize buoyancy
-        float horizontalAcceleration = isInWater ? 25f : 15f; // Faster in water
+        float horizontalAcceleration = isInWater ? 25f : 15f; // Faster acceleration in water
         float newXVelocity = Mathf.MoveTowards(currentXVelocity, targetXVelocity, 
                                             Time.fixedDeltaTime * horizontalAcceleration);
         
-        // Only apply floating effect when not actively moving horizontally
+        // Apply floating effect when not actively moving horizontally
         if (enableFloating && Mathf.Abs(moveInput.x) < 0.1f)
         {
             // Update original position reference for floating
@@ -3034,7 +3110,7 @@ public class Kalb : MonoBehaviour
             
             ApplyFloatingEffect();
             
-            // Apply the floating offset
+            // Apply the floating offset to position
             Vector3 currentPos = transform.position;
             transform.position = new Vector3(currentPos.x, 
                                         originalPosition.y + currentFloatOffset, 
@@ -3067,6 +3143,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Applies buoyancy force to keep player at water surface
+    /// Uses spring physics to maintain position at water surface
     /// </summary>
     private void ApplyBuoyancy()
     {
@@ -3086,7 +3163,7 @@ public class Kalb : MonoBehaviour
         float currentY = transform.position.y;
         float depthDifference = targetY - currentY;
         
-        // Calculate buoyancy force with damping
+        // Calculate buoyancy force with damping (spring physics)
         float buoyancyForce = depthDifference * buoyancyStrength;
         float dampingForce = -rb.linearVelocity.y * buoyancyDamping;
         float totalForce = Mathf.Clamp(buoyancyForce + dampingForce, -maxBuoyancyForce, maxBuoyancyForce);
@@ -3097,6 +3174,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Applies direct position correction for buoyancy (backup system)
+    /// Used when spring physics isn't enough to keep player at surface
     /// </summary>
     private void ApplyBuoyancyCorrection()
     {
@@ -3113,7 +3191,7 @@ public class Kalb : MonoBehaviour
                 // Apply additional downward force
                 rb.AddForce(new Vector2(0, -Mathf.Min(yDifference * 5f, 10f)));
                 
-                // OR use direct position adjustment as fallback
+                // OR use direct position adjustment as fallback for extreme cases
                 if (yDifference > 1.0f)
                 {
                     float newY = Mathf.Lerp(currentY, targetY, Time.fixedDeltaTime * 15f);
@@ -3125,12 +3203,13 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Applies floating/bobbing effect when swimming
+    /// Creates sine wave motion for natural water bobbing
     /// </summary>
     private void ApplyFloatingEffect()
     {
         if (!isSwimming || isSwimDashing || !enableFloating) return;
         
-        // Update timer
+        // Update timer for sine wave
         floatTimer += Time.deltaTime * floatFrequency;
         
         // Calculate sine wave for bobbing
@@ -3140,7 +3219,7 @@ public class Kalb : MonoBehaviour
         float horizontalMovementFactor = Mathf.Clamp01(1f - Mathf.Abs(moveInput.x) * 0.5f);
         targetFloatOffset = sineWave * floatAmplitude * horizontalMovementFactor;
         
-        // Smooth interpolation
+        // Smooth interpolation between current and target offset
         currentFloatOffset = Mathf.Lerp(currentFloatOffset, targetFloatOffset, Time.deltaTime * floatSmoothness);
         
         // Update original position reference
@@ -3151,28 +3230,31 @@ public class Kalb : MonoBehaviour
                                         originalPosition.z);
         }
         
-        // Apply offset
+        // Apply offset to position
         Vector3 currentPos = transform.position;
         transform.position = new Vector3(currentPos.x, originalPosition.y + currentFloatOffset, currentPos.z);
     }
     
     /// <summary>
     /// Checks if player is in water and handles state transitions
+    /// Uses overlap circle to detect water colliders
     /// </summary>
     private void CheckWater()
     {
         wasInWater = isInWater;
         
-        // Check for water overlap
+        // Check for water overlap using circle cast
         Collider2D waterCollider = Physics2D.OverlapCircle(
             transform.position, 
             waterCheckRadius, 
             waterLayer
         );
         
+        // Update water state
         isInWater = waterCollider != null;
         currentWaterCollider = waterCollider;
         
+        // Store water surface position if in water
         if (isInWater && waterCollider != null)
         {
             waterSurfaceY = waterCollider.bounds.max.y;
@@ -3197,7 +3279,7 @@ public class Kalb : MonoBehaviour
     {
         isSwimming = true;
         
-        // Initialize floating effect
+        // Initialize floating effect with random phase
         floatTimer = Random.Range(0f, Mathf.PI * 2f);
         originalPosition = transform.position;
         currentFloatOffset = 0f;
@@ -3206,17 +3288,19 @@ public class Kalb : MonoBehaviour
         // Adjust velocity for water entry
         if (rb.linearVelocity.y < 0)
         {
+            // Slow down downward momentum when entering water
             rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.7f, -3f);
         }
         else
         {
+            // Reduce upward momentum when entering water
             rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.7f, Mathf.Min(rb.linearVelocity.y, 2f) * 0.3f);
         }
         
-        // Set water physics
+        // Set water physics (reduced gravity)
         rb.gravityScale = waterEntryGravity;
         
-        // Reset other states
+        // Reset other states that don't work in water
         isDashing = false;
         isWallJumping = false;
         wallSlideState = WallSlideState.None;
@@ -3229,7 +3313,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Called when player exits water
-    /// Restores normal physics
+    /// Restores normal physics and resets swimming state
     /// </summary>
     private void OnExitWater()
     {
@@ -3237,6 +3321,7 @@ public class Kalb : MonoBehaviour
         isSwimDashing = false;
         isInWater = false;
         
+        // Restore normal gravity
         rb.gravityScale = normalGravityScale;
         swimDashCooldownTimer = 0f;
         canGrabLedge = true; // Reset ledge ability
@@ -3252,6 +3337,7 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void PreventWallStick()
     {
+        // Don't check if grounded, not moving, or hard landing
         if (isGrounded || Mathf.Abs(moveInput.x) < 0.1f || isHardLanding)
         {
             isAgainstWall = false;
@@ -3274,7 +3360,7 @@ public class Kalb : MonoBehaviour
         bool hitWall = false;
         float closestDistance = rayLength;
         
-        // Cast multiple rays to detect walls
+        // Cast multiple rays at different heights to detect walls
         for (int i = 0; i < rayCount; i++)
         {
             float height = (i / (float)(rayCount - 1) - 0.5f) * totalHeight;
@@ -3342,9 +3428,11 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles wall slide physics and state transitions
+    /// Manages wall slide engagement, acceleration, and wall lock
     /// </summary>
     private void HandleWallSlide()
     {
+        // Don't wall slide if ability not unlocked or in certain states
         if (!wallJumpUnlocked || isHardLanding || isLedgeGrabbing || isLedgeClimbing) 
         {
             isWallSliding = false;
@@ -3362,7 +3450,7 @@ public class Kalb : MonoBehaviour
             return;
         }
 
-        // Update wall slide acceleration
+        // Update wall slide acceleration if enabled
         if (enableWallSlideAcceleration && isWallSliding)
         {
             UpdateWallSlideAcceleration();
@@ -3496,6 +3584,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Ends wall slide and transitions to falling state
+    /// Resets all wall slide related states
     /// </summary>
     private void EndWallSlide()
     {
@@ -3530,16 +3619,11 @@ public class Kalb : MonoBehaviour
         {
             rb.gravityScale = normalGravityScale;
         }
-        
-        // Debug log for testing
-        if (showDebugInfo)
-        {
-            Debug.Log("Wall slide ended - transitioning to falling");
-        }
     }
 
     /// <summary>
     /// Handles wall lock ability - locks player to wall position while holding input
+    /// Allows player to stop sliding and hold position on wall
     /// </summary>
     private void HandleWallLock()
     {
@@ -3570,6 +3654,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Starts the wall lock process
+    /// Begins transition to locked state on wall
     /// </summary>
     private void StartWallLock()
     {
@@ -3605,6 +3690,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Ends the wall lock and resumes normal wall slide
+    /// Begins transition back to sliding state
     /// </summary>
     private void EndWallLock()
     {
@@ -3616,21 +3702,21 @@ public class Kalb : MonoBehaviour
         
         // Restore gravity
         rb.gravityScale = normalGravityScale;
-        
     }
 
     /// <summary>
-/// Updates wall lock state timers
-/// </summary>
+    /// Updates wall lock state timers
+    /// Handles transitions between locked/unlocked states
+    /// </summary>
     private void UpdateWallLockTimers()
     {
         if (wallLockTimer > 0)
         {
             wallLockTimer -= Time.deltaTime;
             
+            // Timer finished - complete the state transition
             if (wallLockTimer <= 0)
             {
-                // Timer finished - complete the state transition
                 if (isWallLockEngaging)
                 {
                     CompleteWallLockEngagement();
@@ -3645,6 +3731,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Completes the wall lock engagement process
+    /// Finalizes transition to fully locked state
     /// </summary>
     private void CompleteWallLockEngagement()
     {
@@ -3655,13 +3742,13 @@ public class Kalb : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.gravityScale = 0f;
         
-        // Cancel any remaining slide speed
+        // Set to wall lock speed (very slow or stopped)
         wallSlideSpeed = wallLockSpeed;
-        
     }
 
     /// <summary>
     /// Completes the wall lock disengagement process
+    /// Finalizes transition back to sliding state
     /// </summary>
     private void CompleteWallLockDisengagement()
     {
@@ -3682,11 +3769,11 @@ public class Kalb : MonoBehaviour
         
         // Give a tiny downward nudge to resume sliding
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, -0.1f);
-        
     }
 
     /// <summary>
     /// Applies movement during wall lock states
+    /// Handles smooth transitions between sliding and locked states
     /// </summary>
     private void ApplyWallLockMovement()
     {
@@ -3723,6 +3810,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Resets all wall lock state variables
+    /// Cleans up wall lock state when leaving wall
     /// </summary>
     private void ResetWallLockState()
     {
@@ -3748,6 +3836,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Handles input that should disengage wall slide
+    /// Detects when player is trying to move away from wall
     /// </summary>
     private void HandleWallSlideDisengagement()
     {
@@ -3765,7 +3854,6 @@ public class Kalb : MonoBehaviour
                 
                 // Apply a small force away from wall for responsiveness
                 rb.AddForce(new Vector2(inputDirection * 2f, 0), ForceMode2D.Impulse);
-                
             }
         }
         
@@ -3783,6 +3871,7 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void CheckWall()
     {
+        // Don't check walls if ability not unlocked or in certain states
         if (!wallJumpUnlocked || isHardLanding || isLedgeGrabbing || isLedgeClimbing)
         {
             ResetWallState();
@@ -3892,6 +3981,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Resets all wall interaction state variables
+    /// Cleans up wall state when leaving walls
     /// </summary>
     private void ResetWallState()
     {
@@ -3906,6 +3996,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Sets wall touching state for a specific side
+    /// Updates wall side and resets relevant timers
     /// </summary>
     private void SetWallTouchingState(int side)
     {
@@ -3924,6 +4015,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Resets all hard landing tracking variables
+    /// Called when starting wall slide to measure fall from that point
     /// </summary>
     private void ResetHardLandingTracking()
     {
@@ -3939,12 +4031,11 @@ public class Kalb : MonoBehaviour
         {
             EndHardLanding();
         }
-        
-        Debug.Log("Hard landing tracking reset - wall slide started");
     }
     
     /// <summary>
     /// Handles wall clinging state when switching directions
+    /// Allows brief wall hold when changing direction against wall
     /// </summary>
     private void HandleWallCling(bool touchingRightWall, bool touchingLeftWall)
     {
@@ -4060,7 +4151,7 @@ public class Kalb : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.gravityScale = 0f;
         
-        // Calculate grab position
+        // Calculate grab position with offsets
         float playerHeight = playerCollider.bounds.size.y;
         float grabX = ledgePosition.x - (ledgeSide * ledgeGrabOffsetX);
         float grabY = ledgePosition.y - (playerHeight * ledgeGrabOffsetY);
@@ -4075,7 +4166,7 @@ public class Kalb : MonoBehaviour
             Flip();
         }
         
-        // Reset other states
+        // Reset other states that conflict with ledge grabbing
         isDashing = false;
         isWallSliding = false;
         isWallClinging = false;
@@ -4108,7 +4199,7 @@ public class Kalb : MonoBehaviour
         
         rb.AddForce(releaseForce, ForceMode2D.Impulse);
         
-        // Prevent immediate regrabbing
+        // Prevent immediate regrabbing with cooldown
         canGrabLedge = false;
         ledgeReleaseTimer = ledgeReleaseCooldown;
         ledgeDetected = false;
@@ -4142,6 +4233,7 @@ public class Kalb : MonoBehaviour
     {
         if (!isLedgeClimbing) return;
         
+        // Update climb progress
         ledgeClimbTimer -= Time.deltaTime;
         float climbProgress = 1f - (ledgeClimbTimer / ledgeClimbTime);
         
@@ -4181,7 +4273,7 @@ public class Kalb : MonoBehaviour
             );
             transform.position = finalPosition;
             
-            // Small hop at the end
+            // Small hop at the end for smoother transition
             rb.linearVelocity = new Vector2(0, 3f);
             
             // Reset to idle animation
@@ -4240,6 +4332,7 @@ public class Kalb : MonoBehaviour
     /// </summary>
     private void SetAnimation(float horizontalInput)
     {
+        // Death state (highest priority)
         if (isDead)
         {
             // Keep playing death animation without interruption
@@ -4249,6 +4342,7 @@ public class Kalb : MonoBehaviour
             }
             return;
         }
+        // Respawn state
         else if (isRespawning)
         {
             // Keep playing respawn animation without interruption
@@ -4258,6 +4352,7 @@ public class Kalb : MonoBehaviour
             }
             return;
         }
+        // Damage state
         else if (isTakingDamage && knockbackTimer > 0)
         {
             // FORCE hurt animation to play completely
@@ -4269,7 +4364,7 @@ public class Kalb : MonoBehaviour
             }
             return;
         }
-        // SPECIAL STATES (highest priority)
+        // SPECIAL STATES (high priority)
         else if (isLedgeClimbing)
         {
             animator.Play("Kalb_ledge_climb");
@@ -4290,10 +4385,9 @@ public class Kalb : MonoBehaviour
         {
             HandlePogoAnimations();
         }
-        // COMBO ATTACK STATE (new priority - above regular attacks)
+        // COMBO ATTACK STATE
         else if (isAttacking && currentCombo > 0)
         {
-            // Animator parameters handle this via HandleComboAnimations()
             HandleComboAnimations();
         }
         // ACTION STATES
@@ -4323,6 +4417,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Locks animation for a specific duration to prevent interruption
+    /// Used for attacks and damage animations
     /// </summary>
     private void LockAnimationForDuration(float duration)
     {
@@ -4332,6 +4427,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles swimming-specific animations
+    /// Different animations for swimming, fast swimming, and dashing
     /// </summary>
     private void HandleSwimmingAnimations(float horizontalInput)
     {
@@ -4358,6 +4454,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles ground movement animations
+    /// Controls idle, walk, and run animations
     /// </summary>
     private void HandleGroundAnimations(float horizontalInput)
     {
@@ -4380,6 +4477,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Handles air movement animations with fall speed variation
+    /// Controls jump and fall animations with speed variation
     /// </summary>
     private void HandleAirAnimations()
     {
@@ -4398,12 +4496,13 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Handles combo attack animations through Animator parameters
+    /// Controls combo progression and animation speeds
     /// </summary>
     private void HandleComboAnimations()
     {
         if (animator == null) return;
         
-        // Set animator parameters
+        // Set animator parameters for combo system
         animator.SetBool("IsAttacking", isAttacking);
         animator.SetInteger("CurrentCombo", currentCombo);
         animator.SetFloat("ComboWindow", comboWindowTimer);
@@ -4436,12 +4535,13 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Handles pogo attack animations
+    /// Controls pogo attack and bounce animations
     /// </summary>
     private void HandlePogoAnimations()
     {
         if (isPogoBouncing)
         {
-            //animator.Play("Kalb_pogo_bounce");
+            // Use attack reset animation for bounce (or create specific bounce animation)
             animator.Play("Kalb_attack_reset");
         }
         else
@@ -4453,38 +4553,37 @@ public class Kalb : MonoBehaviour
     // ====================================================================
     // SECTION 14: PUBLIC API & ABILITY MANAGEMENT
     // ====================================================================
+    // Public methods for other scripts to interact with the player
     
     /// <summary>
     /// Unlocks the dash ability
     /// </summary>
-    public void UnlockDash()
-    {
-        dashUnlocked = true;
-    }
+    public void UnlockDash() => dashUnlocked = true;
     
     /// <summary>
     /// Unlocks the run ability
     /// </summary>
-    public void UnlockRun()
-    {
-        runUnlocked = true;
-    }
+    public void UnlockRun() => runUnlocked = true;
     
     /// <summary>
     /// Unlocks the wall jump ability
     /// </summary>
-    public void UnlockWallJump()
-    {
-        wallJumpUnlocked = true;
-    }
+    public void UnlockWallJump() => wallJumpUnlocked = true;
     
     /// <summary>
     /// Unlocks the double jump ability
     /// </summary>
-    public void UnlockDoubleJump()
-    {
-        doubleJumpUnlocked = true;
-    }
+    public void UnlockDoubleJump() => doubleJumpUnlocked = true;
+    
+    /// <summary>
+    /// Unlocks the pogo attack ability
+    /// </summary>
+    public void UnlockPogo() => pogoUnlocked = true;
+    
+    /// <summary>
+    /// Unlocks the wall lock ability
+    /// </summary>
+    public void UnlockWallLock() => wallLockUnlocked = true;
     
     /// <summary>
     /// Unlocks all abilities at once
@@ -4501,6 +4600,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Resets all abilities to locked state
+    /// Useful for game resets or difficulty modes
     /// </summary>
     public void ResetAbilities()
     {
@@ -4513,8 +4613,10 @@ public class Kalb : MonoBehaviour
     }
 
     /// <summary>
-    /// Unlocks longer combo chain
+    /// Upgrades combo chain to allow more hits
+    /// Resizes arrays if needed for new combo length
     /// </summary>
+    /// <param name="newMaxCombo">New maximum combo hits</param>
     public void UpgradeCombo(int newMaxCombo)
     {
         maxComboHits = newMaxCombo;
@@ -4533,120 +4635,76 @@ public class Kalb : MonoBehaviour
     /// <summary>
     /// Gets current combo count
     /// </summary>
-    public int GetCurrentCombo()
-    {
-        return currentCombo;
-    }
-
+    /// <returns>Current combo hit count (0 = no combo)</returns>
+    public int GetCurrentCombo() => currentCombo;
+    
     /// <summary>
     /// Gets max combo hits
     /// </summary>
-    public int GetMaxCombo()
-    {
-        return maxComboHits;
-    }
-
+    /// <returns>Maximum number of hits in combo chain</returns>
+    public int GetMaxCombo() => maxComboHits;
+    
     /// <summary>
     /// Checks if player is in combo finisher state
     /// </summary>
-    public bool IsComboFinishing()
-    {
-        return isComboFinishing;
-    }
-
+    /// <returns>True if performing final combo hit</returns>
+    public bool IsComboFinishing() => isComboFinishing;
+    
     /// <summary>
-    /// Unlocks the pogo attack ability - NEW
+    /// Checks if pogo is unlocked
     /// </summary>
-    public void UnlockPogo()
-    {
-        pogoUnlocked = true;
-    }
-
-    /// <summary>
-    /// Checks if pogo is unlocked - NEW
-    /// </summary>
-    public bool IsPogoUnlocked()
-    {
-        return pogoUnlocked;
-    }
-
-    /// <summary>
-    /// Forces a pogo bounce (for external triggers) - NEW
-    /// </summary>
-    public void ForcePogoBounce(float bounceForce)
-    {
-        PerformPogoBounce();
-        // Override bounce force
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
-        rb.AddForce(Vector2.up * bounceForce, ForceMode2D.Impulse);
-    }
-
-    /// <summary>
-    /// Unlocks the wall lock ability
-    /// </summary>
-    public void UnlockWallLock()
-    {
-        wallLockUnlocked = true;
-    }
+    /// <returns>True if pogo attack is available</returns>
+    public bool IsPogoUnlocked() => pogoUnlocked;
     
     /// <summary>
     /// Checks if wall lock is currently active
     /// </summary>
-    public bool IsWallLocked()
-    {
-        return isWallLocked;
-    }
+    /// <returns>True if player is locked to wall</returns>
+    public bool IsWallLocked() => isWallLocked;
     
     /// <summary>
     /// Checks if wall lock is engaging (transitioning to locked state)
     /// </summary>
-    public bool IsWallLockEngaging()
-    {
-        return isWallLockEngaging;
-    }
-
-        // ====================================================================
-    // SECTION 14: PUBLIC API & ABILITY MANAGEMENT
-    // ====================================================================
-    
-    // ... existing public methods ...
+    /// <returns>True if wall lock is engaging</returns>
+    public bool IsWallLockEngaging() => isWallLockEngaging;
     
     /// <summary>
     /// Heals the player by specified amount
     /// </summary>
+    /// <param name="amount">Health points to restore</param>
     public void Heal(int amount)
     {
         if (isDead) return;
         
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         
-        
-        // Visual feedback for healing
+        // Visual feedback for healing could be added here
         // StartCoroutine(HealFlashRoutine());
     }
     
     /// <summary>
     /// Sets player health to specific value
     /// </summary>
+    /// <param name="health">New health value</param>
     public void SetHealth(int health)
     {
         currentHealth = Mathf.Clamp(health, 0, maxHealth);
-        
     }
     
     /// <summary>
-    /// Increases max health
+    /// Increases max health and restores some health
     /// </summary>
+    /// <param name="increaseAmount">Amount to increase max health by</param>
     public void IncreaseMaxHealth(int increaseAmount)
     {
         maxHealth += increaseAmount;
         currentHealth = Mathf.Clamp(currentHealth + increaseAmount, 0, maxHealth);
-        
     }
     
     /// <summary>
     /// DEBUG: Test damage from right side
     /// </summary>
+    /// <param name="damage">Amount of damage to test (default 10)</param>
     public void TestTakeDamage(int damage = 10)
     {
         Vector3 testDamageSource = transform.position + Vector3.right * 2f;
@@ -4656,6 +4714,7 @@ public class Kalb : MonoBehaviour
     /// <summary>
     /// DEBUG: Test damage from left side
     /// </summary>
+    /// <param name="damage">Amount of damage to test (default 10)</param>
     public void TestTakeDamageLeft(int damage = 10)
     {
         Vector3 testDamageSource = transform.position + Vector3.left * 2f;
@@ -4677,7 +4736,7 @@ public class Kalb : MonoBehaviour
     {
         godMode = !godMode;
         
-        // Visual feedback
+        // Visual feedback for god mode
         if (playerSprite != null)
         {
             if (godMode)
@@ -4690,16 +4749,11 @@ public class Kalb : MonoBehaviour
                 playerSprite.color = originalSpriteColor;
             }
         }
-        
-        
-        
-        // Optional: Play sound effect
-        // if (audioSource != null)
-        //     audioSource.PlayOneShot(godMode ? powerupSound : powerdownSound);
     }
 
     /// <summary>
     /// Manually disengages wall slide (useful for external systems)
+    /// Forces player to leave wall slide state
     /// </summary>
     public void DisengageWallSlide()
     {
@@ -4721,12 +4775,12 @@ public class Kalb : MonoBehaviour
         // Reset wall contact state
         isTouchingWall = false;
         wallSide = 0;
-        
     }
 
     /// <summary>
     /// Gets the current wall slide speed (with acceleration applied)
     /// </summary>
+    /// <returns>Current wall slide speed</returns>
     public float GetCurrentWallSlideSpeed()
     {
         return enableWallSlideAcceleration ? currentWallSlideSpeed : wallSlideSpeed;
@@ -4739,15 +4793,19 @@ public class Kalb : MonoBehaviour
     /// <summary>
     /// Draws gizmos in the Scene view for debugging
     /// Shows detection ranges, raycasts, and state information
+    /// Only visible when GameObject is selected in Unity Editor
     /// </summary>
     void OnDrawGizmosSelected()
     {
+        // Draw basic detection gizmos
         DrawGroundCheckGizmo();
         DrawWallCheckGizmo();
         DrawAttackRangeGizmo();
         
+        // Only draw runtime gizmos when playing
         if (!Application.isPlaying || mainCamera == null) return;
         
+        // Draw system-specific debug visuals
         DrawFallTrackingGizmos();
         DrawScreenBoundsGizmos();
         DrawSwimmingGizmos();
@@ -4799,17 +4857,18 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Draws fall tracking visualizations
+    /// Shows fall start height and hard landing threshold
     /// </summary>
     private void DrawFallTrackingGizmos()
     {
-        // Fall start height
+        // Fall start height line
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(
             new Vector3(transform.position.x - 1f, fallStartHeight, 0),
             new Vector3(transform.position.x + 1f, fallStartHeight, 0)
         );
         
-        // Screen height threshold
+        // Screen height threshold line
         float requiredDistance = screenHeightInUnits * minScreenHeightForHardLanding;
         Gizmos.color = Color.yellow;
         Gizmos.DrawLine(
@@ -4817,7 +4876,7 @@ public class Kalb : MonoBehaviour
             new Vector3(transform.position.x + 1f, fallStartHeight - requiredDistance, 0)
         );
         
-        // Current position
+        // Current position line
         Gizmos.color = Color.white;
         Gizmos.DrawLine(
             new Vector3(transform.position.x - 1f, transform.position.y, 0),
@@ -4832,11 +4891,11 @@ public class Kalb : MonoBehaviour
     {
         Bounds screenBounds = GetScreenBounds();
         
-        // Screen bounds
+        // Screen bounds rectangle
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(screenBounds.center, screenBounds.size);
         
-        // Off-screen detection area
+        // Off-screen detection area line
         Gizmos.color = Color.magenta;
         Vector3 offScreenTop = new Vector3(screenBounds.center.x, screenBounds.max.y + screenHeightDetectionOffset, 0);
         Gizmos.DrawLine(
@@ -4847,6 +4906,7 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Draws swimming system visualizations
+    /// Shows water surface target and floating range
     /// </summary>
     private void DrawSwimmingGizmos()
     {
@@ -4868,6 +4928,7 @@ public class Kalb : MonoBehaviour
             );
         }
 
+        // Floating effect visualization
         if (isSwimming && enableFloating)
         {
             // Floating effect range
@@ -4885,7 +4946,8 @@ public class Kalb : MonoBehaviour
                 new Vector3(transform.position.x + 0.25f, originalPosition.y + currentFloatOffset, 0)
             );
         }
-        // Draw combo attack range if attacking
+        
+        // Combo attack range visualization
         if (isAttacking && currentCombo > 0)
         {
             int comboIndex = (currentCombo - 1) % maxComboHits;
@@ -4894,7 +4956,7 @@ public class Kalb : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(attackPoint.position, range);
             
-            // Draw combo number
+            // Draw combo number label
             UnityEditor.Handles.Label(transform.position + Vector3.up * 2f, 
                 $"Combo: {currentCombo}/{maxComboHits}");
         }
@@ -4902,14 +4964,17 @@ public class Kalb : MonoBehaviour
     
     /// <summary>
     /// Draws ledge system visualizations
+    /// Shows ledge detection and grab positions
     /// </summary>
     private void DrawLedgeGizmos()
     {
+        // Ledge check point
         if (ledgeCheckPoint != null)
         {
             Gizmos.color = Color.magenta;
             Gizmos.DrawWireSphere(ledgeCheckPoint.position, 0.1f);
             
+            // Detected ledge position
             if (ledgeDetected)
             {
                 Gizmos.color = Color.white;
@@ -4917,6 +4982,7 @@ public class Kalb : MonoBehaviour
             }
         }
 
+        // Ledge grab visualization
         if (isLedgeGrabbing)
         {
             // Ledge position
@@ -4941,13 +5007,14 @@ public class Kalb : MonoBehaviour
     }
 
     /// <summary>
-    /// Draws pogo attack detection gizmos - NEW
+    /// Draws pogo attack detection gizmos
+    /// Shows pogo detection range and direction
     /// </summary>
     private void DrawPogoGizmos()
     {
         if (pogoUnlocked)
         {
-            // Pogo detection range
+            // Pogo detection range sphere
             Gizmos.color = Color.magenta;
             Vector2 detectionCenter = transform.position + (Vector3.down * (pogoDetectionRange / 2f));
             Gizmos.DrawWireSphere(detectionCenter, pogoDetectionRange / 2f);
@@ -4959,7 +5026,7 @@ public class Kalb : MonoBehaviour
                 Gizmos.DrawRay(transform.position, pogoDirection * pogoDetectionRange);
             }
             
-            // Pogo chain indicator
+            // Pogo chain indicator label
             if (currentPogoChain > 0)
             {
                 UnityEditor.Handles.Label(transform.position + Vector3.up * 1.5f, 
@@ -4970,6 +5037,7 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Draws wall lock visualization gizmos
+    /// Shows wall lock state with colored indicators
     /// </summary>
     private void DrawWallLockGizmos()
     {
@@ -5007,12 +5075,13 @@ public class Kalb : MonoBehaviour
 
     /// <summary>
     /// Draws wall slide acceleration visualization gizmos
+    /// Shows acceleration progress and current speed
     /// </summary>
     private void DrawWallSlideAccelerationGizmos()
     {
         if (!enableWallSlideAcceleration || !isWallSliding) return;
         
-        // Draw acceleration meter
+        // Draw acceleration meter bar
         Vector3 startPos = transform.position + new Vector3(-0.5f, 0.8f, 0);
         Vector3 endPos = transform.position + new Vector3(0.5f, 0.8f, 0);
         
@@ -5024,6 +5093,7 @@ public class Kalb : MonoBehaviour
         float speedRatio = currentWallSlideSpeed / wallSlideSpeed;
         Vector3 speedPos = Vector3.Lerp(startPos, endPos, speedRatio);
         
+        // Color based on acceleration state
         if (isAcceleratingWallSlide)
         {
             Gizmos.color = Color.Lerp(Color.yellow, Color.green, speedRatio);
@@ -5039,7 +5109,7 @@ public class Kalb : MonoBehaviour
         
         Gizmos.DrawLine(startPos, speedPos);
         
-        // Text label
+        // Text labels for speed and acceleration
         UnityEditor.Handles.Label(transform.position + Vector3.up * 1f, 
             $"Slide Speed: {currentWallSlideSpeed:F1}/{wallSlideSpeed:F1}");
         
@@ -5050,4 +5120,3 @@ public class Kalb : MonoBehaviour
         }
     }
 }
-
