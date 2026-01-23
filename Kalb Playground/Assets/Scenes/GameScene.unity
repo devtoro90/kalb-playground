@@ -2328,6 +2328,8 @@ GameObject:
   - component: {fileID: 658198524}
   - component: {fileID: 658198528}
   - component: {fileID: 658198531}
+  - component: {fileID: 658198532}
+  - component: {fileID: 658198533}
   m_Layer: 0
   m_Name: Kalb
   m_TagString: Player
@@ -2564,6 +2566,8 @@ MonoBehaviour:
   collisionDetector: {fileID: 658198524}
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
   swimming: {fileID: 658198531}
+  comboSystem: {fileID: 658198533}
+  abilitySystem: {fileID: 658198532}
   instantStop: 1
   flipInAir: 1
 --- !u!114 &658198526
@@ -2583,6 +2587,8 @@ MonoBehaviour:
   collisionDetector: {fileID: 658198524}
   swimming: {fileID: 658198531}
   rb: {fileID: 658198517}
+  abilitySystem: {fileID: 658198532}
+  comboSystem: {fileID: 658198533}
 --- !u!114 &658198527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2657,24 +2663,37 @@ MonoBehaviour:
   playerCollider: {fileID: 658198523}
   physics: {fileID: 658198529}
   movement: {fileID: 658198525}
-  swimSpeed: 3
-  swimFastSpeed: 5
-  swimDashSpeed: 10
-  swimJumpForce: 10
-  waterSurfaceOffset: 1.2
-  waterEntrySpeedReduction: 0.5
-  waterLayer:
-    serializedVersion: 2
-    m_Bits: 16
-  waterCheckRadius: 0.5
-  waterEntryGravity: 0.5
-  buoyancyStrength: 50
-  buoyancyDamping: 10
-  maxBuoyancyForce: 20
-  floatAmplitude: 0.05
-  floatFrequency: 1
-  floatSmoothness: 5
-  enableFloating: 1
+  abilitySystem: {fileID: 658198532}
+--- !u!114 &658198532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658198515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad645cd08b66040fe880e464a85f36bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KalbAbilitySystem
+  settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
+--- !u!114 &658198533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658198515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b20e6427ac5894f6da43296f10171ddf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KalbComboSystem
+  settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
+  rb: {fileID: 658198517}
+  animationController: {fileID: 658198526}
+  movement: {fileID: 658198525}
+  attackPoint: {fileID: 0}
 --- !u!1 &690632030
 GameObject:
   m_ObjectHideFlags: 0

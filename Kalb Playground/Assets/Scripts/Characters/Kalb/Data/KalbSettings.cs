@@ -50,14 +50,6 @@ public class KalbSettings : ScriptableObject
     public float swimDashDuration = 0.15f;
     public float swimDashCooldown = 0.3f;
 
-    [Header("Ability Unlocks")]
-    public bool runUnlocked = false;
-    public bool dashUnlocked = false;
-    public bool wallJumpUnlocked = false;
-    public bool doubleJumpUnlocked = false;
-    public bool wallLockUnlocked = false;
-    public bool pogoUnlocked = false;
-    
     [Header("Combo System Settings")]
     public int maxComboHits = 3;
     public float comboWindow = 0.2f;
@@ -87,4 +79,32 @@ public class KalbSettings : ScriptableObject
     public float hitEffectDuration = 0.3f;
     public Color comboFlashColor = Color.white;
     public float comboFlashDuration = 0.1f;
+
+    [Header("Ability Unlocks")]
+    public bool runUnlocked = false;
+    public bool dashUnlocked = false;
+    public bool wallJumpUnlocked = false;
+    public bool doubleJumpUnlocked = false;
+    public bool wallLockUnlocked = false;
+    public bool pogoUnlocked = false;
+
+    [Header("Run Settings")] // NEW
+    public float runSpeed = 8f;
+    public float runAcceleration = 20f;
+    public float runDeceleration = 25f;
+    public float runTurnaroundMultiplier = 0.7f;
+    public float runJumpBoost = 1.2f;
+    
+    [Header("Dash Settings")] // NEW
+    public float dashSpeed = 20f;
+    public float dashDuration = 0.2f;
+    public float dashCooldown = 0.5f;
+    public bool canAirDash = true;
+    public bool resetAirDashOnGround = true;
+    public int maxAirDashes = 1;
+    public float dashEndSlowdown = 0.5f;
+    public float dashTurnaroundMultiplier = 0.5f;
+    public float dashJumpBoost = 1.5f;
+    public bool canDashDiagonal = true;
+    public float diagonalDashMultiplier = 0.707f; // 1/√2 for 45-degree dashes
 }

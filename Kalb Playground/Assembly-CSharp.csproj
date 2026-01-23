@@ -75,6 +75,7 @@
     <Compile Include="Assets/Scripts/Characters/Kalb/Systems/KalbAbilitySystem.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/ShaderPropAnimator.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbStateMachine.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbRunState.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbAnimationController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbPhysics.cs" />

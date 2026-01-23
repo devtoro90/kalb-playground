@@ -51,3 +51,71 @@ MonoBehaviour:
   enableFloating: 1
   swimDashDuration: 0.15
   swimDashCooldown: 0.3
+  maxComboHits: 3
+  comboWindow: 0.3
+  comboResetTime: 0.5
+  enableAirCombo: 1
+  enableWallCombo: 1
+  comboDamage:
+  - 20
+  - 20
+  - 20
+  comboKnockback:
+  - 5
+  - 5
+  - 5
+  comboRange:
+  - 0.5
+  - 0.5
+  - 0.5
+  comboAttackDurations:
+  - 0.2
+  - 0.2
+  - 0.2
+  comboCooldowns:
+  - 0.2
+  - 0.1
+  - 0.3
+  comboForwardForce:
+  - 3
+  - 3
+  - 3
+  comboUpwardForce:
+  - 0
+  - 0
+  - 0
+  comboAnimations:
+  - Kalb_attack1
+  - Kalb_attack2
+  - Kalb_attack3
+  comboResetAnimation: Kalb_attack_reset
+  attackPointOffset: {x: 0.5, y: 0}
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  hitEffectPrefab: {fileID: 0}
+  hitEffectDuration: 0.3
+  comboFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  comboFlashDuration: 0.1
+  runUnlocked: 1
+  dashUnlocked: 1
+  wallJumpUnlocked: 0
+  doubleJumpUnlocked: 0
+  wallLockUnlocked: 0
+  pogoUnlocked: 0
+  runSpeed: 8
+  runAcceleration: 20
+  runDeceleration: 25
+  runTurnaroundMultiplier: 0.7
+  runJumpBoost: 1.2
+  dashSpeed: 20
+  dashDuration: 0.2
+  dashCooldown: 0.5
+  canAirDash: 1
+  resetAirDashOnGround: 1
+  maxAirDashes: 1
+  dashEndSlowdown: 0.5
+  dashTurnaroundMultiplier: 0.5
+  dashJumpBoost: 1.5
+  canDashDiagonal: 1
+  diagonalDashMultiplier: 0.707

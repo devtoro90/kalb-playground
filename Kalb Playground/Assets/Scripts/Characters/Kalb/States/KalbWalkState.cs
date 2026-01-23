@@ -6,6 +6,7 @@ public class KalbWalkState : KalbState
     private KalbCollisionDetector collisionDetector;
     private KalbMovement movement;
     private KalbSwimming swimming;
+    private KalbAbilitySystem abilitySystem; 
     
     public KalbWalkState(KalbController controller, KalbStateMachine stateMachine) 
         : base(controller, stateMachine)
@@ -14,6 +15,7 @@ public class KalbWalkState : KalbState
         collisionDetector = controller.CollisionDetector;
         movement = controller.Movement;
         swimming = controller.Swimming;
+        abilitySystem = controller.AbilitySystem; 
     }
     
     public override void Enter()
@@ -39,6 +41,12 @@ public class KalbWalkState : KalbState
         if (Mathf.Abs(inputHandler.MoveInput.x) < 0.1f)
         {
             stateMachine.ChangeState(controller.IdleState);
+        }
+        
+        if (abilitySystem != null && abilitySystem.CanRun() && inputHandler.DashHeld)
+        {
+            stateMachine.ChangeState(controller.RunState);
+            return;
         }
     }
     

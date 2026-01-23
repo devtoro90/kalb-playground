@@ -9,12 +9,14 @@ public class KalbAnimationController : MonoBehaviour
     [SerializeField] private KalbSwimming swimming;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private KalbAbilitySystem abilitySystem;
-    [SerializeField] private KalbComboSystem comboSystem; // NEW
+    [SerializeField] private KalbComboSystem comboSystem;
+    [SerializeField] private KalbController controller; 
     
     private void Start()
     {
         if (abilitySystem == null) abilitySystem = GetComponent<KalbAbilitySystem>();
-        if (comboSystem == null) comboSystem = GetComponent<KalbComboSystem>(); // NEW
+        if (comboSystem == null) comboSystem = GetComponent<KalbComboSystem>();
+        if (controller == null) controller = GetComponent<KalbController>();
     }
     
     private void Update()
@@ -25,8 +27,15 @@ public class KalbAnimationController : MonoBehaviour
     private void UpdateAnimations()
     {
         if (animator == null) return;
-        
-        // Check if attacking (NEW - highest priority)
+
+        // Check if dashing (highest priority)
+        if (controller != null && controller.DashState != null && controller.DashState.IsDashing)
+        {
+            PlayAnimation("Kalb_dash");
+            return;
+        }
+
+        // Check if attacking 
         if (comboSystem != null && comboSystem.IsAttacking)
         {
             UpdateComboAnimations();
@@ -39,6 +48,14 @@ public class KalbAnimationController : MonoBehaviour
             UpdateSwimmingAnimations();
             return;
         }
+
+        // Check if running (NEW)
+        if (controller != null && controller.RunState != null && controller.RunState.IsRunning)
+        {
+            PlayAnimation("Kalb_run");
+            return;
+        }
+
         
         // Set movement speed parameter
         float speed = Mathf.Abs(rb.linearVelocity.x);

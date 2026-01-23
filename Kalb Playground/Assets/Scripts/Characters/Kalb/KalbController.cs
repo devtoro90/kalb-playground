@@ -27,6 +27,8 @@ public class KalbController : MonoBehaviour
     private KalbAirState airState;
     private KalbSwimState swimState;
     private KalbCombatState combatState;
+    private KalbRunState runState;    
+    private KalbDashState dashState;  
     
     // Properties for component access
     public KalbInputHandler InputHandler => inputHandler;
@@ -48,6 +50,8 @@ public class KalbController : MonoBehaviour
     public KalbAirState AirState => airState;
     public KalbSwimState SwimState => swimState;
     public KalbCombatState CombatState => combatState; 
+    public KalbRunState RunState => runState;    
+    public KalbDashState DashState => dashState; 
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     
@@ -110,6 +114,8 @@ public class KalbController : MonoBehaviour
         airState = new KalbAirState(this, stateMachine);
         swimState = new KalbSwimState(this, stateMachine);
         combatState = new KalbCombatState(this, stateMachine);
+        runState = new KalbRunState(this, stateMachine);    
+        dashState = new KalbDashState(this, stateMachine);  
         
         // Start with idle state
         stateMachine.Initialize(idleState);
@@ -130,15 +136,21 @@ public class KalbController : MonoBehaviour
         if (collisionDetector.IsGrounded)
         {
             physics.SetCoyoteTime();
+            
+            // Reset air dash when grounded
+            if (dashState != null)
+            {
+                dashState.ResetAirDash();
+            }
         }
         
-        // Check for jump input (coyote time or jump buffer)
+        // Check for jump input
         if (inputHandler.JumpPressed)
         {
             physics.SetJumpBuffer();
         }
         
-        // Process jump if conditions are met (but not in swim state)
+        // Process jump
         if (!swimming.IsSwimming && !swimming.IsJumpingFromWater && 
             physics.JumpBufferCounter > 0 && physics.CoyoteTimeCounter > 0)
         {
@@ -146,20 +158,54 @@ public class KalbController : MonoBehaviour
             inputHandler.ResetJumpInput();
         }
 
-        //Check for attack input (combo is always available by default)
+        // DASH INPUT - CRITICAL FIX
+        if (inputHandler.DashPressed && abilitySystem.CanDash())
+        {
+            // Check if we're NOT already in dash state
+            // This prevents re-entering dash state while dashing
+            if (!(stateMachine.CurrentState is KalbDashState))
+            {
+                Debug.Log($"Dash pressed, current state: {stateMachine.CurrentState.GetType().Name}");
+                
+                // Check if dash is available from current state
+                if (CanDashFromCurrentState())
+                {
+                    Debug.Log("Changing to dash state");
+                    stateMachine.ChangeState(dashState);
+                    inputHandler.ResetDashInput();
+                }
+                else
+                {
+                    Debug.Log($"Cannot dash from {stateMachine.CurrentState.GetType().Name}");
+                }
+            }
+            else
+            {
+                Debug.Log("Already in dash state, ignoring dash input");
+            }
+        }
+
+        // Check for run state
+        if (ShouldEnterRunState() && !(stateMachine.CurrentState is KalbRunState))
+        {
+            stateMachine.ChangeState(runState);
+        }
+        else if (stateMachine.CurrentState is KalbRunState && !ShouldContinueRunState())
+        {
+            ExitToAppropriateState();
+        }
+
+        // Check for attack
         if (inputHandler.AttackPressed && comboSystem.CanAttack)
         {
-            // Check if we're in a state that allows attacking
-            bool canAttackFromCurrentState = CanAttackFromCurrentState();
-            
-            if (canAttackFromCurrentState)
+            if (CanAttackFromCurrentState())
             {
                 stateMachine.ChangeState(combatState);
                 inputHandler.ResetAttackInput();
             }
         }
         
-        // Handle state input and update
+        // Handle state updates
         stateMachine.HandleInput();
         stateMachine.Update();
     }
@@ -177,6 +223,12 @@ public class KalbController : MonoBehaviour
         
         // Cancel combo when taking damage
         comboSystem.CancelCombo();
+
+        // Cancel dash when taking damage (NEW)
+        if (stateMachine.CurrentState is KalbDashState)
+        {
+            dashState.ForceResetDash();
+        }
         
         // Force exit combat state if taking damage
         if (stateMachine.CurrentState is KalbCombatState)
@@ -203,12 +255,17 @@ public class KalbController : MonoBehaviour
         // Don't allow attacking while swimming
         if (swimming.IsSwimming)
             return false;
+
+        // Don't allow attacking while dashing (NEW)
+        if (stateMachine.CurrentState is KalbDashState)
+            return false;
         
         // Allow attacking in these states:
         if (stateMachine.CurrentState is KalbIdleState || 
             stateMachine.CurrentState is KalbWalkState ||
             stateMachine.CurrentState is KalbAirState ||
-            stateMachine.CurrentState is KalbJumpState)
+            stateMachine.CurrentState is KalbJumpState ||
+            stateMachine.CurrentState is KalbRunState)
             return true;
         
         // Don't allow attacking while jumping from water (special case)
@@ -225,6 +282,99 @@ public class KalbController : MonoBehaviour
         //     return false;
         
         return false;
+    }
+
+    private bool CanDashFromCurrentState()
+    {
+        // Don't allow dashing from these states:
+        if (stateMachine.CurrentState is KalbSwimState)
+            return false;
+        
+        if (stateMachine.CurrentState is KalbCombatState)
+            return false;
+        
+        // Allow dashing from these states:
+        if (stateMachine.CurrentState is KalbIdleState)
+            return true;
+        
+        if (stateMachine.CurrentState is KalbWalkState)
+            return true;
+        
+        if (stateMachine.CurrentState is KalbRunState)
+            return true;
+        
+        if (stateMachine.CurrentState is KalbAirState)
+            return true;
+        
+        if (stateMachine.CurrentState is KalbJumpState)
+            return true;
+        
+        return false;
+    }
+
+    
+    
+    // NEW: Check if should enter run state
+    private bool ShouldEnterRunState()
+    {
+        // Must have run ability unlocked
+        if (!abilitySystem.CanRun())
+            return false;
+        
+        // Must be grounded
+        if (!collisionDetector.IsGrounded)
+            return false;
+        
+        // Must be holding dash button
+        if (!inputHandler.DashHeld)
+            return false;
+        
+        // Must have horizontal input
+        if (Mathf.Abs(inputHandler.MoveInput.x) < 0.1f)
+            return false;
+        
+        // Can't enter run from these states
+        if (stateMachine.CurrentState is KalbDashState ||
+            stateMachine.CurrentState is KalbCombatState ||
+            stateMachine.CurrentState is KalbSwimState)
+            return false;
+        
+        return true;
+    }
+    
+    // NEW: Check if should continue run state
+    private bool ShouldContinueRunState()
+    {
+        // Must still meet run conditions
+        return ShouldEnterRunState();
+    }
+    
+    // NEW: Exit to appropriate state
+    private void ExitToAppropriateState()
+    {
+        if (swimming.IsInWater)
+        {
+            stateMachine.ChangeState(swimState);
+        }
+        else if (!collisionDetector.IsGrounded)
+        {
+            stateMachine.ChangeState(airState);
+        }
+        else if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
+        {
+            if (inputHandler.DashHeld && abilitySystem.CanRun())
+            {
+                stateMachine.ChangeState(runState);
+            }
+            else
+            {
+                stateMachine.ChangeState(walkState);
+            }
+        }
+        else
+        {
+            stateMachine.ChangeState(idleState);
+        }
     }
     
     public void ForceStateChange(KalbState newState)

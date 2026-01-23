@@ -14,9 +14,14 @@ public class KalbMovement : MonoBehaviour
     [SerializeField] private bool flipInAir = true;
     
     // Movement state
-    private Vector3 velocity = Vector3.zero;
+    protected internal Vector3 velocity = Vector3.zero;
     private bool facingRight = true;
     
+    public Vector3 Velocity 
+    { 
+        get => velocity; 
+        set => velocity = value; 
+    }
     public bool FacingRight => facingRight;
     
     private void Start()

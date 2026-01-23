@@ -487,6 +487,7 @@
 "Assets/Scripts/Characters/Kalb/States/KalbDashState.cs"
 "Assets/Scripts/Characters/Kalb/States/KalbIdleState.cs"
 "Assets/Scripts/Characters/Kalb/States/KalbJumpState.cs"
+"Assets/Scripts/Characters/Kalb/States/KalbRunState.cs"
 "Assets/Scripts/Characters/Kalb/States/KalbState.cs"
 "Assets/Scripts/Characters/Kalb/States/KalbSwimState.cs"
 "Assets/Scripts/Characters/Kalb/States/KalbWalkState.cs"
