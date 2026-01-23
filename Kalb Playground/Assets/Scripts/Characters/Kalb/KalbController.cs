@@ -13,6 +13,8 @@ public class KalbController : MonoBehaviour
     private KalbPhysics physics;
     private KalbAnimationController animationController;
     private KalbHealth health;
+    private KalbSwimming swimming;
+    private KalbAbilitySystem abilitySystem;
     
     // State Machine
     private KalbStateMachine stateMachine;
@@ -22,6 +24,7 @@ public class KalbController : MonoBehaviour
     private KalbWalkState walkState;
     private KalbJumpState jumpState;
     private KalbAirState airState;
+    private KalbSwimState swimState;
     
     // Properties for component access
     public KalbInputHandler InputHandler => inputHandler;
@@ -30,6 +33,8 @@ public class KalbController : MonoBehaviour
     public KalbPhysics Physics => physics;
     public KalbAnimationController AnimationController => animationController;
     public KalbHealth Health => health;
+    public KalbSwimming Swimming => swimming;
+    public KalbAbilitySystem AbilitySystem => abilitySystem;
     public KalbSettings Settings => settings;
     public Rigidbody2D Rb => rb;
     
@@ -38,6 +43,9 @@ public class KalbController : MonoBehaviour
     public KalbWalkState WalkState => walkState;
     public KalbJumpState JumpState => jumpState;
     public KalbAirState AirState => airState;
+    public KalbSwimState SwimState => swimState;
+    
+    public bool FacingRight => movement != null ? movement.FacingRight : true;
     
     private void Awake()
     {
@@ -70,11 +78,18 @@ public class KalbController : MonoBehaviour
         health = GetComponent<KalbHealth>();
         if (health == null) health = gameObject.AddComponent<KalbHealth>();
         
+        swimming = GetComponent<KalbSwimming>();
+        if (swimming == null) swimming = gameObject.AddComponent<KalbSwimming>();
+
+        abilitySystem = GetComponent<KalbAbilitySystem>();
+        if (abilitySystem == null) abilitySystem = gameObject.AddComponent<KalbAbilitySystem>();
+        
         // Create default settings if none provided
         if (settings == null)
         {
             settings = ScriptableObject.CreateInstance<KalbSettings>();
         }
+        
     }
     
     private void InitializeStateMachine()
@@ -86,6 +101,7 @@ public class KalbController : MonoBehaviour
         walkState = new KalbWalkState(this, stateMachine);
         jumpState = new KalbJumpState(this, stateMachine);
         airState = new KalbAirState(this, stateMachine);
+        swimState = new KalbSwimState(this, stateMachine);
         
         // Start with idle state
         stateMachine.Initialize(idleState);
@@ -94,6 +110,12 @@ public class KalbController : MonoBehaviour
     private void Update()
     {
         if (health.IsDead) return;
+        
+        // Check for swimming state transition
+        if (swimming.IsInWater && !swimming.IsJumpingFromWater && !(stateMachine.CurrentState is KalbSwimState))
+        {
+            stateMachine.ChangeState(swimState);
+        }
         
         // Update coyote time and jump buffer based on ground state
         if (collisionDetector.IsGrounded)
@@ -107,8 +129,9 @@ public class KalbController : MonoBehaviour
             physics.SetJumpBuffer();
         }
         
-        // Process jump if conditions are met
-        if (physics.JumpBufferCounter > 0 && physics.CoyoteTimeCounter > 0)
+        // Process jump if conditions are met (but not in swim state)
+        if (!swimming.IsSwimming && !swimming.IsJumpingFromWater && 
+            physics.JumpBufferCounter > 0 && physics.CoyoteTimeCounter > 0)
         {
             stateMachine.ChangeState(jumpState);
             inputHandler.ResetJumpInput();

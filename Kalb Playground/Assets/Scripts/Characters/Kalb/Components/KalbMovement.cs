@@ -6,10 +6,11 @@ public class KalbMovement : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private KalbCollisionDetector collisionDetector;
     [SerializeField] private KalbSettings settings;
+    [SerializeField] private KalbSwimming swimming;
     
     [Header("Movement Settings")]
     [SerializeField] private bool instantStop = true;
-    [SerializeField] private bool flipInAir = true; // NEW: Control whether to flip in air
+    [SerializeField] private bool flipInAir = true;
     
     // Movement state
     private Vector3 velocity = Vector3.zero;
@@ -21,11 +22,20 @@ public class KalbMovement : MonoBehaviour
     {
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (collisionDetector == null) collisionDetector = GetComponent<KalbCollisionDetector>();
+        if (swimming == null) swimming = GetComponent<KalbSwimming>();
     }
     
     public void Move(float moveInput, bool isGrounded)
     {
         if (collisionDetector == null || rb == null || settings == null) return;
+        
+        // Skip if swimming - swimming state handles its own movement
+        if (swimming != null && swimming.IsSwimming)
+        {
+            // Don't apply regular movement when swimming
+            // Swimming movement is handled in KalbSwimState
+            return;
+        }
         
         // Calculate target velocity
         float targetSpeed = moveInput * settings.moveSpeed;
@@ -43,7 +53,7 @@ public class KalbMovement : MonoBehaviour
         // Smooth movement for non-instant stopping or in air
         rb.linearVelocity = Vector3.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, settings.movementSmoothing);
         
-        // Flip sprite if needed - ALWAYS flip based on input, regardless of ground state
+        // Flip sprite if needed
         if (moveInput != 0)
         {
             Flip(moveInput);
@@ -55,7 +65,10 @@ public class KalbMovement : MonoBehaviour
         if (collisionDetector == null || rb == null || settings == null) return;
         if (collisionDetector.IsGrounded) return;
         
-        // If no input in air, allow some drift (platformer standard)
+        // Skip if swimming
+        if (swimming != null && swimming.IsSwimming) return;
+        
+        // If no input in air, allow some drift
         if (moveInput == 0)
         {
             // Slow down gradually in air
@@ -88,6 +101,8 @@ public class KalbMovement : MonoBehaviour
             );
         }
     }
+    
+    // REMOVED: ApplySwimMovement method - it's now in KalbSwimming
     
     private void Flip(float moveInput)
     {

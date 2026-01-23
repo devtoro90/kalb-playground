@@ -5,6 +5,7 @@ public class KalbIdleState : KalbState
     private KalbInputHandler inputHandler;
     private KalbCollisionDetector collisionDetector;
     private KalbMovement movement;
+    private KalbSwimming swimming;
     
     public KalbIdleState(KalbController controller, KalbStateMachine stateMachine) 
         : base(controller, stateMachine)
@@ -12,6 +13,7 @@ public class KalbIdleState : KalbState
         inputHandler = controller.InputHandler;
         collisionDetector = controller.CollisionDetector;
         movement = controller.Movement;
+        swimming = controller.Swimming;
     }
     
     public override void Enter()
@@ -22,6 +24,13 @@ public class KalbIdleState : KalbState
     
     public override void Update()
     {
+        // Check for swimming transition
+        if (swimming != null && swimming.IsInWater)
+        {
+            stateMachine.ChangeState(controller.SwimState);
+            return;
+        }
+        
         if (!collisionDetector.IsGrounded)
         {
             stateMachine.ChangeState(controller.AirState);

@@ -6,6 +6,7 @@ public class KalbPhysics : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private KalbSettings settings;
     [SerializeField] private KalbCollisionDetector collisionDetector;
+    [SerializeField] private KalbSwimming swimming;
     
     // Jump state
     private bool isJumpButtonHeld = false;
@@ -20,6 +21,7 @@ public class KalbPhysics : MonoBehaviour
     {
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (collisionDetector == null) collisionDetector = GetComponent<KalbCollisionDetector>();
+        if (swimming == null) swimming = GetComponent<KalbSwimming>();
         if (settings == null)
         {
             Debug.LogWarning("KalbPhysics: Settings not assigned!");
@@ -40,6 +42,9 @@ public class KalbPhysics : MonoBehaviour
     private void ApplyWallFriction()
     {
         if (collisionDetector == null || rb == null) return;
+        
+        // Skip wall friction if swimming
+        if (swimming != null && swimming.IsSwimming) return;
         
         // Only apply wall friction if we're actually wall sliding (touching wall + falling)
         if (collisionDetector.ShouldApplyWallFriction())
@@ -88,6 +93,14 @@ public class KalbPhysics : MonoBehaviour
     private void ApplyGravity()
     {
         if (settings == null || rb == null) return;
+        
+        // If we're swimming, swimming system handles buoyancy - skip gravity
+        if (swimming != null && swimming.IsSwimming)
+        {
+            // Only apply minimal gravity when swimming (if needed for fall through water)
+            // The buoyancy system in KalbSwimming handles vertical movement
+            return;
+        }
         
         // If we're wall sliding, reduce gravity for that classic wall slide feel
         if (collisionDetector != null && collisionDetector.IsWallSliding)

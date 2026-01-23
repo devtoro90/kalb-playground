@@ -15,6 +15,8 @@ MonoBehaviour:
   moveSpeed: 5
   jumpForce: 12
   movementSmoothing: 0.05
+  groundFriction: 10
+  airFriction: 2
   coyoteTime: 0.15
   jumpBufferTime: 0.1
   jumpCutMultiplier: 0.5
@@ -28,4 +30,24 @@ MonoBehaviour:
   groundCheckRadius: 0.2
   environmentLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
+  swimSpeed: 3
+  swimFastSpeed: 5
+  swimDashSpeed: 10
+  swimJumpForce: 8
+  waterSurfaceOffset: 1.2
+  waterEntrySpeedReduction: 0.5
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16
+  waterCheckRadius: 0.5
+  waterEntryGravity: 0.5
+  buoyancyStrength: 50
+  buoyancyDamping: 10
+  maxBuoyancyForce: 20
+  floatAmplitude: 0.05
+  floatFrequency: 1
+  floatSmoothness: 5
+  enableFloating: 1
+  swimDashDuration: 0.15
+  swimDashCooldown: 0.3

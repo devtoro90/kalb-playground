@@ -1,19 +1,26 @@
-KalbCharacter/
-├── Core/
-│   ├── KalbController.cs
-│   └── KalbInputHandler.cs
-├── States/
-│   ├── KalbState.cs
-│   ├── KalbGroundedState.cs
-│   ├── KalbAirState.cs
-│   ├── KalbIdleState.cs
-│   ├── KalbWalkState.cs
-│   └── KalbJumpState.cs
-├── Components/
-│   ├── KalbMovement.cs
-│   ├── KalbPhysics.cs
-│   ├── KalbCollisionDetector.cs
-│   ├── KalbAnimationController.cs
-│   └── KalbHealth.cs
-└── Data/
-    └── KalbSettings.cs
+Scripts
+├── Characters
+│   ├── Kalb/
+│   │   ├── KalbController.cs
+│   │   ├── Components/
+│   │   │   ├── KalbAnimationController.cs
+│   │   │   ├── KalbCollisionDetector.cs
+│   │   │   ├── KalbHealth.cs
+│   │   │   ├── KalbInputHandler.cs
+│   │   │   ├── KalbMovement.cs
+│   │   │   ├── KalbPhysics.cs
+│   │   │   ├── KalbStateMachine.cs
+│   │   │   └── KalbSwimming.cs
+│   │   └── Data/
+│   │       └── KalbSettings.cs
+│   │   └── Interfaces/
+│   │       └── IKalbState.cs
+│   │   ├── States/
+│   │   │   ├── KalbAirState.cs
+│   │   │   ├── KalbIdleState.cs
+│   │   │   ├── KalbJumpState.cs
+│   │   │   ├── KalbState.cs
+│   │   │   ├── KalbSwimState.cs
+│   │   │   └── KalbWalkState.cs
+│   │   └── Systems/
+│   │       └── KalbAbilitySystem.cs

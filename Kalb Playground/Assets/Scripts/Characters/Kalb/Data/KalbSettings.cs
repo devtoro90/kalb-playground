@@ -29,4 +29,32 @@ public class KalbSettings : ScriptableObject
     [Header("Environment Detection")]
     public float groundCheckRadius = 0.2f;
     public LayerMask environmentLayer;
+    
+    [Header("Swimming Settings")]
+    public float swimSpeed = 3f;
+    public float swimFastSpeed = 5f;
+    public float swimDashSpeed = 10f;
+    public float swimJumpForce = 8f;
+    public float waterSurfaceOffset = 1.20f;
+    public float waterEntrySpeedReduction = 0.5f;
+    public LayerMask waterLayer;
+    public float waterCheckRadius = 0.5f;
+    public float waterEntryGravity = 0.5f;
+    public float buoyancyStrength = 50f;
+    public float buoyancyDamping = 10f;
+    public float maxBuoyancyForce = 20f;
+    public float floatAmplitude = 0.05f;
+    public float floatFrequency = 1f;
+    public float floatSmoothness = 5f;
+    public bool enableFloating = true;
+    public float swimDashDuration = 0.15f;
+    public float swimDashCooldown = 0.3f;
+
+    [Header("Ability Unlocks")]
+    public bool runUnlocked = false;
+    public bool dashUnlocked = false;
+    public bool wallJumpUnlocked = false;
+    public bool doubleJumpUnlocked = false;
+    public bool wallLockUnlocked = false;
+    public bool pogoUnlocked = false;
 }

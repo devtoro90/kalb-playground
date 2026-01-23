@@ -743,6 +743,37 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &313741842
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 313741843}
+  m_Layer: 0
+  m_Name: WaterCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &313741843
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 313741842}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.33, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 658198519}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2296,6 +2327,7 @@ GameObject:
   - component: {fileID: 658198525}
   - component: {fileID: 658198524}
   - component: {fileID: 658198528}
+  - component: {fileID: 658198531}
   m_Layer: 0
   m_Name: Kalb
   m_TagString: Player
@@ -2404,6 +2436,7 @@ Transform:
   m_Children:
   - {fileID: 690632031}
   - {fileID: 194809302}
+  - {fileID: 313741843}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &658198521
@@ -2530,6 +2563,7 @@ MonoBehaviour:
   rb: {fileID: 658198517}
   collisionDetector: {fileID: 658198524}
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
+  swimming: {fileID: 658198531}
   instantStop: 1
   flipInAir: 1
 --- !u!114 &658198526
@@ -2547,6 +2581,7 @@ MonoBehaviour:
   animator: {fileID: 658198522}
   movement: {fileID: 658198525}
   collisionDetector: {fileID: 658198524}
+  swimming: {fileID: 658198531}
   rb: {fileID: 658198517}
 --- !u!114 &658198527
 MonoBehaviour:
@@ -2590,7 +2625,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KalbPhysics
   rb: {fileID: 658198517}
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
-  collisionDetector: {fileID: 0}
+  collisionDetector: {fileID: 658198524}
+  swimming: {fileID: 658198531}
 --- !u!114 &658198530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2603,6 +2639,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 626bfefb59a704b9ba4c986a8c296071, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KalbInputHandler
+--- !u!114 &658198531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658198515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac4a4febc9e854bc6bf106672e68372c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KalbSwimming
+  rb: {fileID: 658198517}
+  settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
+  waterCheckPoint: {fileID: 658198519}
+  playerCollider: {fileID: 658198523}
+  physics: {fileID: 658198529}
+  movement: {fileID: 658198525}
+  swimSpeed: 3
+  swimFastSpeed: 5
+  swimDashSpeed: 10
+  swimJumpForce: 10
+  waterSurfaceOffset: 1.2
+  waterEntrySpeedReduction: 0.5
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16
+  waterCheckRadius: 0.5
+  waterEntryGravity: 0.5
+  buoyancyStrength: 50
+  buoyancyDamping: 10
+  maxBuoyancyForce: 20
+  floatAmplitude: 0.05
+  floatFrequency: 1
+  floatSmoothness: 5
+  enableFloating: 1
 --- !u!1 &690632030
 GameObject:
   m_ObjectHideFlags: 0
