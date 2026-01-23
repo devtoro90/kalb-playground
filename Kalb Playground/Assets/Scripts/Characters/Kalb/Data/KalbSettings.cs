@@ -57,4 +57,34 @@ public class KalbSettings : ScriptableObject
     public bool doubleJumpUnlocked = false;
     public bool wallLockUnlocked = false;
     public bool pogoUnlocked = false;
+    
+    [Header("Combo System Settings")]
+    public int maxComboHits = 3;
+    public float comboWindow = 0.2f;
+    public float comboResetTime = 0.6f;
+    public bool enableAirCombo = true;
+    public bool enableWallCombo = true;
+    
+    [Header("Combo Attack Data")]
+    public float[] comboDamage = new float[] { 20f, 25f, 35f };
+    public float[] comboKnockback = new float[] { 5f, 7f, 12f };
+    public float[] comboRange = new float[] { 0.5f, 0.5f, 0.6f };
+    public float[] comboAttackDurations = new float[] { 0.2f, 0.2f, 0.2f };
+    public float[] comboCooldowns = new float[] { 0.2f, 0.1f, 0.3f };
+    public float[] comboForwardForce = new float[] { 3f, 4f, 0f };
+    public float[] comboUpwardForce = new float[] { 0f, 0f, 3f };
+    
+    [Header("Combo Animation Names")]
+    public string[] comboAnimations = new string[] { "Kalb_attack1", "Kalb_attack2", "Kalb_attack3" };
+    public string comboResetAnimation = "Kalb_attack_reset";
+    
+    [Header("Combo Attack Point")]
+    public Vector2 attackPointOffset = new Vector2(0.5f, 0f);
+    public LayerMask enemyLayers;
+    
+    [Header("Combo Visual Effects")]
+    public GameObject hitEffectPrefab;
+    public float hitEffectDuration = 0.3f;
+    public Color comboFlashColor = Color.white;
+    public float comboFlashDuration = 0.1f;
 }

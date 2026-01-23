@@ -15,6 +15,7 @@ public class KalbController : MonoBehaviour
     private KalbHealth health;
     private KalbSwimming swimming;
     private KalbAbilitySystem abilitySystem;
+    private KalbComboSystem comboSystem;
     
     // State Machine
     private KalbStateMachine stateMachine;
@@ -25,6 +26,7 @@ public class KalbController : MonoBehaviour
     private KalbJumpState jumpState;
     private KalbAirState airState;
     private KalbSwimState swimState;
+    private KalbCombatState combatState;
     
     // Properties for component access
     public KalbInputHandler InputHandler => inputHandler;
@@ -37,6 +39,7 @@ public class KalbController : MonoBehaviour
     public KalbAbilitySystem AbilitySystem => abilitySystem;
     public KalbSettings Settings => settings;
     public Rigidbody2D Rb => rb;
+    public KalbComboSystem ComboSystem => comboSystem;
     
     // State Properties
     public KalbIdleState IdleState => idleState;
@@ -44,6 +47,7 @@ public class KalbController : MonoBehaviour
     public KalbJumpState JumpState => jumpState;
     public KalbAirState AirState => airState;
     public KalbSwimState SwimState => swimState;
+    public KalbCombatState CombatState => combatState; 
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     
@@ -83,6 +87,9 @@ public class KalbController : MonoBehaviour
 
         abilitySystem = GetComponent<KalbAbilitySystem>();
         if (abilitySystem == null) abilitySystem = gameObject.AddComponent<KalbAbilitySystem>();
+
+        comboSystem = GetComponent<KalbComboSystem>(); 
+        if (comboSystem == null) comboSystem = gameObject.AddComponent<KalbComboSystem>();
         
         // Create default settings if none provided
         if (settings == null)
@@ -102,6 +109,7 @@ public class KalbController : MonoBehaviour
         jumpState = new KalbJumpState(this, stateMachine);
         airState = new KalbAirState(this, stateMachine);
         swimState = new KalbSwimState(this, stateMachine);
+        combatState = new KalbCombatState(this, stateMachine);
         
         // Start with idle state
         stateMachine.Initialize(idleState);
@@ -115,6 +123,7 @@ public class KalbController : MonoBehaviour
         if (swimming.IsInWater && !swimming.IsJumpingFromWater && !(stateMachine.CurrentState is KalbSwimState))
         {
             stateMachine.ChangeState(swimState);
+            comboSystem.CancelCombo();
         }
         
         // Update coyote time and jump buffer based on ground state
@@ -136,6 +145,19 @@ public class KalbController : MonoBehaviour
             stateMachine.ChangeState(jumpState);
             inputHandler.ResetJumpInput();
         }
+
+        //Check for attack input (combo is always available by default)
+        if (inputHandler.AttackPressed && comboSystem.CanAttack)
+        {
+            // Check if we're in a state that allows attacking
+            bool canAttackFromCurrentState = CanAttackFromCurrentState();
+            
+            if (canAttackFromCurrentState)
+            {
+                stateMachine.ChangeState(combatState);
+                inputHandler.ResetAttackInput();
+            }
+        }
         
         // Handle state input and update
         stateMachine.HandleInput();
@@ -153,6 +175,15 @@ public class KalbController : MonoBehaviour
     {
         health.TakeDamage(damage);
         
+        // Cancel combo when taking damage
+        comboSystem.CancelCombo();
+        
+        // Force exit combat state if taking damage
+        if (stateMachine.CurrentState is KalbCombatState)
+        {
+            stateMachine.ChangeState(airState);
+        }
+        
         if (health.IsDead)
         {
             // Handle death
@@ -165,6 +196,35 @@ public class KalbController : MonoBehaviour
     public bool CanJump()
     {
         return physics.CoyoteTimeCounter > 0 || physics.JumpBufferCounter > 0;
+    }
+
+    private bool CanAttackFromCurrentState()
+    {
+        // Don't allow attacking while swimming
+        if (swimming.IsSwimming)
+            return false;
+        
+        // Allow attacking in these states:
+        if (stateMachine.CurrentState is KalbIdleState || 
+            stateMachine.CurrentState is KalbWalkState ||
+            stateMachine.CurrentState is KalbAirState ||
+            stateMachine.CurrentState is KalbJumpState)
+            return true;
+        
+        // Don't allow attacking while jumping from water (special case)
+        // Actually, we should allow it! The issue is that IsJumpingFromWater might be true
+        // Let's check if we're actually ascending after water jump
+        if (swimming.IsJumpingFromWater && rb.linearVelocity.y > 0)
+        {
+            // Allow attacks while ascending from water jump
+            return true;
+        }
+        
+        // Check if we're dashing (you'll need to create KalbDashState if not exists)
+        // if (stateMachine.CurrentState is KalbDashState)
+        //     return false;
+        
+        return false;
     }
     
     public void ForceStateChange(KalbState newState)

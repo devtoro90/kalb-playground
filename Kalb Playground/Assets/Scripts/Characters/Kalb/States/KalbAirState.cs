@@ -6,6 +6,7 @@ public class KalbAirState : KalbState
     private KalbCollisionDetector collisionDetector;
     private KalbMovement movement;
     private KalbSwimming swimming;
+    private KalbComboSystem comboSystem;
     
     public KalbAirState(KalbController controller, KalbStateMachine stateMachine) 
         : base(controller, stateMachine)
@@ -14,6 +15,7 @@ public class KalbAirState : KalbState
         collisionDetector = controller.CollisionDetector;
         movement = controller.Movement;
         swimming = controller.Swimming;
+        comboSystem = controller.ComboSystem;
     }
     
     public override void Enter()
@@ -26,6 +28,8 @@ public class KalbAirState : KalbState
         // Check for swimming transition
         if (swimming != null && swimming.IsInWater)
         {
+            // Cancel combo when entering swim state
+            comboSystem?.CancelCombo(); 
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
@@ -63,6 +67,14 @@ public class KalbAirState : KalbState
         if (inputHandler.JumpReleased)
         {
             controller.Physics.ApplyJumpCut();
+        }
+
+        // NEW: Check for attack input in air state
+        // This allows attacking while jumping out of water
+        if (inputHandler.AttackPressed && comboSystem != null && comboSystem.CanAttack)
+        {
+            // Don't check swimming state here - let controller handle it
+            // This allows attacks in air after water jumps
         }
     }
     

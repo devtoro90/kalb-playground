@@ -31,6 +31,9 @@ public class KalbSwimState : KalbState
         controller.AnimationController.PlayAnimation("Kalb_swim_idle");
         jumpBuffered = false;
         jumpBufferTimer = 0f;
+
+        // Cancel combo when entering swim state
+        controller.ComboSystem?.CancelCombo();
     }
     
     public override void Exit()

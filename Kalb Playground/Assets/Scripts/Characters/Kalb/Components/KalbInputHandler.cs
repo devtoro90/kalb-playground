@@ -7,6 +7,7 @@ public class KalbInputHandler : MonoBehaviour
     private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction dashAction;
+    private InputAction attackAction;
     
     // Input Values
     private Vector2 moveInput;
@@ -16,6 +17,7 @@ public class KalbInputHandler : MonoBehaviour
     private bool dashPressed;
     private bool dashHeld;
     private bool dashReleased;
+    private bool attackPressed;
     
     public Vector2 MoveInput => moveInput;
     public bool JumpPressed => jumpPressed;
@@ -24,6 +26,7 @@ public class KalbInputHandler : MonoBehaviour
     public bool DashPressed => dashPressed;
     public bool DashHeld => dashHeld;
     public bool DashReleased => dashReleased;
+    public bool AttackPressed => attackPressed;
     
     private void Awake()
     {
@@ -34,6 +37,7 @@ public class KalbInputHandler : MonoBehaviour
             moveAction = playerInput.actions["Move"];
             jumpAction = playerInput.actions["Jump"];
             dashAction = playerInput.actions["Dash/Run"];
+            attackAction = playerInput.actions["Attack"];
         }
     }
     
@@ -56,6 +60,9 @@ public class KalbInputHandler : MonoBehaviour
         dashPressed = dashAction.WasPressedThisFrame();
         dashHeld = dashAction.IsPressed();
         dashReleased = dashAction.WasReleasedThisFrame();
+
+        //Read attack input
+        attackPressed = attackAction.WasPressedThisFrame();
     }
     
     public void ResetJumpInput()
@@ -68,5 +75,10 @@ public class KalbInputHandler : MonoBehaviour
     {
         dashPressed = false;
         dashReleased = false;
+    }
+
+    public void ResetAttackInput()
+    {
+        attackPressed = false;
     }
 }

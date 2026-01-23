@@ -9,10 +9,12 @@ public class KalbAnimationController : MonoBehaviour
     [SerializeField] private KalbSwimming swimming;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private KalbAbilitySystem abilitySystem;
-
+    [SerializeField] private KalbComboSystem comboSystem; // NEW
+    
     private void Start()
     {
         if (abilitySystem == null) abilitySystem = GetComponent<KalbAbilitySystem>();
+        if (comboSystem == null) comboSystem = GetComponent<KalbComboSystem>(); // NEW
     }
     
     private void Update()
@@ -23,6 +25,13 @@ public class KalbAnimationController : MonoBehaviour
     private void UpdateAnimations()
     {
         if (animator == null) return;
+        
+        // Check if attacking (NEW - highest priority)
+        if (comboSystem != null && comboSystem.IsAttacking)
+        {
+            UpdateComboAnimations();
+            return;
+        }
         
         // Check if swimming
         if (swimming != null && swimming.IsSwimming)
@@ -45,6 +54,29 @@ public class KalbAnimationController : MonoBehaviour
         if (movement != null)
         {
             animator.SetBool("FacingRight", movement.FacingRight);
+        }
+    }
+    
+    private void UpdateComboAnimations() // NEW
+    {
+        if (comboSystem.IsComboFinishing)
+        {
+            PlayAnimation("Kalb_attack3");
+        }
+        else
+        {
+            switch (comboSystem.CurrentCombo)
+            {
+                case 1:
+                    PlayAnimation("Kalb_attack1");
+                    break;
+                case 2:
+                    PlayAnimation("Kalb_attack2");
+                    break;
+                case 3:
+                    PlayAnimation("Kalb_attack3");
+                    break;
+            }
         }
     }
     

@@ -21,6 +21,9 @@ public class KalbJumpState : KalbState
     public override void Enter()
     {
         controller.AnimationController.PlayAnimation("Kalb_jump");
+
+        // Cancel combo when entering swim state
+        controller.ComboSystem?.CancelCombo();
         
         // Perform jump
         physics.Jump(controller.Settings.jumpForce);

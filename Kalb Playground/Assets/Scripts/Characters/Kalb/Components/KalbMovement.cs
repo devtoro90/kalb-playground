@@ -7,6 +7,7 @@ public class KalbMovement : MonoBehaviour
     [SerializeField] private KalbCollisionDetector collisionDetector;
     [SerializeField] private KalbSettings settings;
     [SerializeField] private KalbSwimming swimming;
+    [SerializeField] private KalbComboSystem comboSystem;
     
     [Header("Movement Settings")]
     [SerializeField] private bool instantStop = true;
@@ -23,6 +24,7 @@ public class KalbMovement : MonoBehaviour
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (collisionDetector == null) collisionDetector = GetComponent<KalbCollisionDetector>();
         if (swimming == null) swimming = GetComponent<KalbSwimming>();
+        if (comboSystem == null) comboSystem = GetComponent<KalbComboSystem>();
     }
     
     public void Move(float moveInput, bool isGrounded)
@@ -113,6 +115,12 @@ public class KalbMovement : MonoBehaviour
             Vector3 theScale = transform.localScale;
             theScale.x *= -1;
             transform.localScale = theScale;
+
+            // Update attack point position in combo system
+            if (comboSystem != null)
+            {
+                comboSystem.UpdateAttackPointWithFacing(facingRight);
+            }
         }
     }
     
@@ -137,6 +145,12 @@ public class KalbMovement : MonoBehaviour
             Vector3 theScale = transform.localScale;
             theScale.x *= -1;
             transform.localScale = theScale;
+
+            // Update attack point position in combo system
+            if (comboSystem != null)
+            {
+                comboSystem.UpdateAttackPointWithFacing(facingRight);
+            }
         }
     }
 }
