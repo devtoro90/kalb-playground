@@ -119,3 +119,17 @@ MonoBehaviour:
   dashJumpBoost: 1.5
   canDashDiagonal: 1
   diagonalDashMultiplier: 0.707
+  ledgeDetectionDistance: 0.5
+  ledgeGrabOffsetY: 0.15
+  ledgeGrabOffsetX: 0.55
+  ledgeClimbTime: 0.3
+  ledgeJumpForce: 12
+  ledgeJumpAngle: {x: 1, y: 2}
+  ledgeClimbCheckRadius: 0.2
+  minLedgeHoldTime: 0.3
+  ledgeReleaseForce: 5
+  ledgeReleaseCooldown: 0.2
+  ledgeGrabUnlocked: 1
+  maxClimbDistance: 2
+  climbSurfaceCheckDistance: 1.5
+  climbHorizontalBuffer: 0.3

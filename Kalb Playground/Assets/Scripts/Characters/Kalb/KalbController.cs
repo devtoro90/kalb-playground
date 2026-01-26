@@ -76,6 +76,7 @@ public class KalbController : MonoBehaviour
     {
         InitializeComponents();
         InitializeStateMachine();
+        SetupPhysicsMaterial();
     }
     
     private void InitializeComponents()
@@ -141,6 +142,27 @@ public class KalbController : MonoBehaviour
         
         // Start with idle state
         stateMachine.Initialize(idleState);
+    }
+
+    private void SetupPhysicsMaterial()
+    {
+        // Get or create collider
+        Collider2D collider = GetComponent<Collider2D>();
+        if (collider != null)
+        {
+            // Load or create frictionless material
+            PhysicsMaterial2D frictionlessMaterial = Resources.Load<PhysicsMaterial2D>("Frictionless");
+            if (frictionlessMaterial == null)
+            {
+                // Create it programmatically if not found
+                frictionlessMaterial = new PhysicsMaterial2D();
+                frictionlessMaterial.name = "Frictionless";
+                frictionlessMaterial.friction = 0f;
+                frictionlessMaterial.bounciness = 0f;
+            }
+            
+            collider.sharedMaterial = frictionlessMaterial;
+        }
     }
     
     private void Update()

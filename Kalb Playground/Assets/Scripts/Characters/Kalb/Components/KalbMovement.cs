@@ -75,6 +75,25 @@ public class KalbMovement : MonoBehaviour
         // Skip if swimming
         if (swimming != null && swimming.IsSwimming) return;
         
+        // NEW: Check if wall abilities are unlocked
+        KalbAbilitySystem abilitySystem = GetComponent<KalbAbilitySystem>();
+        if (abilitySystem == null) abilitySystem = GetComponentInParent<KalbAbilitySystem>();
+        
+        // If wall abilities are NOT unlocked and we're touching a wall
+        if (!abilitySystem.CanWallJump() && !abilitySystem.CanWallLock() && 
+            collisionDetector.IsTouchingWall)
+        {
+            // Adjust input when pressing into wall
+            if (collisionDetector.WallSide != 0)
+            {
+                // If input is into the wall, ignore it for movement
+                if (Mathf.Sign(moveInput) == collisionDetector.WallSide)
+                {
+                    moveInput = 0;
+                }
+            }
+        }
+        
         // If no input in air, allow some drift
         if (moveInput == 0)
         {

@@ -2768,16 +2768,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b66cd4b20d514d67aedaa89fab0eaa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KalbLedgeDetector
+  controller: {fileID: 0}
   ledgeCheckPoint: {fileID: 698528782}
   playerCollider: {fileID: 658198523}
   collisionDetector: {fileID: 658198524}
-  ledgeDetectionDistance: 0.5
   ledgeGrabOffsetY: 0.15
   ledgeGrabOffsetX: 0.55
-  ledgeClimbCheckRadius: 0.2
   environmentLayer:
     serializedVersion: 2
     m_Bits: 64
+  ledgeGrabCooldown: 0.5
+  verticalReleaseThreshold: -2
 --- !u!1 &690632030
 GameObject:
   m_ObjectHideFlags: 0

@@ -47,7 +47,7 @@ public class KalbCollisionDetector : MonoBehaviour
         
         // Reset wall states
         isTouchingWall = false;
-        isWallSliding = false;
+        isWallSliding = false;  // IMPORTANT: Start with false
         wallSide = 0;
         
         // Check right wall
