@@ -446,7 +446,7 @@ public class KalbSwimming : MonoBehaviour
         // 7. Restore original jump force after a delay
         StartCoroutine(RestoreJumpForce(originalJumpForce, 0.1f));
         
-        Debug.Log($"Water jump executed with force: {settings.swimJumpForce * 1.5f}, Current Y: {transform.position.y}, Water Surface: {waterSurfaceY}");
+        
     }
     
     private System.Collections.IEnumerator RestoreJumpForce(float originalForce, float delay)

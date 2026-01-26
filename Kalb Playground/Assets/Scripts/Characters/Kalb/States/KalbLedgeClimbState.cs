@@ -48,7 +48,7 @@ public class KalbLedgeClimbState : KalbState
         // Play climb animation - animation will handle the visual climb
         controller.AnimationController.PlayAnimation("Kalb_ledge_climb");
         
-        Debug.Log($"Ledge Climb Started - Player positioned at: {climbTargetPosition}");
+        
     }
     
     public override void Exit()

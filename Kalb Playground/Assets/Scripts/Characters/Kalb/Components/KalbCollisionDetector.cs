@@ -47,19 +47,10 @@ public class KalbCollisionDetector : MonoBehaviour
         
         // Reset wall states
         isTouchingWall = false;
-        isWallSliding = false; // Reset wall sliding state
+        isWallSliding = false;
         wallSide = 0;
         
-        // Only check for walls if we're falling (negative velocity) 
-        // This prevents wall friction when ascending/jumping
-        bool isFalling = rb.linearVelocity.y < -0.1f;
-        
-        if (!isFalling)
-        {
-            return; // Don't detect walls when not falling
-        }
-        
-        // Check right wall with multiple rays for better detection
+        // Check right wall
         bool touchingRightWall = false;
         for (float yOffset = -wallSlideDetectionHeight/2; yOffset <= wallSlideDetectionHeight/2; yOffset += wallSlideDetectionHeight/3)
         {
@@ -69,11 +60,12 @@ public class KalbCollisionDetector : MonoBehaviour
             if (hit.collider != null && !isGrounded)
             {
                 touchingRightWall = true;
+                wallSide = 1;
                 break;
             }
         }
         
-        // Check left wall with multiple rays
+        // Check left wall
         bool touchingLeftWall = false;
         for (float yOffset = -wallSlideDetectionHeight/2; yOffset <= wallSlideDetectionHeight/2; yOffset += wallSlideDetectionHeight/3)
         {
@@ -83,15 +75,34 @@ public class KalbCollisionDetector : MonoBehaviour
             if (hit.collider != null && !isGrounded)
             {
                 touchingLeftWall = true;
+                wallSide = -1;
                 break;
             }
         }
         
         isTouchingWall = touchingRightWall || touchingLeftWall;
-        wallSide = touchingRightWall ? 1 : (touchingLeftWall ? -1 : 0);
         
-        // We're wall sliding if we're touching a wall AND falling down
-        isWallSliding = isTouchingWall && isFalling;
+        // IMPORTANT: Wall sliding should ONLY happen when:
+        // 1. We're touching a wall
+        // 2. We're falling (negative velocity)
+        // 3. We're NOT trying to move away from the wall (this is key!)
+        if (isTouchingWall)
+        {
+            bool isFalling = rb.linearVelocity.y < -0.1f;
+            
+            // Check if player is pressing into the wall
+            KalbController controller = GetComponent<KalbController>();
+            bool pressingIntoWall = false;
+            
+            if (controller != null && controller.InputHandler != null)
+            {
+                float moveInput = controller.InputHandler.MoveInput.x;
+                pressingIntoWall = Mathf.Sign(moveInput) == wallSide && Mathf.Abs(moveInput) > 0.1f;
+            }
+            
+            // Wall sliding happens when falling AND (pressing into wall OR no horizontal input)
+            isWallSliding = isFalling && (pressingIntoWall || controller?.InputHandler?.MoveInput.x == 0);
+        }
     }
     
     // NEW: Method to check if we should apply wall friction

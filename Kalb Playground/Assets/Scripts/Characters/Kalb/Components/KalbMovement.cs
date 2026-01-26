@@ -78,7 +78,7 @@ public class KalbMovement : MonoBehaviour
         // If no input in air, allow some drift
         if (moveInput == 0)
         {
-            // Slow down gradually in air
+            // Slow down gradually in air - NO EXCEPTIONS FOR WALLS
             float newXVelocity = Mathf.MoveTowards(rb.linearVelocity.x, 0, 5f * Time.fixedDeltaTime);
             rb.linearVelocity = new Vector2(newXVelocity, rb.linearVelocity.y);
             

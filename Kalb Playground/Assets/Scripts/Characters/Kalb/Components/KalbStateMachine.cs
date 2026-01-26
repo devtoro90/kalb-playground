@@ -22,7 +22,7 @@ public class KalbStateMachine
     public void Update()
     {
         currentState.Update();
-        Debug.Log($"[StateMachine] Current State: {currentState.GetType().Name}");
+        
     }
     
     public void FixedUpdate()

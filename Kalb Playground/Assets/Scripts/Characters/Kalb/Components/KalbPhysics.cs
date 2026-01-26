@@ -46,11 +46,10 @@ public class KalbPhysics : MonoBehaviour
         // Skip wall friction if swimming
         if (swimming != null && swimming.IsSwimming) return;
         
-        // Only apply wall friction if we're actually wall sliding (touching wall + falling)
-        if (collisionDetector.ShouldApplyWallFriction())
+        // NO FRICTION when just touching a wall - only when actually wall sliding
+        if (collisionDetector.IsWallSliding)
         {
             // When wall sliding, we want to limit fall speed but not stop horizontal movement
-            // This creates the classic wall slide feel
             float currentSlideSpeed = rb.linearVelocity.y;
             
             // Limit maximum wall slide speed (optional - adjust as needed)
@@ -63,16 +62,7 @@ public class KalbPhysics : MonoBehaviour
             // DO NOT apply horizontal friction when wall sliding
             // This allows player to push away from wall or continue falling naturally
         }
-        // If we're touching a wall but NOT wall sliding (e.g., jumping into wall), 
-        // we might want to apply some friction to prevent sticking
-        else if (collisionDetector.IsTouchingWall && !collisionDetector.IsGrounded)
-        {
-            // Minimal friction when touching wall but not sliding
-            // This helps prevent getting "stuck" on walls when jumping
-            float wallTouchFriction = 2f;
-            float newXVelocity = Mathf.MoveTowards(rb.linearVelocity.x, 0, wallTouchFriction * Time.fixedDeltaTime);
-            rb.linearVelocity = new Vector2(newXVelocity, rb.linearVelocity.y);
-        }
+        // COMPLETELY REMOVE any other wall friction cases
     }
     
     private void UpdateTimers()

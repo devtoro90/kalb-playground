@@ -9,10 +9,10 @@ public class KalbLedgeDetector : MonoBehaviour
     [SerializeField] private KalbCollisionDetector collisionDetector;
     
     [Header("Settings")]
-    [SerializeField] private float ledgeDetectionDistance = 0.5f;
+    //[SerializeField] private float ledgeDetectionDistance = 0.5f;
     [SerializeField] private float ledgeGrabOffsetY = 0.15f;
     [SerializeField] private float ledgeGrabOffsetX = 0.55f;
-    [SerializeField] private float ledgeClimbCheckRadius = 0.2f;
+    //[SerializeField] private float ledgeClimbCheckRadius = 0.2f;
     [SerializeField] private LayerMask environmentLayer;
     
     [Header("Cooldown Settings")]
@@ -214,7 +214,7 @@ public class KalbLedgeDetector : MonoBehaviour
         isOnCooldown = true;
         lastLedgeReleaseTime = Time.time;
         ledgeDetected = false; // Clear detection
-        Debug.Log($"Ledge cooldown started: {ledgeGrabCooldown}s");
+        
     }
     
     // Call this when player climbs successfully (no cooldown needed)

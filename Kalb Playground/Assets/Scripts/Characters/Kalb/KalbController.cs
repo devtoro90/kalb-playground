@@ -239,7 +239,7 @@ public class KalbController : MonoBehaviour
             // This prevents re-entering dash state while dashing
             if (!(stateMachine.CurrentState is KalbDashState))
             {
-                Debug.Log($"Dash pressed, current state: {stateMachine.CurrentState.GetType().Name}");
+                
                 
                 // Check if dash is available from current state
                 if (CanDashFromCurrentState() && dashCooldownTimer <= 0)
@@ -254,11 +254,11 @@ public class KalbController : MonoBehaviour
                 }
                 else if (dashCooldownTimer > 0)
                 {
-                    Debug.Log($"Dash on cooldown: {dashCooldownTimer:F2}s");
+                    
                 }
                 else
                 {
-                    Debug.Log($"Cannot dash from {stateMachine.CurrentState.GetType().Name}");
+                    
                 }
             }
             else
@@ -290,7 +290,7 @@ public class KalbController : MonoBehaviour
         // Handle state updates
         stateMachine.HandleInput();
         stateMachine.Update();
-        Debug.Log($"Current State: {stateMachine.CurrentState.GetType().Name}");
+        
     }
     
     private void FixedUpdate()

@@ -68,7 +68,7 @@ public class KalbLedgeState : KalbState
         // Play grab animation
         controller.AnimationController.PlayAnimation("Kalb_ledge_grab");
         
-        Debug.Log($"Ledge Grab: Position={grabPosition}, Side={ledgeSide}");
+        
     }
     
     public override void Exit()
@@ -130,7 +130,7 @@ public class KalbLedgeState : KalbState
         // DEBUG: Log input for troubleshooting
         if (Mathf.Abs(horizontalInput) > 0.1f || Mathf.Abs(verticalInput) > 0.1f)
         {
-            Debug.Log($"Ledge Input: H={horizontalInput:F2}, V={verticalInput:F2}, Side={ledgeSide}");
+            
         }
         
         // CLIMB UP: Press Up or towards the ledge
@@ -146,7 +146,7 @@ public class KalbLedgeState : KalbState
         
         if (pressingDown || pressingAway)
         {
-            Debug.Log($"Release triggered: Down={pressingDown}, Away={pressingAway}");
+            
             ReleaseLedge();
             return;
         }
@@ -192,7 +192,7 @@ public class KalbLedgeState : KalbState
         float releaseHorizontal = -ledgeSide * controller.Settings.ledgeReleaseForce * 0.5f;
         float releaseVertical = -controller.Settings.ledgeReleaseForce * 0.8f;
         
-        Debug.Log($"Release velocity: H={releaseHorizontal}, V={releaseVertical}");
+        
         
         // Apply release force
         rb.linearVelocity = new Vector2(releaseHorizontal, releaseVertical);
@@ -226,7 +226,7 @@ public class KalbLedgeState : KalbState
         float jumpForce = controller.Settings.ledgeJumpForce;
         rb.linearVelocity = jumpDir * jumpForce;
         
-        Debug.Log($"Ledge jump: Dir={jumpDir}, Force={jumpForce}, Velocity={rb.linearVelocity}");
+        
         
         // Face away from wall
         bool shouldFaceRight = ledgeSide == -1;

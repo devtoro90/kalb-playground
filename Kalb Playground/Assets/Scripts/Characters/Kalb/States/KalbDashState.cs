@@ -113,7 +113,7 @@ public class KalbDashState : KalbState
         // Check cooldown
         if (controller.DashCooldownTimer > 0)
         {
-            Debug.Log($"Dash failed: On cooldown ({controller.DashCooldownTimer:F2}s)");
+            
             return false;
         }
         
@@ -140,7 +140,7 @@ public class KalbDashState : KalbState
         
         if (airDashCount >= settings.maxAirDashes)
         {
-            Debug.Log($"Dash failed: Max air dashes ({airDashCount}/{settings.maxAirDashes})");
+            
             return false;
         }
         
@@ -169,7 +169,7 @@ public class KalbDashState : KalbState
         if (!collisionDetector.IsGrounded)
         {
             airDashCount++;
-            Debug.Log($"Air dash #{airDashCount} (Max: {settings.maxAirDashes})");
+            
         }
         else
         {
@@ -186,7 +186,7 @@ public class KalbDashState : KalbState
         // Play animation
         controller.AnimationController.PlayAnimation("Kalb_dash");
         
-        Debug.Log($"Dash started! Direction: {dashDirection}");
+        
     }
     
     private void DetermineDashDirection()
@@ -307,7 +307,7 @@ public class KalbDashState : KalbState
             (swimming != null && swimming.IsInWater && source == "Swimmning")))
         {
             airDashCount = 0;
-            Debug.Log("Air dash count reset" + (string.IsNullOrEmpty(source) ? "" : $" - Source: {source}"));
+            
         }
     }
     
@@ -326,12 +326,12 @@ public class KalbDashState : KalbState
     public void DebugDashState()
     {
        
-        Debug.Log($"IsDashing: {isDashing}");
-        Debug.Log($"Dash Timer: {dashTimer:F2}");
-        Debug.Log($"Cooldown: {controller.DashCooldownTimer:F2}");
-        Debug.Log($"Grounded: {collisionDetector.IsGrounded}");
-        Debug.Log($"Air Dash Count: {airDashCount}/{settings.maxAirDashes}");
-        Debug.Log($"Can Dash Now: {CanDash()}");
+        
+        
+        
+        
+        
+        
        
     }
 }
