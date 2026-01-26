@@ -25,6 +25,21 @@ public class KalbAirState : KalbState
     
     public override void Update()
     {
+        // Check for ledge state
+        if (controller.LedgeDetector.LedgeDetected && !collisionDetector.IsGrounded && 
+            controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
+        {
+            // Check if we should auto-grab
+            float playerBottom = controller.GetComponent<Collider2D>().bounds.min.y;
+            float ledgeTop = controller.LedgeDetector.LedgePosition.y;
+            
+            if (playerBottom < ledgeTop && playerBottom > ledgeTop - 1.0f)
+            {
+                stateMachine.ChangeState(controller.LedgeState);
+                return;
+            }
+        }
+        
         // Check for swimming transition
         if (swimming != null && swimming.IsInWater)
         {

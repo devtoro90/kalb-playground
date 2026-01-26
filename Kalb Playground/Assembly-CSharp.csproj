@@ -72,12 +72,14 @@
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbCombatState.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/WarpTextExample.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Systems/KalbAbilitySystem.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbLedgeClimbState.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/ShaderPropAnimator.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbStateMachine.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbRunState.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbAnimationController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbPhysics.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbLedgeDetector.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexShakeA.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbHealth.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb.cs" />
@@ -95,6 +97,7 @@
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbAirState.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/CameraController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark03.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbLedgeState.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/DropdownSample.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexColorCycler.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Systems/KalbComboSystem.cs" />

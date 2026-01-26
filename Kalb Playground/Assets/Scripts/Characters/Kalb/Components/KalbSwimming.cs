@@ -361,7 +361,7 @@ public class KalbSwimming : MonoBehaviour
         // Check if dash ability is unlocked
         if (abilitySystem != null && !abilitySystem.CanDash())
         {
-            Debug.Log("Swim dash not available - dash ability not unlocked");
+           
             return;
         }
 
@@ -411,7 +411,7 @@ public class KalbSwimming : MonoBehaviour
     {
         if (!isSwimming || isSwimDashing || rb == null || physics == null) return;
         
-        Debug.Log("Attempting water jump...");
+       
         
         // Set jumping flag to prevent immediate re-entry
         isJumpingFromWater = true;

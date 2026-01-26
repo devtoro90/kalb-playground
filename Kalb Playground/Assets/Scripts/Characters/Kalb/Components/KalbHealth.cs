@@ -34,7 +34,7 @@ public class KalbHealth : MonoBehaviour
     
     private void Die()
     {
-        Debug.Log("Kalb died!");
+       
         // Add death logic here
     }
 }

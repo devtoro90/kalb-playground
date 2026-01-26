@@ -28,7 +28,21 @@ public class KalbAnimationController : MonoBehaviour
     {
         if (animator == null) return;
 
-        // Check if dashing (highest priority)
+        // Check if ledge climbing (highest priority)
+        if (controller != null && controller.LedgeClimbState != null && controller.LedgeClimbState.IsLedgeClimbing)
+        {
+            PlayAnimation("Kalb_ledge_climb");
+            return;
+        }
+        
+        // Check if ledge grabbing
+        if (controller != null && controller.LedgeState != null && controller.LedgeState.IsLedgeGrabbing)
+        {
+            PlayAnimation("Kalb_ledge_grab");
+            return;
+        }
+
+        // Check if dashing (high priority)
         if (controller != null && controller.DashState != null && controller.DashState.IsDashing)
         {
             PlayAnimation("Kalb_dash");

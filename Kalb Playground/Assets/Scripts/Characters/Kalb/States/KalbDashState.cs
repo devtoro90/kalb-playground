@@ -34,7 +34,7 @@ public class KalbDashState : KalbState
     
     public override void Enter()
     {
-        Debug.Log("=== ENTERING DASH STATE ===");
+       
         
         if (!CanDash())
         {
@@ -48,7 +48,7 @@ public class KalbDashState : KalbState
     
     public override void Exit()
     {
-        Debug.Log("Exiting Dash State");
+       
         
         if (isDashing)
         {
@@ -61,7 +61,7 @@ public class KalbDashState : KalbState
         // Check if dash should end
         if (isDashing && dashTimer <= 0)
         {
-            Debug.Log("Dash timer expired, exiting state");
+           
             ExitToAppropriateState();
             return;
         }
@@ -75,7 +75,7 @@ public class KalbDashState : KalbState
         // Check for swimming (cancel dash)
         if (swimming != null && swimming.IsInWater && isDashing)
         {
-            Debug.Log("Entering water, canceling dash");
+           
             CancelDash();
             stateMachine.ChangeState(controller.SwimState);
         }
@@ -99,14 +99,14 @@ public class KalbDashState : KalbState
         // Check ability
         if (abilitySystem == null || !abilitySystem.CanDash())
         {
-            Debug.Log("Dash failed: Ability not unlocked");
+           
             return false;
         }
         
         // Check if dashing
         if (isDashing)
         {
-            Debug.Log("Dash failed: Already dashing");
+           
             return false;
         }
         
@@ -120,21 +120,21 @@ public class KalbDashState : KalbState
         // Check swimming
         if (swimming != null && swimming.IsSwimming)
         {
-            Debug.Log("Dash failed: Swimming");
+           
             return false;
         }
         
         // Ground dash - always available
         if (collisionDetector.IsGrounded)
         {
-            Debug.Log("Dash available: Ground dash");
+           
             return true;
         }
         
         // Air dash - check limits
         if (!settings.canAirDash)
         {
-            Debug.Log("Dash failed: Air dash disabled");
+           
             return false;
         }
         
@@ -146,11 +146,11 @@ public class KalbDashState : KalbState
         
         if (collisionDetector.IsWallSliding)
         {
-            Debug.Log("Dash failed: Wall sliding");
+           
             return false;
         }
         
-        Debug.Log("Dash available: Air dash");
+       
         return true;
     }
     
@@ -173,7 +173,7 @@ public class KalbDashState : KalbState
         }
         else
         {
-            Debug.Log("Ground dash");
+           
         }
         
         // Cancel combo
@@ -240,7 +240,7 @@ public class KalbDashState : KalbState
 
         controller.DashCooldownTimer = settings.dashCooldown;
         
-        Debug.Log("Dash ended (velocity slowed)");
+       
     }
     
     private void CancelDash()
@@ -253,7 +253,7 @@ public class KalbDashState : KalbState
     
     private void ExitToAppropriateState()
     {
-        Debug.Log("Exiting to appropriate state...");
+       
         
         // End dash first
         if (isDashing)
@@ -264,7 +264,7 @@ public class KalbDashState : KalbState
         // Check swimming
         if (swimming != null && swimming.IsInWater)
         {
-            Debug.Log("-> Swim State");
+           
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
@@ -272,7 +272,7 @@ public class KalbDashState : KalbState
         // Check grounded
         if (!collisionDetector.IsGrounded)
         {
-            Debug.Log("-> Air State");
+           
             stateMachine.ChangeState(controller.AirState);
             return;
         }
@@ -283,18 +283,18 @@ public class KalbDashState : KalbState
             // Check if should run
             if (inputHandler.DashHeld && abilitySystem.CanRun())
             {
-                Debug.Log("-> Run State");
+               
                 stateMachine.ChangeState(controller.RunState);
             }
             else
             {
-                Debug.Log("-> Walk State");
+               
                 stateMachine.ChangeState(controller.WalkState);
             }
         }
         else
         {
-            Debug.Log("-> Idle State");
+           
             stateMachine.ChangeState(controller.IdleState);
         }
     }
@@ -320,18 +320,18 @@ public class KalbDashState : KalbState
         if (controller.Rb != null)
             controller.Rb.gravityScale = settings.normalGravityScale;
             
-        Debug.Log("Dash forcefully reset");
+       
     }
     
     public void DebugDashState()
     {
-        Debug.Log("=== DASH STATE DEBUG ===");
+       
         Debug.Log($"IsDashing: {isDashing}");
         Debug.Log($"Dash Timer: {dashTimer:F2}");
         Debug.Log($"Cooldown: {controller.DashCooldownTimer:F2}");
         Debug.Log($"Grounded: {collisionDetector.IsGrounded}");
         Debug.Log($"Air Dash Count: {airDashCount}/{settings.maxAirDashes}");
         Debug.Log($"Can Dash Now: {CanDash()}");
-        Debug.Log("========================");
+       
     }
 }

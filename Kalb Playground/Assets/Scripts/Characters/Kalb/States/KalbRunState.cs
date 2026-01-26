@@ -43,7 +43,7 @@ public class KalbRunState : KalbState
         runTransitionTimer = 0f;
         currentRunSpeed = Mathf.Max(movement.FacingRight ? controller.Rb.linearVelocity.x : -controller.Rb.linearVelocity.x, settings.moveSpeed);
         
-        Debug.Log("Entering Run State");
+       
         
         // Update animation
         UpdateAnimation();
@@ -57,11 +57,26 @@ public class KalbRunState : KalbState
         // Reset movement smoothing
         movement.ResetSmoothing();
         
-        Debug.Log("Exiting Run State");
+       
     }
     
     public override void Update()
     {
+        // Check for ledge state
+        if (controller.LedgeDetector.LedgeDetected && !collisionDetector.IsGrounded && 
+            controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
+        {
+            // Check if we should auto-grab
+            float playerBottom = controller.GetComponent<Collider2D>().bounds.min.y;
+            float ledgeTop = controller.LedgeDetector.LedgePosition.y;
+            
+            if (playerBottom < ledgeTop && playerBottom > ledgeTop - 1.0f)
+            {
+                stateMachine.ChangeState(controller.LedgeState);
+                return;
+            }
+        }
+
         // Check if we should exit run state
         if (!CanRun() || !ShouldContinueRunning())
         {

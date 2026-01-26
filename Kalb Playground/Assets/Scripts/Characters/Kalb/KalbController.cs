@@ -16,6 +16,7 @@ public class KalbController : MonoBehaviour
     private KalbSwimming swimming;
     private KalbAbilitySystem abilitySystem;
     private KalbComboSystem comboSystem;
+    private KalbLedgeDetector ledgeDetector;
     
     // State Machine
     private KalbStateMachine stateMachine;
@@ -29,6 +30,8 @@ public class KalbController : MonoBehaviour
     private KalbCombatState combatState;
     private KalbRunState runState;    
     private KalbDashState dashState;  
+    private KalbLedgeState ledgeState;
+    private KalbLedgeClimbState ledgeClimbState;
     
     // Dash cooldown tracking - MOVED HERE from KalbDashState
     private float dashCooldownTimer = 0f;
@@ -45,6 +48,7 @@ public class KalbController : MonoBehaviour
     public KalbSettings Settings => settings;
     public Rigidbody2D Rb => rb;
     public KalbComboSystem ComboSystem => comboSystem;
+    public KalbLedgeDetector LedgeDetector => ledgeDetector;
     
     // Dash cooldown property - NEW
     public float DashCooldownTimer
@@ -63,6 +67,8 @@ public class KalbController : MonoBehaviour
     public KalbCombatState CombatState => combatState; 
     public KalbRunState RunState => runState;    
     public KalbDashState DashState => dashState; 
+    public KalbLedgeState LedgeState => ledgeState;
+    public KalbLedgeClimbState LedgeClimbState => ledgeClimbState;
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     
@@ -105,6 +111,9 @@ public class KalbController : MonoBehaviour
 
         comboSystem = GetComponent<KalbComboSystem>(); 
         if (comboSystem == null) comboSystem = gameObject.AddComponent<KalbComboSystem>();
+
+        ledgeDetector = GetComponent<KalbLedgeDetector>();
+        if (ledgeDetector == null) ledgeDetector = gameObject.AddComponent<KalbLedgeDetector>();
         
         // Create default settings if none provided
         if (settings == null)
@@ -127,6 +136,8 @@ public class KalbController : MonoBehaviour
         combatState = new KalbCombatState(this, stateMachine);
         runState = new KalbRunState(this, stateMachine);    
         dashState = new KalbDashState(this, stateMachine);  
+        ledgeState = new KalbLedgeState(this, stateMachine);        
+        ledgeClimbState = new KalbLedgeClimbState(this, stateMachine); 
         
         // Start with idle state
         stateMachine.Initialize(idleState);
@@ -141,6 +152,44 @@ public class KalbController : MonoBehaviour
         {
             dashCooldownTimer -= Time.deltaTime;
         }
+
+        // Check for ledge grab (auto-grab when falling past ledge)
+        if (settings.ledgeGrabUnlocked && !IsInLedgeState() && ledgeDetector != null && 
+            rb.linearVelocity.y < 0 && !collisionDetector.IsGrounded)
+        {
+            // Skip if on cooldown
+            if (!ledgeDetector.IsOnCooldown)
+            {
+                bool ledgeFound = ledgeDetector.CheckForLedge(this);
+                
+                if (ledgeFound && !collisionDetector.IsGrounded && 
+                    !swimming.IsSwimming && !dashState.IsDashing && 
+                    !comboSystem.IsAttacking)
+                {
+                    // Check if player is at appropriate height to grab
+                    Collider2D playerCollider = GetComponent<Collider2D>();
+                    if (playerCollider != null)
+                    {
+                        float playerBottom = playerCollider.bounds.min.y;
+                        float ledgeTop = ledgeDetector.LedgePosition.y;
+                        
+                        // Player should be slightly below the ledge (within grab range)
+                        // Use settings value for consistency
+                        float grabRange = 1.0f; // Adjust this based on testing
+                        if (playerBottom < ledgeTop && playerBottom > ledgeTop - grabRange)
+                        {
+                            // Additional check: we should be moving downward
+                            if (rb.linearVelocity.y < -0.1f)
+                            {
+                               
+                                stateMachine.ChangeState(ledgeState);
+                                return; // Exit early to prevent other state changes
+                            }
+                        }
+                    }
+                }
+            }
+        }
         
         // Check for swimming state transition
         if (swimming.IsInWater && !swimming.IsJumpingFromWater && !(stateMachine.CurrentState is KalbSwimState))
@@ -151,7 +200,7 @@ public class KalbController : MonoBehaviour
             // Reset air dash when entering swim state
             if (dashState != null)
             {   
-                Debug.Log("Resetting air dash due to swimming state");
+               
                 dashState.ResetAirDash("Swimmning");
             }
             
@@ -195,7 +244,7 @@ public class KalbController : MonoBehaviour
                 // Check if dash is available from current state
                 if (CanDashFromCurrentState() && dashCooldownTimer <= 0)
                 {
-                    Debug.Log("Changing to dash state");
+                   
                     
                     // Set cooldown BEFORE entering dash state
                     //dashCooldownTimer = settings.dashCooldown;
@@ -214,7 +263,7 @@ public class KalbController : MonoBehaviour
             }
             else
             {
-                Debug.Log("Already in dash state, ignoring dash input");
+               
             }
         }
 
@@ -376,6 +425,12 @@ public class KalbController : MonoBehaviour
     {
         // Must still meet run conditions
         return ShouldEnterRunState();
+    }
+
+    private bool IsInLedgeState()
+    {
+        return stateMachine.CurrentState is KalbLedgeState || 
+            stateMachine.CurrentState is KalbLedgeClimbState;
     }
     
     // NEW: Exit to appropriate state
