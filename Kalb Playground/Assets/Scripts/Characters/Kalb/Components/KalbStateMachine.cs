@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class KalbStateMachine
 {
     private KalbState currentState;
@@ -20,6 +22,7 @@ public class KalbStateMachine
     public void Update()
     {
         currentState.Update();
+        Debug.Log($"[StateMachine] Current State: {currentState.GetType().Name}");
     }
     
     public void FixedUpdate()

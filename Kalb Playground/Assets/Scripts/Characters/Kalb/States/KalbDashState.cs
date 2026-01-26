@@ -12,14 +12,12 @@ public class KalbDashState : KalbState
     // Dash state
     private bool isDashing = false;
     private float dashTimer = 0f;
-    private float dashCooldownTimer = 0f;
     private Vector2 dashDirection = Vector2.right;
     private int airDashCount = 0;
     private float preDashGravityScale;
     
     public bool IsDashing => isDashing;
     public float DashTimer => dashTimer;
-    public float DashCooldownTimer => dashCooldownTimer;
     public Vector2 DashDirection => dashDirection;
     public int AirDashCount => airDashCount;
     
@@ -74,11 +72,6 @@ public class KalbDashState : KalbState
             dashTimer -= Time.deltaTime;
         }
         
-        if (dashCooldownTimer > 0)
-        {
-            dashCooldownTimer -= Time.deltaTime;
-        }
-        
         // Check for swimming (cancel dash)
         if (swimming != null && swimming.IsInWater && isDashing)
         {
@@ -87,7 +80,6 @@ public class KalbDashState : KalbState
             stateMachine.ChangeState(controller.SwimState);
         }
 
-        Debug.Log($"Dash Update - IsDashing: {isDashing}, DashTimer: {dashTimer:F2}, Cooldown: {dashCooldownTimer:F2}");
     }
     
     public override void FixedUpdate()
@@ -119,9 +111,9 @@ public class KalbDashState : KalbState
         }
         
         // Check cooldown
-        if (dashCooldownTimer > 0)
+        if (controller.DashCooldownTimer > 0)
         {
-            Debug.Log($"Dash failed: On cooldown ({dashCooldownTimer:F2}s)");
+            Debug.Log($"Dash failed: On cooldown ({controller.DashCooldownTimer:F2}s)");
             return false;
         }
         
@@ -166,7 +158,6 @@ public class KalbDashState : KalbState
     {
         isDashing = true;
         dashTimer = settings.dashDuration;
-        dashCooldownTimer = settings.dashCooldown;
         
         // Save gravity
         preDashGravityScale = controller.Rb.gravityScale;
@@ -246,8 +237,9 @@ public class KalbDashState : KalbState
             controller.Rb.linearVelocity.x * settings.dashEndSlowdown,
             controller.Rb.linearVelocity.y * settings.dashEndSlowdown
         );
+
+        controller.DashCooldownTimer = settings.dashCooldown;
         
-        dashCooldownTimer = 0f;
         Debug.Log("Dash ended (velocity slowed)");
     }
     
@@ -308,12 +300,14 @@ public class KalbDashState : KalbState
     }
     
     // Public methods for external access
-    public void ResetAirDash()
+    public void ResetAirDash(string source = "")
     {
-        if (collisionDetector.IsGrounded && settings.resetAirDashOnGround)
+        if (airDashCount != 0 && 
+            ((collisionDetector.IsGrounded && settings.resetAirDashOnGround &&  source == "Grounded" )|| 
+            (swimming != null && swimming.IsInWater && source == "Swimmning")))
         {
             airDashCount = 0;
-            Debug.Log("Air dash count reset (grounded)");
+            Debug.Log("Air dash count reset" + (string.IsNullOrEmpty(source) ? "" : $" - Source: {source}"));
         }
     }
     
@@ -321,7 +315,6 @@ public class KalbDashState : KalbState
     {
         isDashing = false;
         dashTimer = 0f;
-        dashCooldownTimer = 0f;
         airDashCount = 0;
         
         if (controller.Rb != null)
@@ -335,7 +328,7 @@ public class KalbDashState : KalbState
         Debug.Log("=== DASH STATE DEBUG ===");
         Debug.Log($"IsDashing: {isDashing}");
         Debug.Log($"Dash Timer: {dashTimer:F2}");
-        Debug.Log($"Cooldown: {dashCooldownTimer:F2}");
+        Debug.Log($"Cooldown: {controller.DashCooldownTimer:F2}");
         Debug.Log($"Grounded: {collisionDetector.IsGrounded}");
         Debug.Log($"Air Dash Count: {airDashCount}/{settings.maxAirDashes}");
         Debug.Log($"Can Dash Now: {CanDash()}");

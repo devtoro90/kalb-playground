@@ -30,6 +30,9 @@ public class KalbController : MonoBehaviour
     private KalbRunState runState;    
     private KalbDashState dashState;  
     
+    // Dash cooldown tracking - MOVED HERE from KalbDashState
+    private float dashCooldownTimer = 0f;
+    
     // Properties for component access
     public KalbInputHandler InputHandler => inputHandler;
     public KalbCollisionDetector CollisionDetector => collisionDetector;
@@ -42,6 +45,14 @@ public class KalbController : MonoBehaviour
     public KalbSettings Settings => settings;
     public Rigidbody2D Rb => rb;
     public KalbComboSystem ComboSystem => comboSystem;
+    
+    // Dash cooldown property - NEW
+    public float DashCooldownTimer
+    {
+        get => dashCooldownTimer;
+        set => dashCooldownTimer = value;
+    }
+
     
     // State Properties
     public KalbIdleState IdleState => idleState;
@@ -125,11 +136,25 @@ public class KalbController : MonoBehaviour
     {
         if (health.IsDead) return;
         
+        // Update dash cooldown timer - ALWAYS UPDATE REGARDLESS OF STATE
+        if (dashCooldownTimer > 0)
+        {
+            dashCooldownTimer -= Time.deltaTime;
+        }
+        
         // Check for swimming state transition
         if (swimming.IsInWater && !swimming.IsJumpingFromWater && !(stateMachine.CurrentState is KalbSwimState))
         {
             stateMachine.ChangeState(swimState);
             comboSystem.CancelCombo();
+
+            // Reset air dash when entering swim state
+            if (dashState != null)
+            {   
+                Debug.Log("Resetting air dash due to swimming state");
+                dashState.ResetAirDash("Swimmning");
+            }
+            
         }
         
         // Update coyote time and jump buffer based on ground state
@@ -140,7 +165,7 @@ public class KalbController : MonoBehaviour
             // Reset air dash when grounded
             if (dashState != null)
             {
-                dashState.ResetAirDash();
+                dashState.ResetAirDash("Grounded");
             }
         }
         
@@ -168,11 +193,19 @@ public class KalbController : MonoBehaviour
                 Debug.Log($"Dash pressed, current state: {stateMachine.CurrentState.GetType().Name}");
                 
                 // Check if dash is available from current state
-                if (CanDashFromCurrentState())
+                if (CanDashFromCurrentState() && dashCooldownTimer <= 0)
                 {
                     Debug.Log("Changing to dash state");
+                    
+                    // Set cooldown BEFORE entering dash state
+                    //dashCooldownTimer = settings.dashCooldown;
+                    
                     stateMachine.ChangeState(dashState);
                     inputHandler.ResetDashInput();
+                }
+                else if (dashCooldownTimer > 0)
+                {
+                    Debug.Log($"Dash on cooldown: {dashCooldownTimer:F2}s");
                 }
                 else
                 {
@@ -208,6 +241,7 @@ public class KalbController : MonoBehaviour
         // Handle state updates
         stateMachine.HandleInput();
         stateMachine.Update();
+        Debug.Log($"Current State: {stateMachine.CurrentState.GetType().Name}");
     }
     
     private void FixedUpdate()
@@ -228,6 +262,7 @@ public class KalbController : MonoBehaviour
         if (stateMachine.CurrentState is KalbDashState)
         {
             dashState.ForceResetDash();
+            dashCooldownTimer = 0f; // Reset cooldown if dash was interrupted
         }
         
         // Force exit combat state if taking damage
@@ -277,10 +312,6 @@ public class KalbController : MonoBehaviour
             return true;
         }
         
-        // Check if we're dashing (you'll need to create KalbDashState if not exists)
-        // if (stateMachine.CurrentState is KalbDashState)
-        //     return false;
-        
         return false;
     }
 
@@ -311,8 +342,6 @@ public class KalbController : MonoBehaviour
         
         return false;
     }
-
-    
     
     // NEW: Check if should enter run state
     private bool ShouldEnterRunState()
@@ -375,6 +404,12 @@ public class KalbController : MonoBehaviour
         {
             stateMachine.ChangeState(idleState);
         }
+    }
+    
+    // NEW: Method to reset dash cooldown (e.g., when ability is unlocked)
+    public void ResetDashCooldown()
+    {
+        dashCooldownTimer = 0f;
     }
     
     public void ForceStateChange(KalbState newState)

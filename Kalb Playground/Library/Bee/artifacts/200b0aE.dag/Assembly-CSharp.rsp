@@ -470,7 +470,6 @@
 -analyzer:"/Applications/Unity/Hub/Editor/6000.3.1f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 -analyzer:"/Applications/Unity/Hub/Editor/6000.3.1f1/Unity.app/Contents/Resources/BuildPipeline/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
 "Assets/Scripts/Characters/Kalb.cs"
-"Assets/Scripts/Characters/Kalb/Abilities/KalbDash.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbAnimationController.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbCollisionDetector.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbHealth.cs"
