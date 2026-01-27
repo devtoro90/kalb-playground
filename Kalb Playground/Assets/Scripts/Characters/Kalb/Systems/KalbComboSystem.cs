@@ -179,25 +179,6 @@ public class KalbComboSystem : MonoBehaviour
             settings.enemyLayers
         );
         
-        // Apply damage and knockback to each enemy
-        /*foreach (Collider2D enemy in hitEnemies)
-        {
-            // Get enemy health component
-            EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
-            if (enemyHealth != null)
-            {
-                enemyHealth.TakeDamage((int)settings.comboDamage[comboIndex]);
-                
-                // Apply knockback
-                Rigidbody2D enemyRb = enemy.GetComponent<Rigidbody2D>();
-                if (enemyRb != null)
-                {
-                    Vector2 knockbackDirection = movement.FacingRight ? Vector2.right : Vector2.left;
-                    enemyRb.AddForce(knockbackDirection * settings.comboKnockback[comboIndex], ForceMode2D.Impulse);
-                }
-            }
-        }*/
-        
         // Spawn hit effect if available
         if (settings.hitEffectPrefab != null && hitEnemies.Length > 0)
         {

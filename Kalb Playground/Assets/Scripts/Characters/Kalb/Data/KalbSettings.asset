@@ -99,7 +99,7 @@ MonoBehaviour:
   comboFlashDuration: 0.1
   runUnlocked: 1
   dashUnlocked: 1
-  wallJumpUnlocked: 0
+  wallJumpUnlocked: 1
   doubleJumpUnlocked: 0
   wallLockUnlocked: 0
   pogoUnlocked: 0

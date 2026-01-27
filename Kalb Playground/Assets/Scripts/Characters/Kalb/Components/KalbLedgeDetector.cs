@@ -9,10 +9,8 @@ public class KalbLedgeDetector : MonoBehaviour
     [SerializeField] private KalbCollisionDetector collisionDetector;
     
     [Header("Settings")]
-    //[SerializeField] private float ledgeDetectionDistance = 0.5f;
     [SerializeField] private float ledgeGrabOffsetY = 0.15f;
     [SerializeField] private float ledgeGrabOffsetX = 0.55f;
-    //[SerializeField] private float ledgeClimbCheckRadius = 0.2f;
     [SerializeField] private LayerMask environmentLayer;
     
     [Header("Cooldown Settings")]
@@ -85,7 +83,7 @@ public class KalbLedgeDetector : MonoBehaviour
         
         // Don't check during certain states
         if (controller.DashState.IsDashing || controller.ComboSystem.IsAttacking || 
-            controller.Swimming.IsSwimming || collisionDetector.IsWallSliding)
+            controller.Swimming.IsSwimming)
         {
             ledgeDetected = false;
             return false;

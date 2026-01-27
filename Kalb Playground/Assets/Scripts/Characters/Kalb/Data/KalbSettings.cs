@@ -8,10 +8,6 @@ public class KalbSettings : ScriptableObject
     public float jumpForce = 12f;
     [Range(0, 0.3f)] public float movementSmoothing = 0.05f;
     
-    [Header("Friction")]
-    public float groundFriction = 10f;
-    public float airFriction = 2f;
-    
     [Header("Jump & Air")]
     public float coyoteTime = 0.15f;
     public float jumpBufferTime = 0.1f;
@@ -55,7 +51,6 @@ public class KalbSettings : ScriptableObject
     public float comboWindow = 0.2f;
     public float comboResetTime = 0.6f;
     public bool enableAirCombo = true;
-    public bool enableWallCombo = true;
     
     [Header("Combo Attack Data")]
     public float[] comboDamage = new float[] { 20f, 25f, 35f };
@@ -83,19 +78,15 @@ public class KalbSettings : ScriptableObject
     [Header("Ability Unlocks")]
     public bool runUnlocked = false;
     public bool dashUnlocked = false;
-    public bool wallJumpUnlocked = false;
-    public bool doubleJumpUnlocked = false;
-    public bool wallLockUnlocked = false;
-    public bool pogoUnlocked = false;
-
-    [Header("Run Settings")] // NEW
+    
+    [Header("Run Settings")]
     public float runSpeed = 8f;
     public float runAcceleration = 20f;
     public float runDeceleration = 25f;
     public float runTurnaroundMultiplier = 0.7f;
     public float runJumpBoost = 1.2f;
     
-    [Header("Dash Settings")] // NEW
+    [Header("Dash Settings")]
     public float dashSpeed = 20f;
     public float dashDuration = 0.2f;
     public float dashCooldown = 0.5f;

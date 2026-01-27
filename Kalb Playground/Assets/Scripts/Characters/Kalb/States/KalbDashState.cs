@@ -34,11 +34,8 @@ public class KalbDashState : KalbState
     
     public override void Enter()
     {
-       
-        
         if (!CanDash())
         {
-            Debug.LogWarning("Cannot dash from Enter()");
             ExitToAppropriateState();
             return;
         }
@@ -48,8 +45,6 @@ public class KalbDashState : KalbState
     
     public override void Exit()
     {
-       
-        
         if (isDashing)
         {
             EndDash();
@@ -61,7 +56,6 @@ public class KalbDashState : KalbState
         // Check if dash should end
         if (isDashing && dashTimer <= 0)
         {
-           
             ExitToAppropriateState();
             return;
         }
@@ -75,11 +69,9 @@ public class KalbDashState : KalbState
         // Check for swimming (cancel dash)
         if (swimming != null && swimming.IsInWater && isDashing)
         {
-           
             CancelDash();
             stateMachine.ChangeState(controller.SwimState);
         }
-
     }
     
     public override void FixedUpdate()
@@ -99,58 +91,44 @@ public class KalbDashState : KalbState
         // Check ability
         if (abilitySystem == null || !abilitySystem.CanDash())
         {
-           
             return false;
         }
         
         // Check if dashing
         if (isDashing)
         {
-           
             return false;
         }
         
         // Check cooldown
         if (controller.DashCooldownTimer > 0)
         {
-            
             return false;
         }
         
         // Check swimming
         if (swimming != null && swimming.IsSwimming)
         {
-           
             return false;
         }
         
         // Ground dash - always available
         if (collisionDetector.IsGrounded)
         {
-           
             return true;
         }
         
         // Air dash - check limits
         if (!settings.canAirDash)
         {
-           
             return false;
         }
         
         if (airDashCount >= settings.maxAirDashes)
         {
-            
             return false;
         }
         
-        if (collisionDetector.IsWallSliding)
-        {
-           
-            return false;
-        }
-        
-       
         return true;
     }
     
@@ -169,11 +147,6 @@ public class KalbDashState : KalbState
         if (!collisionDetector.IsGrounded)
         {
             airDashCount++;
-            
-        }
-        else
-        {
-           
         }
         
         // Cancel combo
@@ -185,8 +158,6 @@ public class KalbDashState : KalbState
         
         // Play animation
         controller.AnimationController.PlayAnimation("Kalb_dash");
-        
-        
     }
     
     private void DetermineDashDirection()
@@ -239,8 +210,6 @@ public class KalbDashState : KalbState
         );
 
         controller.DashCooldownTimer = settings.dashCooldown;
-        
-       
     }
     
     private void CancelDash()
@@ -253,8 +222,6 @@ public class KalbDashState : KalbState
     
     private void ExitToAppropriateState()
     {
-       
-        
         // End dash first
         if (isDashing)
         {
@@ -264,7 +231,6 @@ public class KalbDashState : KalbState
         // Check swimming
         if (swimming != null && swimming.IsInWater)
         {
-           
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
@@ -272,7 +238,6 @@ public class KalbDashState : KalbState
         // Check grounded
         if (!collisionDetector.IsGrounded)
         {
-           
             stateMachine.ChangeState(controller.AirState);
             return;
         }
@@ -283,18 +248,15 @@ public class KalbDashState : KalbState
             // Check if should run
             if (inputHandler.DashHeld && abilitySystem.CanRun())
             {
-               
                 stateMachine.ChangeState(controller.RunState);
             }
             else
             {
-               
                 stateMachine.ChangeState(controller.WalkState);
             }
         }
         else
         {
-           
             stateMachine.ChangeState(controller.IdleState);
         }
     }
@@ -307,7 +269,6 @@ public class KalbDashState : KalbState
             (swimming != null && swimming.IsInWater && source == "Swimmning")))
         {
             airDashCount = 0;
-            
         }
     }
     
@@ -319,19 +280,5 @@ public class KalbDashState : KalbState
         
         if (controller.Rb != null)
             controller.Rb.gravityScale = settings.normalGravityScale;
-            
-       
-    }
-    
-    public void DebugDashState()
-    {
-       
-        
-        
-        
-        
-        
-        
-       
     }
 }
