@@ -12,10 +12,13 @@ public class KalbPhysics : MonoBehaviour
     private bool isJumpButtonHeld = false;
     private float coyoteTimeCounter = 0f;
     private float jumpBufferCounter = 0f;
+    private bool canDoubleJump = false;
+    private bool hasDoubleJumped = false;
     
     public bool IsJumpButtonHeld => isJumpButtonHeld;
     public float CoyoteTimeCounter => coyoteTimeCounter;
     public float JumpBufferCounter => jumpBufferCounter;
+    public bool CanDoubleJump => canDoubleJump && !hasDoubleJumped;
     
     private void Start()
     {
@@ -126,5 +129,17 @@ public class KalbPhysics : MonoBehaviour
         coyoteTimeCounter = 0f;
         jumpBufferCounter = 0f;
         isJumpButtonHeld = false;
+    }
+
+    public void SetCanDoubleJump(bool value)
+    {
+        canDoubleJump = value;
+        if (value) hasDoubleJumped = false; // Reset double jump when enabled
+    }
+
+    public void ResetDoubleJump()
+    {
+        canDoubleJump = false;
+        hasDoubleJumped = false;
     }
 }

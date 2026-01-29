@@ -15,8 +15,6 @@ MonoBehaviour:
   moveSpeed: 5
   jumpForce: 12
   movementSmoothing: 0.05
-  groundFriction: 10
-  airFriction: 2
   coyoteTime: 0.15
   jumpBufferTime: 0.1
   jumpCutMultiplier: 0.5
@@ -55,7 +53,6 @@ MonoBehaviour:
   comboWindow: 0.3
   comboResetTime: 0.5
   enableAirCombo: 1
-  enableWallCombo: 1
   comboDamage:
   - 20
   - 20
@@ -97,12 +94,23 @@ MonoBehaviour:
   hitEffectDuration: 0.3
   comboFlashColor: {r: 1, g: 1, b: 1, a: 1}
   comboFlashDuration: 0.1
+  ledgeDetectionDistance: 0.5
+  ledgeGrabOffsetY: 0.15
+  ledgeGrabOffsetX: 0.55
+  ledgeClimbTime: 0.3
+  ledgeJumpForce: 12
+  ledgeJumpAngle: {x: 1, y: 2}
+  ledgeClimbCheckRadius: 0.2
+  minLedgeHoldTime: 0.3
+  ledgeReleaseForce: 5
+  ledgeReleaseCooldown: 0.2
+  ledgeGrabUnlocked: 1
+  maxClimbDistance: 2
+  climbSurfaceCheckDistance: 1.5
+  climbHorizontalBuffer: 0.3
   runUnlocked: 1
   dashUnlocked: 1
-  wallJumpUnlocked: 1
-  doubleJumpUnlocked: 0
-  wallLockUnlocked: 0
-  pogoUnlocked: 0
+  doubleJumpUnlocked: 1
   runSpeed: 8
   runAcceleration: 20
   runDeceleration: 25
@@ -119,17 +127,6 @@ MonoBehaviour:
   dashJumpBoost: 1.5
   canDashDiagonal: 1
   diagonalDashMultiplier: 0.707
-  ledgeDetectionDistance: 0.5
-  ledgeGrabOffsetY: 0.15
-  ledgeGrabOffsetX: 0.55
-  ledgeClimbTime: 0.3
-  ledgeJumpForce: 12
-  ledgeJumpAngle: {x: 1, y: 2}
-  ledgeClimbCheckRadius: 0.2
-  minLedgeHoldTime: 0.3
-  ledgeReleaseForce: 5
-  ledgeReleaseCooldown: 0.2
-  ledgeGrabUnlocked: 1
-  maxClimbDistance: 2
-  climbSurfaceCheckDistance: 1.5
-  climbHorizontalBuffer: 0.3
+  doubleJumpForce: 12
+  doubleJumpMaintainsMomentum: 1
+  doubleJumpHorizontalBoost: 1.5

@@ -223,20 +223,36 @@ public class KalbController : MonoBehaviour
             if (dashState != null)
             {   
                
-                dashState.ResetAirDash("Swimmning");
+                dashState.ResetAirDash();
             }
+
+            
+            physics.ResetDoubleJump();
+            physics.SetCanDoubleJump(true); // Enable for swim jump
             
         }
         
-        // Update coyote time and jump buffer based on ground state
-        if (collisionDetector.IsGrounded)
+        // Update coyote time and jump buffer based on ground and ceiling state
+        if (collisionDetector.IsGrounded && !collisionDetector.IsTouchingCeiling)
         {
+            // Only reset double jump when ACTUALLY on ground (not hitting ceiling)
+            
             physics.SetCoyoteTime();
+            physics.ResetDoubleJump(); // Reset when landing
+            physics.SetCanDoubleJump(true); // Enable for next jump
             
             // Reset air dash when grounded
             if (dashState != null)
             {
-                dashState.ResetAirDash("Grounded");
+                dashState.ResetAirDash();
+            }
+        }
+        else if (collisionDetector.IsTouchingCeiling)
+        {
+            // When hitting ceiling, cancel upward velocity but DON'T reset double jump
+            if (rb.linearVelocity.y > 0)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
             }
         }
         

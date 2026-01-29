@@ -206,7 +206,6 @@ public class KalbLedgeState : KalbState
         if (isReleasing) return;
         
         isReleasing = true;
-       
         
         // START COOLDOWN to prevent immediate re-grab
         if (ledgeDetector != null)
@@ -226,8 +225,6 @@ public class KalbLedgeState : KalbState
         float jumpForce = controller.Settings.ledgeJumpForce;
         rb.linearVelocity = jumpDir * jumpForce;
         
-        
-        
         // Face away from wall
         bool shouldFaceRight = ledgeSide == -1;
         if (shouldFaceRight != movement.FacingRight)
@@ -236,8 +233,16 @@ public class KalbLedgeState : KalbState
         }
         
         // Reset abilities
-        controller.DashState.ResetAirDash("LedgeJump");
+        controller.DashState.ResetAirDash();
         physics.ResetJumpState();
+        
+        // Enable double jump after ledge jump
+        if (controller.AbilitySystem != null && controller.AbilitySystem.CanDoubleJump())
+        {
+            
+            physics.ResetDoubleJump(); // Clear any previous double jump
+            physics.SetCanDoubleJump(true); // Enable for next jump
+        }
         
         // Force state change to AirState
         stateMachine.ChangeState(controller.AirState);

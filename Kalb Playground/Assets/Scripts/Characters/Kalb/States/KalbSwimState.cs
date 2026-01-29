@@ -181,6 +181,14 @@ public class KalbSwimState : KalbState
         // Perform the swim jump
         swimming.SwimJump();
         
+        // Enable double jump after water jump
+        if (physics != null && abilitySystem != null && abilitySystem.CanDoubleJump())
+        {
+            
+            physics.ResetDoubleJump(); // Clear any previous double jump
+            physics.SetCanDoubleJump(true); // Enable for next jump
+        }
+        
         // CRITICAL: Immediately change to air state
         stateMachine.ChangeState(controller.AirState);
         

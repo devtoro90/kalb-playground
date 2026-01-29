@@ -5,7 +5,7 @@ public class KalbSettings : ScriptableObject
 {
     [Header("Basic Movement")]
     public float moveSpeed = 5f;
-    public float jumpForce = 12f;
+    public float jumpForce = 15f;
     [Range(0, 0.3f)] public float movementSmoothing = 0.05f;
     
     [Header("Jump & Air")]
@@ -75,9 +75,29 @@ public class KalbSettings : ScriptableObject
     public Color comboFlashColor = Color.white;
     public float comboFlashDuration = 0.1f;
 
+    [Header("Ledge Settings")]
+    public float ledgeDetectionDistance = 0.5f;
+    public float ledgeGrabOffsetY = 0.15f;
+    public float ledgeGrabOffsetX = 0.55f;
+    public float ledgeClimbTime = 0.2f;
+    public float ledgeJumpForce = 12f;
+    public Vector2 ledgeJumpAngle = new Vector2(1, 2);
+    public float ledgeClimbCheckRadius = 0.2f;
+    public float minLedgeHoldTime = 0.3f;
+    public float ledgeReleaseForce = 5f;
+    public float ledgeReleaseCooldown = 0.2f;
+    public bool ledgeGrabUnlocked = true;
+
+    [Header("Ledge Climb Validation")]
+    public float maxClimbDistance = 2f; // Maximum allowed climb distance
+    public float climbSurfaceCheckDistance = 1.5f; // How far to check for platform surface
+    public float climbHorizontalBuffer = 0.3f; // Buffer from platform edge
+
+
     [Header("Ability Unlocks")]
     public bool runUnlocked = false;
     public bool dashUnlocked = false;
+    public bool doubleJumpUnlocked = false;
     
     [Header("Run Settings")]
     public float runSpeed = 8f;
@@ -99,21 +119,8 @@ public class KalbSettings : ScriptableObject
     public bool canDashDiagonal = true;
     public float diagonalDashMultiplier = 0.707f; // 1/√2 for 45-degree dashes
 
-    [Header("Ledge Settings")]
-    public float ledgeDetectionDistance = 0.5f;
-    public float ledgeGrabOffsetY = 0.15f;
-    public float ledgeGrabOffsetX = 0.55f;
-    public float ledgeClimbTime = 0.2f;
-    public float ledgeJumpForce = 12f;
-    public Vector2 ledgeJumpAngle = new Vector2(1, 2);
-    public float ledgeClimbCheckRadius = 0.2f;
-    public float minLedgeHoldTime = 0.3f;
-    public float ledgeReleaseForce = 5f;
-    public float ledgeReleaseCooldown = 0.2f;
-    public bool ledgeGrabUnlocked = true;
-
-    [Header("Ledge Climb Validation")]
-    public float maxClimbDistance = 2f; // Maximum allowed climb distance
-    public float climbSurfaceCheckDistance = 1.5f; // How far to check for platform surface
-    public float climbHorizontalBuffer = 0.3f; // Buffer from platform edge
+    [Header("Double Jump Settings")]
+    public float doubleJumpForce = 10f;
+    public bool doubleJumpMaintainsMomentum = true;
+    public float doubleJumpHorizontalBoost = 1.5f;
 }

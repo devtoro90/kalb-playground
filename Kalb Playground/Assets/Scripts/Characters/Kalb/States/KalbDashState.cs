@@ -262,14 +262,11 @@ public class KalbDashState : KalbState
     }
     
     // Public methods for external access
-    public void ResetAirDash(string source = "")
+    public void ResetAirDash()
     {
-        if (airDashCount != 0 && 
-            ((collisionDetector.IsGrounded && settings.resetAirDashOnGround &&  source == "Grounded" )|| 
-            (swimming != null && swimming.IsInWater && source == "Swimmning")))
-        {
-            airDashCount = 0;
-        }
+        
+        airDashCount = 0;
+        
     }
     
     public void ForceResetDash()

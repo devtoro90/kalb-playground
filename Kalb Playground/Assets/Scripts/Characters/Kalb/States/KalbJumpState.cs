@@ -28,6 +28,12 @@ public class KalbJumpState : KalbState
         // Perform jump
         physics.Jump(controller.Settings.jumpForce);
         physics.SetJumpButtonState(true);
+
+        // Enable double jump after initial jump (if ability unlocked)
+        if (controller.AbilitySystem != null && controller.AbilitySystem.CanDoubleJump())
+        {
+            physics.SetCanDoubleJump(true);
+        }
     }
     
     public override void Exit()

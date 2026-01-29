@@ -73,10 +73,20 @@ public class KalbAirState : KalbState
     
     public override void HandleInput()
     {
-        // Check for jump input (for coyote time or double jump later)
+        // Check for jump input (for coyote time or double jump)
         if (inputHandler.JumpPressed)
         {
             controller.Physics.SetJumpBuffer();
+            
+            // Check for double jump
+            if (!collisionDetector.IsGrounded && 
+                controller.Physics.CanDoubleJump &&
+                controller.AbilitySystem != null && 
+                controller.AbilitySystem.CanDoubleJump())
+            {
+                // Execute double jump
+                ExecuteDoubleJump();
+            }
         }
         
         if (inputHandler.JumpReleased)
@@ -84,13 +94,49 @@ public class KalbAirState : KalbState
             controller.Physics.ApplyJumpCut();
         }
 
-        // NEW: Check for attack input in air state
-        // This allows attacking while jumping out of water
+        // Check for attack input in air state
         if (inputHandler.AttackPressed && comboSystem != null && comboSystem.CanAttack)
         {
             // Don't check swimming state here - let controller handle it
             // This allows attacks in air after water jumps
         }
+    }
+
+    private void ExecuteDoubleJump()
+    {
+        // Mark as double jumped
+        
+        controller.Physics.ResetDoubleJump(); // This sets hasDoubleJumped = true
+        
+        // Apply double jump force
+        float jumpForce = controller.Settings.doubleJumpForce;
+        
+        // Optionally maintain horizontal momentum
+        if (controller.Settings.doubleJumpMaintainsMomentum)
+        {
+            // Keep current horizontal velocity or boost it
+            float currentXVelocity = controller.Rb.linearVelocity.x;
+            float boostedXVelocity = currentXVelocity * controller.Settings.doubleJumpHorizontalBoost;
+            
+            controller.Rb.linearVelocity = new Vector2(
+                boostedXVelocity,
+                jumpForce
+            );
+        }
+        else
+        {
+            // Standard double jump
+            controller.Physics.Jump(jumpForce);
+        }
+        
+        controller.Physics.SetJumpButtonState(true);
+        
+        // Play double jump animation/sound
+        controller.AnimationController.PlayAnimation("Kalb_jump"); // You'll need to create this animation
+        
+        // Reset jump buffer to prevent chaining
+        controller.Physics.SetJumpBuffer(); // This clears the buffer
+        inputHandler.ResetJumpInput();
     }
     
     private void UpdateAnimation()

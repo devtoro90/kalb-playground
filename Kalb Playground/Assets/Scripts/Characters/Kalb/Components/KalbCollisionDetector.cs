@@ -4,21 +4,21 @@ public class KalbCollisionDetector : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private Transform wallCheck;
+    [SerializeField] private Transform ceilingCheck; 
     
     [Header("Settings")]
     [SerializeField] private float groundCheckRadius = 0.2f;
-    [SerializeField] private float wallCheckDistance = 0.05f;
+    [SerializeField] private float ceilingCheckRadius = 0.15f;
     [SerializeField] private LayerMask environmentLayer;
     
     // State
     private bool isGrounded;
-    private bool isTouchingWall;
+    private bool isTouchingCeiling;
     private int wallSide = 0; // -1 = left, 1 = right, 0 = none
     private Rigidbody2D rb;
     
     public bool IsGrounded => isGrounded;
-    public bool IsTouchingWall => isTouchingWall;
+    public bool IsTouchingCeiling => isTouchingCeiling;
     public int WallSide => wallSide;
     
     private void Awake()
@@ -29,12 +29,19 @@ public class KalbCollisionDetector : MonoBehaviour
     private void Update()
     {
         CheckGround();
+        CheckCeiling();
     }
     
     private void CheckGround()
     {
         if (groundCheck == null) return;
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, environmentLayer);
+    }
+
+    private void CheckCeiling()
+    {
+        if (ceilingCheck == null) return;
+        isTouchingCeiling = Physics2D.OverlapCircle(ceilingCheck.position, ceilingCheckRadius, environmentLayer);
     }
     
     
@@ -45,15 +52,11 @@ public class KalbCollisionDetector : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         }
-        
-        if (wallCheck != null)
+
+        if (ceilingCheck != null)
         {
-            // Draw wall check rays
-            Gizmos.color = Color.blue;
-            Gizmos.DrawRay(wallCheck.position, Vector2.right * wallCheckDistance);
-            
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawRay(wallCheck.position, Vector2.left * wallCheckDistance);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(ceilingCheck.position, ceilingCheckRadius);
         }
     }
 }
