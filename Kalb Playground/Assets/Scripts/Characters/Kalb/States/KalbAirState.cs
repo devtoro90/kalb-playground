@@ -73,9 +73,11 @@ public class KalbAirState : KalbState
     
     public override void HandleInput()
     {
+        
         // Check for jump input (for coyote time or double jump)
         if (inputHandler.JumpPressed)
         {
+            
             controller.Physics.SetJumpBuffer();
             
             // Check for double jump
@@ -84,6 +86,7 @@ public class KalbAirState : KalbState
                 controller.AbilitySystem != null && 
                 controller.AbilitySystem.CanDoubleJump())
             {
+                
                 // Execute double jump
                 ExecuteDoubleJump();
             }
@@ -91,6 +94,7 @@ public class KalbAirState : KalbState
         
         if (inputHandler.JumpReleased)
         {
+            
             controller.Physics.ApplyJumpCut();
         }
 
@@ -104,8 +108,8 @@ public class KalbAirState : KalbState
 
     private void ExecuteDoubleJump()
     {
-        // Mark as double jumped
         
+        // Mark as double jumped
         controller.Physics.ResetDoubleJump(); // This sets hasDoubleJumped = true
         
         // Apply double jump force

@@ -166,6 +166,8 @@ public class KalbController : MonoBehaviour
     private void Update()
     {
         if (health.IsDead) return;
+
+        EnsureProperGravity();
         
         // Update dash cooldown timer
         if (dashCooldownTimer > 0)
@@ -252,7 +254,8 @@ public class KalbController : MonoBehaviour
         
         // Process jump with momentum boost
         if (!swimming.IsSwimming && !swimming.IsJumpingFromWater && 
-            physics.JumpBufferCounter > 0 && physics.CoyoteTimeCounter > 0)
+            physics.JumpBufferCounter > 0 && physics.CoyoteTimeCounter > 0 &&
+            stateMachine.CurrentState is not KalbAirState)
         {
             // Apply strong forward force for running jumps
             ApplyRunningJumpForce();
@@ -338,18 +341,18 @@ public class KalbController : MonoBehaviour
             // Start jump momentum preservation
             movement.StartJumpMomentum(0.4f); // 0.4 seconds of momentum preservation
             
-            Debug.Log($"RUNNING JUMP: Applied {forwardForce:F2} forward force (Velocity was {currentXVelocity:F2}, Ratio={runSpeedRatio:F2})");
+            
         }
         else if (Mathf.Abs(currentXVelocity) > 0.1f)
         {
             // Walking jump - preserve momentum with shorter duration
             movement.StartJumpMomentum(0.2f); // 0.2 seconds for walking jumps
-            Debug.Log($"WALKING JUMP: Preserving velocity {currentXVelocity:F2} for 0.2s");
+            
         }
         else
         {
             // Stationary jump - no momentum
-            Debug.Log($"STATIONARY JUMP: No horizontal force");
+            
         }
     }
     
@@ -502,5 +505,30 @@ public class KalbController : MonoBehaviour
     public void ForceStateChange(KalbState newState)
     {
         stateMachine.ChangeState(newState);
+    }
+
+    private void EnsureProperGravity()
+    {
+        // Skip if swimming (swimming handles its own gravity)
+        if (swimming.IsSwimming || swimming.IsJumpingFromWater)
+            return;
+        
+        // Skip if in states that intentionally modify gravity
+        if (stateMachine.CurrentState is KalbDashState && dashState.IsDashing)
+            return;
+        
+        if (stateMachine.CurrentState is KalbLedgeState || 
+            stateMachine.CurrentState is KalbLedgeClimbState)
+            return;
+        
+        // Skip if in swim dash
+        if (swimming.IsSwimDashing)
+            return;
+        
+        // Reset to normal gravity scale for all other cases
+        if (rb.gravityScale != settings.normalGravityScale)
+        {
+            rb.gravityScale = settings.normalGravityScale;
+        }
     }
 }

@@ -20,16 +20,27 @@ public class KalbJumpState : KalbState
     
     public override void Enter()
     {
+        
+        // FIX: Ensure gravity is properly set before jumping
+        if (controller.Rb.gravityScale != controller.Settings.normalGravityScale)
+        {
+            
+            controller.Rb.gravityScale = controller.Settings.normalGravityScale;
+        }
+        
         controller.AnimationController.PlayAnimation("Kalb_jump");
 
         // Cancel combo when entering swim state
         controller.ComboSystem?.CancelCombo();
         
         // Apply jump - physics.Jump() preserves horizontal velocity
+        
+        
+        
         physics.Jump(controller.Settings.jumpForce);
         physics.SetJumpButtonState(true);
         
-        Debug.Log($"JumpState: Jumping with force {controller.Settings.jumpForce}");
+        
 
         // Enable double jump after initial jump (if ability unlocked)
         if (controller.AbilitySystem != null && controller.AbilitySystem.CanDoubleJump())

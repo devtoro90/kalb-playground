@@ -90,7 +90,7 @@ public class KalbMovement : MonoBehaviour
         {
             // During jump momentum phase, DO NOT modify horizontal velocity at all
             // This preserves the running jump momentum
-            Debug.Log($"Jump momentum active: timer={jumpMomentumTimer:F2}, X velocity={rb.linearVelocity.x:F2}");
+            
             return;
         }
         
@@ -180,7 +180,7 @@ public class KalbMovement : MonoBehaviour
     public void StartJumpMomentum(float duration = 0.3f)
     {
         jumpMomentumTimer = duration; // Longer duration for better momentum preservation
-        Debug.Log($"StartJumpMomentum: {duration}s, current X velocity = {rb.linearVelocity.x:F2}");
+        
     }
     
     // Check if jump momentum is active

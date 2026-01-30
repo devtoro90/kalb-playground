@@ -14,6 +14,7 @@ public class KalbStateMachine
     
     public void ChangeState(KalbState newState)
     {
+        
         currentState.Exit();
         currentState = newState;
         currentState.Enter();
