@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: KalbSettings
   m_EditorClassIdentifier: Assembly-CSharp::KalbSettings
   moveSpeed: 5
-  jumpForce: 12
+  jumpForce: 15
   movementSmoothing: 0.05
   coyoteTime: 0.15
   jumpBufferTime: 0.1
@@ -127,6 +127,6 @@ MonoBehaviour:
   dashJumpBoost: 1.5
   canDashDiagonal: 1
   diagonalDashMultiplier: 0.707
-  doubleJumpForce: 12
-  doubleJumpMaintainsMomentum: 1
+  doubleJumpForce: 10
+  doubleJumpMaintainsMomentum: 0
   doubleJumpHorizontalBoost: 1.5

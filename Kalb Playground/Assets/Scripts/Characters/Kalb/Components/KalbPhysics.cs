@@ -107,7 +107,14 @@ public class KalbPhysics : MonoBehaviour
     public void Jump(float jumpForce)
     {
         if (rb == null) return;
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        
+        // CRITICAL FIX: Only modify the Y velocity, preserve X completely
+        // Don't even read rb.linearVelocity.x here - just set Y
+        Vector2 currentVelocity = rb.linearVelocity;
+        rb.linearVelocity = new Vector2(currentVelocity.x, jumpForce);
+        
+        Debug.Log($"Physics.Jump(): Preserved X = {currentVelocity.x:F2}, Set Y = {jumpForce}");
+        
         coyoteTimeCounter = 0f;
         jumpBufferCounter = 0f;
     }

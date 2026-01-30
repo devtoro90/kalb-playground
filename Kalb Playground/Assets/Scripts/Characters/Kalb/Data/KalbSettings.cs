@@ -104,7 +104,7 @@ public class KalbSettings : ScriptableObject
     public float runAcceleration = 20f;
     public float runDeceleration = 25f;
     public float runTurnaroundMultiplier = 0.7f;
-    public float runJumpBoost = 1.2f;
+    public float runJumpForwardForce = 2.5f; // NEW: Strong forward force for running jumps
     
     [Header("Dash Settings")]
     public float dashSpeed = 20f;

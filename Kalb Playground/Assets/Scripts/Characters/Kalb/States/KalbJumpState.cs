@@ -25,9 +25,11 @@ public class KalbJumpState : KalbState
         // Cancel combo when entering swim state
         controller.ComboSystem?.CancelCombo();
         
-        // Perform jump
+        // Apply jump - physics.Jump() preserves horizontal velocity
         physics.Jump(controller.Settings.jumpForce);
         physics.SetJumpButtonState(true);
+        
+        Debug.Log($"JumpState: Jumping with force {controller.Settings.jumpForce}");
 
         // Enable double jump after initial jump (if ability unlocked)
         if (controller.AbilitySystem != null && controller.AbilitySystem.CanDoubleJump())
@@ -88,7 +90,7 @@ public class KalbJumpState : KalbState
     
     public override void FixedUpdate()
     {
-        // Use ApplyAirControl to allow flipping in air during jump
+        // Apply air control - momentum preservation is handled in controller
         movement.ApplyAirControl(inputHandler.MoveInput.x);
     }
     

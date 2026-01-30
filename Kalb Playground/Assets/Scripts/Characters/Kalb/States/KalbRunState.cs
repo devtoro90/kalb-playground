@@ -34,7 +34,6 @@ public class KalbRunState : KalbState
     {
         if (!CanRun())
         {
-            // Can't run, go to appropriate state
             ExitToAppropriateState();
             return;
         }
@@ -43,9 +42,6 @@ public class KalbRunState : KalbState
         runTransitionTimer = 0f;
         currentRunSpeed = Mathf.Max(movement.FacingRight ? controller.Rb.linearVelocity.x : -controller.Rb.linearVelocity.x, settings.moveSpeed);
         
-       
-        
-        // Update animation
         UpdateAnimation();
     }
     
@@ -53,11 +49,7 @@ public class KalbRunState : KalbState
     {
         isRunning = false;
         currentRunSpeed = 0f;
-        
-        // Reset movement smoothing
         movement.ResetSmoothing();
-        
-       
     }
     
     public override void Update()
@@ -66,7 +58,6 @@ public class KalbRunState : KalbState
         if (controller.LedgeDetector.LedgeDetected && !collisionDetector.IsGrounded && 
             controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
         {
-            // Check if we should auto-grab
             float playerBottom = controller.GetComponent<Collider2D>().bounds.min.y;
             float ledgeTop = controller.LedgeDetector.LedgePosition.y;
             
@@ -77,14 +68,12 @@ public class KalbRunState : KalbState
             }
         }
 
-        // Check if we should exit run state
         if (!CanRun() || !ShouldContinueRunning())
         {
             ExitToAppropriateState();
             return;
         }
         
-        // Check for swimming transition
         if (swimming != null && swimming.IsInWater)
         {
             stateMachine.ChangeState(controller.SwimState);
@@ -97,35 +86,21 @@ public class KalbRunState : KalbState
             return;
         }
         
-        // Update run speed with acceleration
         UpdateRunSpeed();
-        
-        // Update animation
         UpdateAnimation();
     }
     
     public override void FixedUpdate()
     {
         if (!isRunning) return;
-        
-        // Apply run movement
         ApplyRunMovement();
     }
     
     public override void HandleInput()
     {
-        // Check for jump input (run jump)
         if (inputHandler.JumpPressed)
         {
             controller.Physics.SetJumpBuffer();
-            
-            // Apply run jump boost if jumping
-            if (controller.Physics.JumpBufferCounter > 0 && controller.Physics.CoyoteTimeCounter > 0)
-            {
-                controller.ForceStateChange(controller.JumpState);
-                ApplyRunJumpBoost();
-                return;
-            }
         }
         
         if (inputHandler.JumpReleased)
@@ -133,29 +108,23 @@ public class KalbRunState : KalbState
             controller.Physics.ApplyJumpCut();
         }
         
-        // Check for dash input
         if (inputHandler.DashPressed && abilitySystem.CanDash())
         {
-            // Transition to dash state from run
             controller.ForceStateChange(controller.DashState);
         }
     }
     
     private bool CanRun()
     {
-        // Check if run ability is unlocked
         if (abilitySystem != null && !abilitySystem.CanRun())
             return false;
         
-        // Must be grounded to run
         if (!collisionDetector.IsGrounded)
             return false;
         
-        // Must be holding dash button
         if (!inputHandler.DashHeld)
             return false;
         
-        // Must have horizontal input
         if (Mathf.Abs(inputHandler.MoveInput.x) < 0.1f)
             return false;
         
@@ -164,7 +133,6 @@ public class KalbRunState : KalbState
     
     private bool ShouldContinueRunning()
     {
-        // Stop running if we lose any condition
         return CanRun();
     }
     
@@ -172,21 +140,17 @@ public class KalbRunState : KalbState
     {
         float targetSpeed = settings.runSpeed;
         
-        // Check for turnaround (changing direction)
         float currentDirection = movement.FacingRight ? 1f : -1f;
         float inputDirection = Mathf.Sign(inputHandler.MoveInput.x);
         
         if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f && Mathf.Sign(inputDirection) != Mathf.Sign(currentDirection))
         {
-            // Turnaround - slower acceleration
             targetSpeed *= settings.runTurnaroundMultiplier;
         }
         
-        // Accelerate or decelerate to target speed
         float acceleration = (currentRunSpeed < targetSpeed) ? settings.runAcceleration : settings.runDeceleration;
         currentRunSpeed = Mathf.MoveTowards(currentRunSpeed, targetSpeed, acceleration * Time.deltaTime);
         
-        // Update run transition
         if (runTransitionTimer < RUN_TRANSITION_TIME)
         {
             runTransitionTimer += Time.deltaTime;
@@ -198,21 +162,16 @@ public class KalbRunState : KalbState
         if (!isRunning || controller.Rb == null) return;
         
         float moveInput = inputHandler.MoveInput.x;
-        
-        // Calculate target velocity
         float targetSpeed = moveInput * currentRunSpeed;
         
-        // Smooth movement
         Vector2 targetVelocity = new Vector2(targetSpeed, controller.Rb.linearVelocity.y);
         Vector2 currentVelocity = controller.Rb.linearVelocity;
         
-        // Faster smoothing for run state
         float runSmoothing = settings.movementSmoothing * 0.7f;
         controller.Rb.linearVelocity = Vector3.SmoothDamp(currentVelocity, targetVelocity, ref runVelocity, runSmoothing);
 
         movement.Velocity = runVelocity;
         
-        // Flip if needed
         if (moveInput != 0)
         {
             bool shouldFaceRight = moveInput > 0;
@@ -221,18 +180,6 @@ public class KalbRunState : KalbState
                 movement.ForceFlip(shouldFaceRight);
             }
         }
-    }
-    
-    private void ApplyRunJumpBoost()
-    {
-        // Apply additional horizontal velocity when jumping from run
-        float runJumpBoost = Mathf.Clamp(currentRunSpeed / settings.runSpeed, 1f, settings.runJumpBoost);
-        
-        Vector2 currentVelocity = controller.Rb.linearVelocity;
-        controller.Rb.linearVelocity = new Vector2(
-            currentVelocity.x * runJumpBoost,
-            currentVelocity.y
-        );
     }
     
     private void UpdateAnimation()
@@ -267,7 +214,6 @@ public class KalbRunState : KalbState
         }
     }
     
-    // Public methods for external access
     public float GetRunSpeedRatio()
     {
         return Mathf.Clamp01(currentRunSpeed / settings.runSpeed);

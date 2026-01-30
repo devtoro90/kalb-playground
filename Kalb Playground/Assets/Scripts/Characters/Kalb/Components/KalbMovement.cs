@@ -16,6 +16,7 @@ public class KalbMovement : MonoBehaviour
     // Movement state
     protected internal Vector3 velocity = Vector3.zero;
     private bool facingRight = true;
+    private float jumpMomentumTimer = 0f;
     
     public Vector3 Velocity 
     { 
@@ -30,6 +31,15 @@ public class KalbMovement : MonoBehaviour
         if (collisionDetector == null) collisionDetector = GetComponent<KalbCollisionDetector>();
         if (swimming == null) swimming = GetComponent<KalbSwimming>();
         if (comboSystem == null) comboSystem = GetComponent<KalbComboSystem>();
+    }
+    
+    private void Update()
+    {
+        // Update jump momentum timer
+        if (jumpMomentumTimer > 0)
+        {
+            jumpMomentumTimer -= Time.deltaTime;
+        }
     }
     
     public void Move(float moveInput, bool isGrounded)
@@ -75,11 +85,20 @@ public class KalbMovement : MonoBehaviour
         // Skip if swimming
         if (swimming != null && swimming.IsSwimming) return;
         
-        // If no input in air, allow some drift
+        // CRITICAL FIX: If we have jump momentum, PRESERVE IT by not applying air control
+        if (jumpMomentumTimer > 0)
+        {
+            // During jump momentum phase, DO NOT modify horizontal velocity at all
+            // This preserves the running jump momentum
+            Debug.Log($"Jump momentum active: timer={jumpMomentumTimer:F2}, X velocity={rb.linearVelocity.x:F2}");
+            return;
+        }
+        
+        // If no input in air, allow some drift but don't slow down too quickly
         if (moveInput == 0)
         {
-            // Slow down gradually in air
-            float newXVelocity = Mathf.MoveTowards(rb.linearVelocity.x, 0, 5f * Time.fixedDeltaTime);
+            // Very gradual slowdown in air (Silksong style - momentum carries)
+            float newXVelocity = Mathf.MoveTowards(rb.linearVelocity.x, 0, 2f * Time.fixedDeltaTime);
             rb.linearVelocity = new Vector2(newXVelocity, rb.linearVelocity.y);
             
             // Don't flip when no input
@@ -155,5 +174,18 @@ public class KalbMovement : MonoBehaviour
                 comboSystem.UpdateAttackPointWithFacing(facingRight);
             }
         }
+    }
+    
+    // Method to set jump momentum timer
+    public void StartJumpMomentum(float duration = 0.3f)
+    {
+        jumpMomentumTimer = duration; // Longer duration for better momentum preservation
+        Debug.Log($"StartJumpMomentum: {duration}s, current X velocity = {rb.linearVelocity.x:F2}");
+    }
+    
+    // Check if jump momentum is active
+    public bool HasJumpMomentum()
+    {
+        return jumpMomentumTimer > 0;
     }
 }

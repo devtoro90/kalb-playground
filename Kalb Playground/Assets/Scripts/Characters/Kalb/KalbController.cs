@@ -56,7 +56,6 @@ public class KalbController : MonoBehaviour
         get => dashCooldownTimer;
         set => dashCooldownTimer = value;
     }
-
     
     // State Properties
     public KalbIdleState IdleState => idleState;
@@ -121,7 +120,6 @@ public class KalbController : MonoBehaviour
         {
             settings = ScriptableObject.CreateInstance<KalbSettings>();
         }
-        
     }
     
     private void InitializeStateMachine()
@@ -169,13 +167,13 @@ public class KalbController : MonoBehaviour
     {
         if (health.IsDead) return;
         
-        // Update dash cooldown timer - ALWAYS UPDATE REGARDLESS OF STATE
+        // Update dash cooldown timer
         if (dashCooldownTimer > 0)
         {
             dashCooldownTimer -= Time.deltaTime;
         }
 
-        // Check for ledge grab (auto-grab when falling past ledge)
+        // Check for ledge grab
         if (settings.ledgeGrabUnlocked && !IsInLedgeState() && ledgeDetector != null && 
             rb.linearVelocity.y < 0 && !collisionDetector.IsGrounded)
         {
@@ -195,17 +193,13 @@ public class KalbController : MonoBehaviour
                         float playerBottom = playerCollider.bounds.min.y;
                         float ledgeTop = ledgeDetector.LedgePosition.y;
                         
-                        // Player should be slightly below the ledge (within grab range)
-                        // Use settings value for consistency
-                        float grabRange = 1.0f; // Adjust this based on testing
+                        float grabRange = 1.0f;
                         if (playerBottom < ledgeTop && playerBottom > ledgeTop - grabRange)
                         {
-                            // Additional check: we should be moving downward
                             if (rb.linearVelocity.y < -0.1f)
                             {
-                               
                                 stateMachine.ChangeState(ledgeState);
-                                return; // Exit early to prevent other state changes
+                                return;
                             }
                         }
                     }
@@ -222,24 +216,19 @@ public class KalbController : MonoBehaviour
             // Reset air dash when entering swim state
             if (dashState != null)
             {   
-               
                 dashState.ResetAirDash();
             }
 
-            
             physics.ResetDoubleJump();
-            physics.SetCanDoubleJump(true); // Enable for swim jump
-            
+            physics.SetCanDoubleJump(true);
         }
         
-        // Update coyote time and jump buffer based on ground and ceiling state
+        // Update coyote time and jump buffer
         if (collisionDetector.IsGrounded && !collisionDetector.IsTouchingCeiling)
         {
-            // Only reset double jump when ACTUALLY on ground (not hitting ceiling)
-            
             physics.SetCoyoteTime();
-            physics.ResetDoubleJump(); // Reset when landing
-            physics.SetCanDoubleJump(true); // Enable for next jump
+            physics.ResetDoubleJump();
+            physics.SetCanDoubleJump(true);
             
             // Reset air dash when grounded
             if (dashState != null)
@@ -249,7 +238,6 @@ public class KalbController : MonoBehaviour
         }
         else if (collisionDetector.IsTouchingCeiling)
         {
-            // When hitting ceiling, cancel upward velocity but DON'T reset double jump
             if (rb.linearVelocity.y > 0)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
@@ -262,46 +250,26 @@ public class KalbController : MonoBehaviour
             physics.SetJumpBuffer();
         }
         
-        // Process jump
+        // Process jump with momentum boost
         if (!swimming.IsSwimming && !swimming.IsJumpingFromWater && 
             physics.JumpBufferCounter > 0 && physics.CoyoteTimeCounter > 0)
         {
+            // Apply strong forward force for running jumps
+            ApplyRunningJumpForce();
             stateMachine.ChangeState(jumpState);
             inputHandler.ResetJumpInput();
         }
 
-        // DASH INPUT - CRITICAL FIX
+        // DASH INPUT
         if (inputHandler.DashPressed && abilitySystem.CanDash())
         {
-            // Check if we're NOT already in dash state
-            // This prevents re-entering dash state while dashing
             if (!(stateMachine.CurrentState is KalbDashState))
             {
-                
-                
-                // Check if dash is available from current state
                 if (CanDashFromCurrentState() && dashCooldownTimer <= 0)
                 {
-                   
-                    
-                    // Set cooldown BEFORE entering dash state
-                    //dashCooldownTimer = settings.dashCooldown;
-                    
                     stateMachine.ChangeState(dashState);
                     inputHandler.ResetDashInput();
                 }
-                else if (dashCooldownTimer > 0)
-                {
-                    
-                }
-                else
-                {
-                    
-                }
-            }
-            else
-            {
-               
             }
         }
 
@@ -328,7 +296,6 @@ public class KalbController : MonoBehaviour
         // Handle state updates
         stateMachine.HandleInput();
         stateMachine.Update();
-        
     }
     
     private void FixedUpdate()
@@ -338,6 +305,54 @@ public class KalbController : MonoBehaviour
         stateMachine.FixedUpdate();
     }
     
+    // Apply strong forward force for running jumps
+    private void ApplyRunningJumpForce()
+    {
+        float currentXVelocity = rb.linearVelocity.x;
+        
+        // Determine if this is a running jump
+        bool isRunningJump = false;
+        float runSpeedThreshold = settings.runSpeed * 0.7f;
+        
+        if (stateMachine.CurrentState is KalbRunState)
+        {
+            isRunningJump = true;
+        }
+        else if (inputHandler.DashHeld && abilitySystem.CanRun() && Mathf.Abs(currentXVelocity) > runSpeedThreshold)
+        {
+            isRunningJump = true;
+        }
+        
+        if (isRunningJump)
+        {
+            // Apply a strong forward impulse for running jumps
+            Vector2 forwardDirection = movement.FacingRight ? Vector2.right : Vector2.left;
+            
+            // Calculate forward force - stronger for faster runs
+            float runSpeedRatio = Mathf.Clamp01(Mathf.Abs(currentXVelocity) / settings.runSpeed);
+            float forwardForce = settings.runJumpForwardForce * runSpeedRatio;
+            
+            // Apply the forward impulse
+            rb.AddForce(forwardDirection * forwardForce, ForceMode2D.Impulse);
+            
+            // Start jump momentum preservation
+            movement.StartJumpMomentum(0.4f); // 0.4 seconds of momentum preservation
+            
+            Debug.Log($"RUNNING JUMP: Applied {forwardForce:F2} forward force (Velocity was {currentXVelocity:F2}, Ratio={runSpeedRatio:F2})");
+        }
+        else if (Mathf.Abs(currentXVelocity) > 0.1f)
+        {
+            // Walking jump - preserve momentum with shorter duration
+            movement.StartJumpMomentum(0.2f); // 0.2 seconds for walking jumps
+            Debug.Log($"WALKING JUMP: Preserving velocity {currentXVelocity:F2} for 0.2s");
+        }
+        else
+        {
+            // Stationary jump - no momentum
+            Debug.Log($"STATIONARY JUMP: No horizontal force");
+        }
+    }
+    
     public void TakeDamage(int damage, Vector3 damageSource)
     {
         health.TakeDamage(damage);
@@ -345,11 +360,11 @@ public class KalbController : MonoBehaviour
         // Cancel combo when taking damage
         comboSystem.CancelCombo();
 
-        // Cancel dash when taking damage (NEW)
+        // Cancel dash when taking damage
         if (stateMachine.CurrentState is KalbDashState)
         {
             dashState.ForceResetDash();
-            dashCooldownTimer = 0f; // Reset cooldown if dash was interrupted
+            dashCooldownTimer = 0f;
         }
         
         // Force exit combat state if taking damage
@@ -360,13 +375,11 @@ public class KalbController : MonoBehaviour
         
         if (health.IsDead)
         {
-            // Handle death
             rb.linearVelocity = Vector2.zero;
             animationController.PlayAnimation("Kalb_death");
         }
     }
     
-    // Public methods for ability integration
     public bool CanJump()
     {
         return physics.CoyoteTimeCounter > 0 || physics.JumpBufferCounter > 0;
@@ -374,15 +387,12 @@ public class KalbController : MonoBehaviour
 
     private bool CanAttackFromCurrentState()
     {
-        // Don't allow attacking while swimming
         if (swimming.IsSwimming)
             return false;
 
-        // Don't allow attacking while dashing (NEW)
         if (stateMachine.CurrentState is KalbDashState)
             return false;
         
-        // Allow attacking in these states:
         if (stateMachine.CurrentState is KalbIdleState || 
             stateMachine.CurrentState is KalbWalkState ||
             stateMachine.CurrentState is KalbAirState ||
@@ -390,12 +400,8 @@ public class KalbController : MonoBehaviour
             stateMachine.CurrentState is KalbRunState)
             return true;
         
-        // Don't allow attacking while jumping from water (special case)
-        // Actually, we should allow it! The issue is that IsJumpingFromWater might be true
-        // Let's check if we're actually ascending after water jump
         if (swimming.IsJumpingFromWater && rb.linearVelocity.y > 0)
         {
-            // Allow attacks while ascending from water jump
             return true;
         }
         
@@ -404,14 +410,12 @@ public class KalbController : MonoBehaviour
 
     private bool CanDashFromCurrentState()
     {
-        // Don't allow dashing from these states:
         if (stateMachine.CurrentState is KalbSwimState)
             return false;
         
         if (stateMachine.CurrentState is KalbCombatState)
             return false;
         
-        // Allow dashing from these states:
         if (stateMachine.CurrentState is KalbIdleState)
             return true;
         
@@ -430,26 +434,20 @@ public class KalbController : MonoBehaviour
         return false;
     }
     
-    // NEW: Check if should enter run state
     private bool ShouldEnterRunState()
     {
-        // Must have run ability unlocked
         if (!abilitySystem.CanRun())
             return false;
         
-        // Must be grounded
         if (!collisionDetector.IsGrounded)
             return false;
         
-        // Must be holding dash button
         if (!inputHandler.DashHeld)
             return false;
         
-        // Must have horizontal input
         if (Mathf.Abs(inputHandler.MoveInput.x) < 0.1f)
             return false;
         
-        // Can't enter run from these states
         if (stateMachine.CurrentState is KalbDashState ||
             stateMachine.CurrentState is KalbCombatState ||
             stateMachine.CurrentState is KalbSwimState)
@@ -458,10 +456,8 @@ public class KalbController : MonoBehaviour
         return true;
     }
     
-    // NEW: Check if should continue run state
     private bool ShouldContinueRunState()
     {
-        // Must still meet run conditions
         return ShouldEnterRunState();
     }
 
@@ -471,7 +467,6 @@ public class KalbController : MonoBehaviour
             stateMachine.CurrentState is KalbLedgeClimbState;
     }
     
-    // NEW: Exit to appropriate state
     private void ExitToAppropriateState()
     {
         if (swimming.IsInWater)
@@ -499,7 +494,6 @@ public class KalbController : MonoBehaviour
         }
     }
     
-    // NEW: Method to reset dash cooldown (e.g., when ability is unlocked)
     public void ResetDashCooldown()
     {
         dashCooldownTimer = 0f;
