@@ -7,6 +7,8 @@ public class KalbPhysics : MonoBehaviour
     [SerializeField] private KalbSettings settings;
     [SerializeField] private KalbCollisionDetector collisionDetector;
     [SerializeField] private KalbSwimming swimming;
+    [SerializeField] private KalbGravityManager gravityManager;
+
     
     // Jump state
     private bool isJumpButtonHeld = false;
@@ -25,6 +27,7 @@ public class KalbPhysics : MonoBehaviour
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (collisionDetector == null) collisionDetector = GetComponent<KalbCollisionDetector>();
         if (swimming == null) swimming = GetComponent<KalbSwimming>();
+        if (gravityManager == null) gravityManager = GetComponent<KalbGravityManager>();
         if (settings == null)
         {
             Debug.LogWarning("KalbPhysics: Settings not assigned!");
@@ -68,10 +71,13 @@ public class KalbPhysics : MonoBehaviour
             return;
         }
         
+        // Let gravity manager handle gravity scaling
+        // We just handle jump physics logic here
+        
         // FALLING: Apply increased falling gravity
         if (rb.linearVelocity.y < 0)
         {
-            rb.gravityScale = settings.fallingGravityScale;
+            gravityManager?.SetFallingGravity();
             
             // Clamp to maximum fall speed (terminal velocity)
             if (rb.linearVelocity.y < settings.maxFallSpeed)
@@ -82,12 +88,12 @@ public class KalbPhysics : MonoBehaviour
         // ASCENDING (JUMP RELEASED): Apply quick fall gravity for faster descent
         else if (rb.linearVelocity.y > 0 && !isJumpButtonHeld)
         {
-            rb.gravityScale = settings.fallingGravityScale * settings.quickFallGravityMultiplier;
+            gravityManager?.SetQuickFallGravity();
         }
         // NEUTRAL: Apply normal gravity
         else
         {
-            rb.gravityScale = settings.normalGravityScale;
+            gravityManager?.SetNormalGravity();
         }
     }
     

@@ -39,8 +39,8 @@ public class KalbLedgeClimbState : KalbState
         controller.transform.position = climbTargetPosition;
         
         // DISABLE PHYSICS during climb
-        rb.gravityScale = 0f;
         rb.linearVelocity = Vector2.zero;
+        controller.GravityManager.SetZeroGravity("LedgeClimb");
         
         // Reset physics state
         physics.ResetJumpState();
@@ -57,7 +57,7 @@ public class KalbLedgeClimbState : KalbState
         isFinishing = false;
         
         // RESTORE PHYSICS PROPERLY
-        rb.gravityScale = controller.Settings.normalGravityScale;
+        controller.GravityManager.ClearOverride("LedgeClimb");
         
         // Clear ledge detection after successful climb
         if (ledgeDetector != null)

@@ -17,6 +17,7 @@ public class KalbController : MonoBehaviour
     private KalbAbilitySystem abilitySystem;
     private KalbComboSystem comboSystem;
     private KalbLedgeDetector ledgeDetector;
+    private KalbGravityManager gravityManager;
     
     // State Machine
     private KalbStateMachine stateMachine;
@@ -49,6 +50,8 @@ public class KalbController : MonoBehaviour
     public Rigidbody2D Rb => rb;
     public KalbComboSystem ComboSystem => comboSystem;
     public KalbLedgeDetector LedgeDetector => ledgeDetector;
+
+    public KalbGravityManager GravityManager => gravityManager;
     
     // Dash cooldown property - NEW
     public float DashCooldownTimer
@@ -114,6 +117,9 @@ public class KalbController : MonoBehaviour
 
         ledgeDetector = GetComponent<KalbLedgeDetector>();
         if (ledgeDetector == null) ledgeDetector = gameObject.AddComponent<KalbLedgeDetector>();
+
+        gravityManager = GetComponent<KalbGravityManager>();
+        if (gravityManager == null) gravityManager = gameObject.AddComponent<KalbGravityManager>();
         
         // Create default settings if none provided
         if (settings == null)
@@ -166,8 +172,6 @@ public class KalbController : MonoBehaviour
     private void Update()
     {
         if (health.IsDead) return;
-
-        EnsureProperGravity();
         
         // Update dash cooldown timer
         if (dashCooldownTimer > 0)
@@ -245,6 +249,30 @@ public class KalbController : MonoBehaviour
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
             }
         }
+
+        // DASH INPUT
+        if (inputHandler.DashPressed && abilitySystem.CanDash())
+        {
+            if (!(stateMachine.CurrentState is KalbDashState))
+            {
+                if (CanDashFromCurrentState() && dashCooldownTimer <= 0)
+                {
+                    stateMachine.ChangeState(dashState);
+                    inputHandler.ResetDashInput();
+                }
+            }
+        }
+        
+        // Check for run state transitions
+        if (ShouldEnterRunState() && !(stateMachine.CurrentState is KalbRunState))
+        {
+            // Don't transition to run if we're in incompatible states
+            if (CanTransitionToRunState())
+            {
+                stateMachine.ChangeState(runState);
+                return; // Skip further input processing this frame
+            }
+        }
         
         // Check for jump input
         if (inputHandler.JumpPressed)
@@ -263,28 +291,7 @@ public class KalbController : MonoBehaviour
             inputHandler.ResetJumpInput();
         }
 
-        // DASH INPUT
-        if (inputHandler.DashPressed && abilitySystem.CanDash())
-        {
-            if (!(stateMachine.CurrentState is KalbDashState))
-            {
-                if (CanDashFromCurrentState() && dashCooldownTimer <= 0)
-                {
-                    stateMachine.ChangeState(dashState);
-                    inputHandler.ResetDashInput();
-                }
-            }
-        }
-
-        // Check for run state
-        if (ShouldEnterRunState() && !(stateMachine.CurrentState is KalbRunState))
-        {
-            stateMachine.ChangeState(runState);
-        }
-        else if (stateMachine.CurrentState is KalbRunState && !ShouldContinueRunState())
-        {
-            ExitToAppropriateState();
-        }
+        
 
         // Check for attack
         if (inputHandler.AttackPressed && comboSystem.CanAttack)
@@ -455,6 +462,21 @@ public class KalbController : MonoBehaviour
             stateMachine.CurrentState is KalbCombatState ||
             stateMachine.CurrentState is KalbSwimState)
             return false;
+        
+        return true;
+    }
+
+    private bool CanTransitionToRunState()
+    {
+        // Can't transition to run from these states
+        if (stateMachine.CurrentState is KalbDashState ||
+            stateMachine.CurrentState is KalbCombatState ||
+            stateMachine.CurrentState is KalbSwimState ||
+            stateMachine.CurrentState is KalbLedgeState ||
+            stateMachine.CurrentState is KalbLedgeClimbState)
+        {
+            return false;
+        }
         
         return true;
     }

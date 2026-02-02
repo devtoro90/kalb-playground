@@ -41,6 +41,8 @@ public class KalbDashState : KalbState
         }
         
         StartDash();
+
+        controller.GravityManager?.SetZeroGravity("Dash" );
     }
     
     public override void Exit()
@@ -199,6 +201,8 @@ public class KalbDashState : KalbState
         if (!isDashing) return;
         
         isDashing = false;
+
+        controller.GravityManager.ClearOverride("Dash");
         
         // Restore gravity
         controller.Rb.gravityScale = preDashGravityScale;

@@ -85,11 +85,40 @@ public class KalbMovement : MonoBehaviour
         // Skip if swimming
         if (swimming != null && swimming.IsSwimming) return;
         
-        // CRITICAL FIX: If we have jump momentum, PRESERVE IT by not applying air control
+        // FIXED: Preserve momentum but allow directional control
         if (jumpMomentumTimer > 0)
         {
-            // During jump momentum phase, DO NOT modify horizontal velocity at all
-            // This preserves the running jump momentum
+            // Calculate momentum preservation factor (decays over time)
+            float momentumPreservation = Mathf.Clamp01(jumpMomentumTimer / 0.3f);
+            
+            // Get current velocity
+            float currentXVelocity = rb.linearVelocity.x;
+            float currentSpeed = Mathf.Abs(currentXVelocity);
+            
+            // Calculate target velocity based on input
+            float targetXVelocity = moveInput * settings.moveSpeed * settings.airControlMultiplier;
+            
+            // Only apply control if:
+            // 1. Player is actively providing input, AND
+            // 2. They're trying to go opposite direction OR current speed is below max air speed
+            if (Mathf.Abs(moveInput) > 0.1f && 
+                (Mathf.Sign(moveInput) != Mathf.Sign(currentXVelocity) || currentSpeed < settings.maxAirSpeed))
+            {
+                // Blend between momentum preservation and player control
+                float blendedVelocity = Mathf.Lerp(
+                    currentXVelocity,
+                    targetXVelocity,
+                    (1f - momentumPreservation) * 0.5f // Reduced control during momentum phase
+                );
+                
+                rb.linearVelocity = new Vector2(blendedVelocity, rb.linearVelocity.y);
+            }
+            
+            // Still update flip for consistency
+            if (flipInAir && moveInput != 0)
+            {
+                Flip(moveInput);
+            }
             
             return;
         }
@@ -112,8 +141,8 @@ public class KalbMovement : MonoBehaviour
         }
         
         // Calculate target velocity based on input
-        float targetXVelocity = moveInput * settings.moveSpeed * settings.airControlMultiplier;
-        float velocityDifference = targetXVelocity - rb.linearVelocity.x;
+        float targetSpeed = moveInput * settings.moveSpeed * settings.airControlMultiplier;
+        float velocityDifference = targetSpeed - rb.linearVelocity.x;
         
         // Apply acceleration force toward target velocity
         rb.AddForce(Vector2.right * velocityDifference * settings.airAcceleration);
@@ -179,8 +208,24 @@ public class KalbMovement : MonoBehaviour
     // Method to set jump momentum timer
     public void StartJumpMomentum(float duration = 0.3f)
     {
-        jumpMomentumTimer = duration; // Longer duration for better momentum preservation
+        jumpMomentumTimer = duration;
         
+        // Store current velocity for momentum preservation
+        if (rb != null)
+        {
+            float currentSpeed = Mathf.Abs(rb.linearVelocity.x);
+            
+            // If speed is below walk speed, boost it for better jump feel
+            if (currentSpeed < settings.moveSpeed * 0.5f && settings != null)
+            {
+                float direction = facingRight ? 1f : -1f;
+                float boostAmount = settings.moveSpeed * 0.3f;
+                rb.linearVelocity = new Vector2(
+                    rb.linearVelocity.x + (direction * boostAmount),
+                    rb.linearVelocity.y
+                );
+            }
+        }
     }
     
     // Check if jump momentum is active

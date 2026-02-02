@@ -2236,6 +2236,7 @@ GameObject:
   - component: {fileID: 658198527}
   - component: {fileID: 658198530}
   - component: {fileID: 658198529}
+  - component: {fileID: 658198535}
   - component: {fileID: 658198526}
   - component: {fileID: 658198525}
   - component: {fileID: 658198524}
@@ -2244,7 +2245,6 @@ GameObject:
   - component: {fileID: 658198531}
   - component: {fileID: 658198532}
   - component: {fileID: 658198533}
-  - component: {fileID: 658198535}
   m_Layer: 0
   m_Name: Kalb
   m_TagString: Player
@@ -2415,7 +2415,7 @@ CapsuleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 658198515}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -2547,6 +2547,7 @@ MonoBehaviour:
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
   collisionDetector: {fileID: 658198524}
   swimming: {fileID: 658198531}
+  gravityManager: {fileID: 658198535}
 --- !u!114 &658198530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2631,52 +2632,22 @@ MonoBehaviour:
     m_Bits: 64
   ledgeGrabCooldown: 0.5
   verticalReleaseThreshold: -2
---- !u!61 &658198535
-BoxCollider2D:
+--- !u!114 &658198535
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 658198515}
   m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0.024600506, y: -0.11808163}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.1600001, y: 1.5703111}
-    newSize: {x: 1.1600001, y: 1.5703111}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.62863255, y: 1.3046273}
-  m_EdgeRadius: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6d9c398405a74443a41ec447b6a9510, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KalbGravityManager
+  rb: {fileID: 658198517}
+  settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
+  swimming: {fileID: 658198531}
+  showGravityDebug: 1
 --- !u!1 &690632030
 GameObject:
   m_ObjectHideFlags: 0

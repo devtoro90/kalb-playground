@@ -68,7 +68,8 @@ public class KalbRunState : KalbState
             }
         }
 
-        if (!CanRun() || !ShouldContinueRunning())
+        // FIXED: Check if we should exit run state first
+        if (!ShouldContinueRunning())
         {
             ExitToAppropriateState();
             return;
@@ -133,7 +134,15 @@ public class KalbRunState : KalbState
     
     private bool ShouldContinueRunning()
     {
-        return CanRun();
+        // Must meet all run conditions
+        if (!collisionDetector.IsGrounded) return false;
+        if (!inputHandler.DashHeld) return false;
+        if (Mathf.Abs(inputHandler.MoveInput.x) < 0.1f) return false;
+        
+        // Check ability
+        if (abilitySystem != null && !abilitySystem.CanRun()) return false;
+        
+        return true;
     }
     
     private void UpdateRunSpeed()

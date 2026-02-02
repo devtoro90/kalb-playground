@@ -43,7 +43,8 @@ public class KalbLedgeState : KalbState
         
         // COMPLETELY STOP ALL PHYSICS
         rb.linearVelocity = Vector2.zero;
-        rb.gravityScale = 0f; // CRITICAL: Zero gravity
+        
+        controller.GravityManager.SetZeroGravity("LedgeGrab");
         
         // Calculate exact grab position
         grabPosition = ledgeDetector.CalculateGrabPosition();
@@ -186,7 +187,7 @@ public class KalbLedgeState : KalbState
         }
         
         // Restore gravity IMMEDIATELY
-        rb.gravityScale = controller.Settings.normalGravityScale;
+        controller.GravityManager.ClearOverride("LedgeGrab");
         
         // Calculate release velocity - push away from wall and down
         float releaseHorizontal = -ledgeSide * controller.Settings.ledgeReleaseForce * 0.5f;
