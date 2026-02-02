@@ -18,6 +18,7 @@ public class KalbInputBuffer : MonoBehaviour
     [SerializeField] private float jumpBufferTime = 0.15f;
     [SerializeField] private float dashBufferTime = 0.1f;
     [SerializeField] private float attackBufferTime = 0.1f;
+    [SerializeField] private bool enableDebug = false;
     
     private List<BufferedInput> bufferedInputs = new List<BufferedInput>();
     
@@ -132,7 +133,7 @@ public class KalbInputBuffer : MonoBehaviour
     // Debug visualization
     private void OnGUI()
     {
-        if (!Application.isPlaying) return;
+        if (!Application.isPlaying || !enableDebug) return;
         
         GUILayout.BeginArea(new Rect(10, 100, 200, 200));
         GUILayout.Label("Input Buffer:");

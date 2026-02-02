@@ -16,10 +16,22 @@ public class KalbDashState : KalbState
     private int airDashCount = 0;
     private float preDashGravityScale;
     
+    // Dash direction type
+    public enum DashDirectionType
+    {
+        Forward,
+        Up,
+        Down,
+        UpDiagonal,
+        DownDiagonal
+    }
+    private DashDirectionType currentDashDirectionType = DashDirectionType.Forward;
+    
     public bool IsDashing => isDashing;
     public float DashTimer => dashTimer;
     public Vector2 DashDirection => dashDirection;
     public int AirDashCount => airDashCount;
+    public DashDirectionType CurrentDashDirectionType => currentDashDirectionType;
     
     public KalbDashState(KalbController controller, KalbStateMachine stateMachine) 
         : base(controller, stateMachine)
@@ -149,6 +161,9 @@ public class KalbDashState : KalbState
         // Determine direction
         DetermineDashDirection();
         
+        // Determine dash direction type for animation
+        DetermineDashDirectionType();
+        
         // Track air dash
         if (!collisionDetector.IsGrounded)
         {
@@ -162,8 +177,8 @@ public class KalbDashState : KalbState
         movement.StopHorizontalMovement();
         movement.ResetSmoothing();
         
-        // Play animation
-        controller.AnimationController.PlayAnimation("Kalb_dash");
+        // Play appropriate animation
+        PlayDashAnimation();
     }
     
     private void DetermineDashDirection()
@@ -172,30 +187,85 @@ public class KalbDashState : KalbState
         dashDirection = movement.FacingRight ? Vector2.right : Vector2.left;
         
         // Use input
-        if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
+        if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f || Mathf.Abs(inputHandler.MoveInput.y) > 0.1f)
         {
-            dashDirection = new Vector2(Mathf.Sign(inputHandler.MoveInput.x), 0);
+            dashDirection = new Vector2(inputHandler.MoveInput.x, inputHandler.MoveInput.y).normalized;
             
-            if (settings.canDashDiagonal && Mathf.Abs(inputHandler.MoveInput.y) > 0.1f)
+            // Apply diagonal multiplier if not pure horizontal/vertical
+            if (settings.canDashDiagonal && Mathf.Abs(inputHandler.MoveInput.x) > 0.1f && Mathf.Abs(inputHandler.MoveInput.y) > 0.1f)
             {
-                dashDirection = new Vector2(
-                    Mathf.Sign(inputHandler.MoveInput.x),
-                    Mathf.Sign(inputHandler.MoveInput.y)
-                ).normalized * settings.diagonalDashMultiplier;
+                dashDirection *= settings.diagonalDashMultiplier;
             }
         }
-        else if (settings.canDashDiagonal && Mathf.Abs(inputHandler.MoveInput.y) > 0.1f)
+    }
+    
+    private void DetermineDashDirectionType()
+    {
+        float horizontalInput = Mathf.Abs(inputHandler.MoveInput.x);
+        float verticalInput = Mathf.Abs(inputHandler.MoveInput.y);
+        float inputThreshold = 0.1f;
+        
+        // If no directional input, use forward dash
+        if (horizontalInput < inputThreshold && verticalInput < inputThreshold)
         {
-            dashDirection = new Vector2(0, Mathf.Sign(inputHandler.MoveInput.y));
+            currentDashDirectionType = DashDirectionType.Forward;
+            return;
         }
         
-        dashDirection = dashDirection.normalized;
+        // Pure vertical dashes
+        if (horizontalInput < inputThreshold && verticalInput > inputThreshold)
+        {
+            if (inputHandler.MoveInput.y > 0)
+                currentDashDirectionType = DashDirectionType.Up;
+            else
+                currentDashDirectionType = DashDirectionType.Down;
+            return;
+        }
+        
+        // Pure horizontal dashes
+        if (horizontalInput > inputThreshold && verticalInput < inputThreshold)
+        {
+            currentDashDirectionType = DashDirectionType.Forward;
+            return;
+        }
+        
+        // Diagonal dashes
+        if (horizontalInput > inputThreshold && verticalInput > inputThreshold)
+        {
+            if (inputHandler.MoveInput.y > 0)
+                currentDashDirectionType = DashDirectionType.UpDiagonal;
+            else
+                currentDashDirectionType = DashDirectionType.DownDiagonal;
+        }
+    }
+    
+    private void PlayDashAnimation()
+    {
+        switch (currentDashDirectionType)
+        {
+            case DashDirectionType.Forward:
+                controller.AnimationController.PlayAnimation("Kalb_dash");
+                break;
+            case DashDirectionType.Up:
+                controller.AnimationController.PlayAnimation("Kalb_dash_up");
+                break;
+            case DashDirectionType.Down:
+                controller.AnimationController.PlayAnimation("Kalb_dash_down");
+                break;
+            case DashDirectionType.UpDiagonal:
+                controller.AnimationController.PlayAnimation("Kalb_dash_up_diagonal");
+                break;
+            case DashDirectionType.DownDiagonal:
+                controller.AnimationController.PlayAnimation("Kalb_dash_down_diagonal");
+                break;
+        }
     }
     
     private void ApplyDashMovement()
     {
         if (!isDashing || controller.Rb == null) return;
         
+        // Apply dash movement based on direction
         controller.Rb.linearVelocity = dashDirection * settings.dashSpeed;
         controller.Rb.gravityScale = 0f;
     }

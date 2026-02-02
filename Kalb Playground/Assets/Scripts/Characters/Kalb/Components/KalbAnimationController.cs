@@ -45,7 +45,7 @@ public class KalbAnimationController : MonoBehaviour
         // Check if dashing (high priority)
         if (controller != null && controller.DashState != null && controller.DashState.IsDashing)
         {
-            PlayAnimation("Kalb_dash");
+            UpdateDashAnimation();
             return;
         }
 
@@ -85,6 +85,37 @@ public class KalbAnimationController : MonoBehaviour
         if (movement != null)
         {
             animator.SetBool("FacingRight", movement.FacingRight);
+        }
+    }
+    
+    private void UpdateDashAnimation()
+    {
+        if (controller.DashState == null) return;
+        
+        // Get the current dash direction type
+        var dashState = controller.DashState;
+        
+        // Use appropriate animation based on dash direction
+        switch (dashState.CurrentDashDirectionType)
+        {
+            case KalbDashState.DashDirectionType.Forward:
+                PlayAnimation("Kalb_dash");
+                break;
+            case KalbDashState.DashDirectionType.Up:
+                PlayAnimation("Kalb_dash_up");
+                break;
+            case KalbDashState.DashDirectionType.Down:
+                PlayAnimation("Kalb_dash_down");
+                break;
+            case KalbDashState.DashDirectionType.UpDiagonal:
+                PlayAnimation("Kalb_dash_up_diagonal");
+                break;
+            case KalbDashState.DashDirectionType.DownDiagonal:
+                PlayAnimation("Kalb_dash_down_diagonal");
+                break;
+            default:
+                PlayAnimation("Kalb_dash"); // Fallback
+                break;
         }
     }
     
