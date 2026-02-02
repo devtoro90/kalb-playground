@@ -43,6 +43,10 @@ public class KalbRunState : KalbState
         currentRunSpeed = Mathf.Max(movement.FacingRight ? controller.Rb.linearVelocity.x : -controller.Rb.linearVelocity.x, settings.moveSpeed);
         
         UpdateAnimation();
+
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
     }
     
     public override void Exit()

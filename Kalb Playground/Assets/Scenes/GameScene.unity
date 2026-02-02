@@ -2235,6 +2235,7 @@ GameObject:
   - component: {fileID: 658198523}
   - component: {fileID: 658198527}
   - component: {fileID: 658198530}
+  - component: {fileID: 658198536}
   - component: {fileID: 658198529}
   - component: {fileID: 658198535}
   - component: {fileID: 658198526}
@@ -2648,6 +2649,21 @@ MonoBehaviour:
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
   swimming: {fileID: 658198531}
   showGravityDebug: 1
+--- !u!114 &658198536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658198515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53a3ed8caa9b94d3fb77524dff201bb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KalbInputBuffer
+  jumpBufferTime: 0.15
+  dashBufferTime: 0.1
+  attackBufferTime: 0.1
 --- !u!1 &690632030
 GameObject:
   m_ObjectHideFlags: 0

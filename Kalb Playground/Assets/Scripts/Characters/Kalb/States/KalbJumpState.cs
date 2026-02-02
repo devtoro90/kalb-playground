@@ -47,6 +47,10 @@ public class KalbJumpState : KalbState
         {
             physics.SetCanDoubleJump(true);
         }
+
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
     }
     
     public override void Exit()

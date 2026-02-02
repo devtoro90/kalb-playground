@@ -18,6 +18,7 @@ public class KalbController : MonoBehaviour
     private KalbComboSystem comboSystem;
     private KalbLedgeDetector ledgeDetector;
     private KalbGravityManager gravityManager;
+    private KalbInputBuffer inputBuffer;
     
     // State Machine
     private KalbStateMachine stateMachine;
@@ -50,8 +51,8 @@ public class KalbController : MonoBehaviour
     public Rigidbody2D Rb => rb;
     public KalbComboSystem ComboSystem => comboSystem;
     public KalbLedgeDetector LedgeDetector => ledgeDetector;
-
     public KalbGravityManager GravityManager => gravityManager;
+    public KalbInputBuffer InputBuffer => inputBuffer;
     
     // Dash cooldown property - NEW
     public float DashCooldownTimer
@@ -120,6 +121,9 @@ public class KalbController : MonoBehaviour
 
         gravityManager = GetComponent<KalbGravityManager>();
         if (gravityManager == null) gravityManager = gameObject.AddComponent<KalbGravityManager>();
+
+        inputBuffer = GetComponent<KalbInputBuffer>();
+        if (inputBuffer == null) inputBuffer = gameObject.AddComponent<KalbInputBuffer>();
         
         // Create default settings if none provided
         if (settings == null)
@@ -257,8 +261,13 @@ public class KalbController : MonoBehaviour
             {
                 if (CanDashFromCurrentState() && dashCooldownTimer <= 0)
                 {
-                    stateMachine.ChangeState(dashState);
-                    inputHandler.ResetDashInput();
+                    inputBuffer.BufferDash();
+
+                    if(inputBuffer.ConsumeBufferedInput("Dash"))
+                    {
+                        stateMachine.ChangeState(dashState);
+                        inputHandler.ResetDashInput();
+                    }
                 }
             }
         }
@@ -278,6 +287,7 @@ public class KalbController : MonoBehaviour
         if (inputHandler.JumpPressed)
         {
             physics.SetJumpBuffer();
+            inputBuffer.BufferJump();
         }
         
         // Process jump with momentum boost
@@ -285,10 +295,13 @@ public class KalbController : MonoBehaviour
             physics.JumpBufferCounter > 0 && physics.CoyoteTimeCounter > 0 &&
             stateMachine.CurrentState is not KalbAirState)
         {
-            // Apply strong forward force for running jumps
-            ApplyRunningJumpForce();
-            stateMachine.ChangeState(jumpState);
-            inputHandler.ResetJumpInput();
+            if(inputBuffer.ConsumeBufferedInput("Jump"))
+            {
+                // Apply strong forward force for running jumps
+                ApplyRunningJumpForce();
+                stateMachine.ChangeState(jumpState);
+                inputHandler.ResetJumpInput();
+            }
         }
 
         
@@ -298,8 +311,13 @@ public class KalbController : MonoBehaviour
         {
             if (CanAttackFromCurrentState())
             {
-                stateMachine.ChangeState(combatState);
-                inputHandler.ResetAttackInput();
+                inputBuffer.BufferAttack();
+
+                if(inputBuffer.ConsumeBufferedInput("Attack"))
+                {
+                    stateMachine.ChangeState(combatState);
+                    inputHandler.ResetAttackInput();
+                }
             }
         }
         

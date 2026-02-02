@@ -68,6 +68,10 @@ public class KalbLedgeState : KalbState
         
         // Play grab animation
         controller.AnimationController.PlayAnimation("Kalb_ledge_grab");
+
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
         
         
     }

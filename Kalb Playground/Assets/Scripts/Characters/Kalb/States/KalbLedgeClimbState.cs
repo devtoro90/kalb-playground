@@ -47,6 +47,10 @@ public class KalbLedgeClimbState : KalbState
         
         // Play climb animation - animation will handle the visual climb
         controller.AnimationController.PlayAnimation("Kalb_ledge_climb");
+
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
         
         
     }

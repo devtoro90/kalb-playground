@@ -25,6 +25,9 @@ public class KalbCombatState : KalbState
     {
         // Start the combo attack
         comboSystem.StartAttack();
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
     }
     
     public override void Exit()

@@ -21,6 +21,9 @@ public class KalbAirState : KalbState
     public override void Enter()
     {
         UpdateAnimation();
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
     }
     
     public override void Update()

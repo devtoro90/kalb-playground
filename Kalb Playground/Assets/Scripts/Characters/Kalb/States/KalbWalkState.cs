@@ -21,6 +21,10 @@ public class KalbWalkState : KalbState
     public override void Enter()
     {
         controller.AnimationController.PlayAnimation("Kalb_walk");
+
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
     }
     
     public override void Update()

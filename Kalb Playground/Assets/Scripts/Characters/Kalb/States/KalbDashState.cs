@@ -43,6 +43,10 @@ public class KalbDashState : KalbState
         StartDash();
 
         controller.GravityManager?.SetZeroGravity("Dash" );
+
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
     }
     
     public override void Exit()

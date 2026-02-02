@@ -22,6 +22,10 @@ public class KalbIdleState : KalbState
     {
         controller.AnimationController.PlayAnimation("Kalb_idle");
         movement.ResetSmoothing(); // Reset smoothing when entering idle
+
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
     }
     
     public override void Update()

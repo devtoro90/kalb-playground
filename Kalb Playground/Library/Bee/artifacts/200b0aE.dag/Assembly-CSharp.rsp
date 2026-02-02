@@ -474,6 +474,7 @@
 "Assets/Scripts/Characters/Kalb/Components/KalbCollisionDetector.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbGravityManager.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbHealth.cs"
+"Assets/Scripts/Characters/Kalb/Components/KalbInputBuffer.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbInputHandler.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbLedgeDetector.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbMovement.cs"

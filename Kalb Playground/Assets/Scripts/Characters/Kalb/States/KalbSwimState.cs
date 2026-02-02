@@ -34,6 +34,10 @@ public class KalbSwimState : KalbState
 
         // Cancel combo when entering swim state
         controller.ComboSystem?.CancelCombo();
+
+        controller.InputBuffer?.ClearBufferedInput("Jump");
+        controller.InputBuffer?.ClearBufferedInput("Dash");
+        controller.InputBuffer?.ClearBufferedInput("Attack");
     }
     
     public override void Exit()
@@ -198,6 +202,7 @@ public class KalbSwimState : KalbState
         
         // Reset jump input so we don't double-jump
         inputHandler.ResetJumpInput();
+        
         
        
     }
