@@ -143,6 +143,46 @@ public class KalbWallJump : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, settings.wallSlideSpeed);
         }
+
+        // Apply force toward the wall to prevent drifting
+        float currentDistanceToWall = GetDistanceToWall();
+        
+        if (currentDistanceToWall > settings.wallStickTolerance)
+        {
+            // Apply force toward the wall
+            float forceMultiplier = Mathf.Clamp((currentDistanceToWall - settings.wallStickTolerance) * 10f, 0, 10f);
+            Vector2 wallForce = new Vector2(wallSide * settings.wallStickForce * forceMultiplier * Time.fixedDeltaTime, 0);
+            rb.AddForce(wallForce);
+        }
+        
+        // If no horizontal input, clamp horizontal velocity
+        if (controller.InputHandler == null || Mathf.Abs(controller.InputHandler.MoveInput.x) < 0.1f)
+        {
+            // Allow very slight movement but prevent drifting
+            float maxDrift = 0.05f;
+            if (Mathf.Abs(rb.linearVelocity.x) > maxDrift)
+            {
+                rb.linearVelocity = new Vector2(
+                    Mathf.MoveTowards(rb.linearVelocity.x, 0, 20f * Time.fixedDeltaTime),
+                    rb.linearVelocity.y
+                );
+            }
+        }
+    }
+
+    public float GetDistanceToWall()
+    {
+        if (!isTouchingWall) return Mathf.Infinity;
+        
+        Vector2 checkPosition = wallCheckMiddle.position;
+        RaycastHit2D hit = Physics2D.Raycast(
+            checkPosition,
+            Vector2.right * wallSide,
+            settings.wallCheckDistance,
+            settings.wallLayer
+        );
+        
+        return hit.collider != null ? hit.distance : Mathf.Infinity;
     }
     
     public bool CanWallJump()

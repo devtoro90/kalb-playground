@@ -128,6 +128,8 @@ public class KalbSettings : ScriptableObject
     public float wallCheckDistance = 0.45f;
     public float wallSlideSpeed = -2.5f;// Time player sticks to wall before sliding
     public LayerMask wallLayer;
+    public float wallStickForce = 5f;
+    public float wallStickTolerance = 0.1f;
     
     [Header("Wall Jump Force")]
     public float wallJumpForce = 13f;

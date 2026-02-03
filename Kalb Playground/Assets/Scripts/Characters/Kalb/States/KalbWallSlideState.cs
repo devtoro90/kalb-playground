@@ -34,6 +34,14 @@ public class KalbWallSlideState : KalbState
         
         // Set gravity for wall slide
         controller.GravityManager.SetNormalGravity();
+
+        // Apply immediate force toward the wall
+        if (wallJump != null && wallJump.WallSide != 0)
+        {
+            // Push slightly toward the wall to ensure contact
+            Vector2 wallPush = new Vector2(wallJump.WallSide * 2f, 0);
+            rb.AddForce(wallPush, ForceMode2D.Impulse);
+        }
         
         // Reset input buffer
         controller.InputBuffer?.ClearBufferedInput("Jump");
@@ -51,8 +59,13 @@ public class KalbWallSlideState : KalbState
         // Check if we should exit wall slide
         if (!ShouldContinueWallSliding())
         {
-            ExitToAppropriateState();
-            return;
+            // Add a small tolerance for drifting
+            float currentDistanceToWall = wallJump.GetDistanceToWall();
+            if (currentDistanceToWall > 0.3f) // Only exit if significantly away from wall
+            {
+                ExitToAppropriateState();
+                return;
+            }
         }
         
         // Check for ledge (higher priority than wall slide)
