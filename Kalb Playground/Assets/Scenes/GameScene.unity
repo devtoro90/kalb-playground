@@ -1082,7 +1082,7 @@ TilemapRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
-  m_ChunkCullingBounds: {x: 0.02020204, y: 0.02020204, z: 0}
+  m_ChunkCullingBounds: {x: 0.025510192, y: 0.010204077, z: 0}
   m_MaxChunkCount: 16
   m_MaxFrameAge: 16
   m_SortOrder: 0
@@ -2246,6 +2246,7 @@ GameObject:
   - component: {fileID: 658198531}
   - component: {fileID: 658198532}
   - component: {fileID: 658198533}
+  - component: {fileID: 658198537}
   m_Layer: 0
   m_Name: Kalb
   m_TagString: Player
@@ -2348,11 +2349,12 @@ Transform:
   m_GameObject: {fileID: 658198515}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.28, y: -2.18, z: 0}
+  m_LocalPosition: {x: -6.96, y: -2.18, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 690632031}
+  - {fileID: 1525144135}
   - {fileID: 313741843}
   - {fileID: 698528782}
   m_Father: {fileID: 0}
@@ -2477,6 +2479,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1324d21db18734384bc608ca592db4e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KalbMovement
+  controller: {fileID: 0}
   rb: {fileID: 658198517}
   collisionDetector: {fileID: 658198524}
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
@@ -2664,6 +2667,27 @@ MonoBehaviour:
   jumpBufferTime: 0.15
   dashBufferTime: 0.1
   attackBufferTime: 0.1
+  enableDebug: 0
+--- !u!114 &658198537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658198515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 884fd28255cea47dcb3fe400bafde116, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KalbWallJump
+  controller: {fileID: 658198527}
+  rb: {fileID: 658198517}
+  collisionDetector: {fileID: 658198524}
+  movement: {fileID: 658198525}
+  physics: {fileID: 658198529}
+  wallCheckMiddle: {fileID: 1525144135}
+  settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
+  playerCollider: {fileID: 658198523}
 --- !u!1 &690632030
 GameObject:
   m_ObjectHideFlags: 0
@@ -3105,6 +3129,37 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &1525144134
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1525144135}
+  m_Layer: 0
+  m_Name: WallCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1525144135
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1525144134}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.1, y: -0.24, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 658198519}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2102329490
 GameObject:
   m_ObjectHideFlags: 0

@@ -77,6 +77,12 @@ public class KalbAirState : KalbState
     
     public override void HandleInput()
     {
+        // Check for wall slide state (ADD THIS at the beginning)
+        if (controller.WallJump != null && controller.WallJump.IsWallSliding)
+        {
+            stateMachine.ChangeState(controller.WallSlideState);
+            return;
+        }
         
         // Check for jump input (for coyote time or double jump)
         if (inputHandler.JumpPressed)

@@ -10,7 +10,8 @@ Scripts
 │   │   │   ├── KalbMovement.cs
 │   │   │   ├── KalbPhysics.cs
 │   │   │   ├── KalbStateMachine.cs
-│   │   │   └── KalbSwimming.cs
+│   │   │   ├── KalbSwimming.cs
+│   │   │   └── KalbWallJump.cs
 │   │   ├── Data/
 │   │   │   └── KalbSettings.cs
 │   │   ├── Interfaces/
@@ -26,7 +27,8 @@ Scripts
 │   │   │   ├── KalbRunState.cs
 │   │   │   ├── KalbState.cs
 │   │   │   ├── KalbSwimState.cs
-│   │   │   └── KalbWalkState.cs
+│   │   │   ├── KalbWalkState.cs
+│   │   │   └── KalbWallSlideState.cs
 │   │   ├── Systems/
 │   │   │   ├── KalbAbilitySystem.cs
 │   │   │   └── KalbComboSystem.cs

@@ -19,6 +19,7 @@ public class KalbController : MonoBehaviour
     private KalbLedgeDetector ledgeDetector;
     private KalbGravityManager gravityManager;
     private KalbInputBuffer inputBuffer;
+    private KalbWallJump wallJump;
     
     // State Machine
     private KalbStateMachine stateMachine;
@@ -34,13 +35,13 @@ public class KalbController : MonoBehaviour
     private KalbDashState dashState;  
     private KalbLedgeState ledgeState;
     private KalbLedgeClimbState ledgeClimbState;
+    private KalbWallSlideState wallSlideState;
     
     // Dash cooldown tracking - MOVED HERE from KalbDashState
     private float dashCooldownTimer = 0f;
     
     // Ground check tolerance to prevent flickering
     private bool wasGroundedLastFrame = true;
-    private float groundStickTime = 0.1f;
     private float groundStickTimer = 0f;
     private const float GROUND_STICK_THRESHOLD = 0.15f; // How long to stay "grounded" after leaving ground
     
@@ -59,6 +60,7 @@ public class KalbController : MonoBehaviour
     public KalbLedgeDetector LedgeDetector => ledgeDetector;
     public KalbGravityManager GravityManager => gravityManager;
     public KalbInputBuffer InputBuffer => inputBuffer;
+    public KalbWallJump WallJump => wallJump;
     
     // Dash cooldown property - NEW
     public float DashCooldownTimer
@@ -78,6 +80,7 @@ public class KalbController : MonoBehaviour
     public KalbDashState DashState => dashState; 
     public KalbLedgeState LedgeState => ledgeState;
     public KalbLedgeClimbState LedgeClimbState => ledgeClimbState;
+    public KalbWallSlideState WallSlideState => wallSlideState;
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     
@@ -130,6 +133,9 @@ public class KalbController : MonoBehaviour
 
         inputBuffer = GetComponent<KalbInputBuffer>();
         if (inputBuffer == null) inputBuffer = gameObject.AddComponent<KalbInputBuffer>();
+
+        wallJump = GetComponent<KalbWallJump>();
+        if (wallJump == null) wallJump = gameObject.AddComponent<KalbWallJump>();
         
         // Create default settings if none provided
         if (settings == null)
@@ -153,6 +159,7 @@ public class KalbController : MonoBehaviour
         dashState = new KalbDashState(this, stateMachine);  
         ledgeState = new KalbLedgeState(this, stateMachine);        
         ledgeClimbState = new KalbLedgeClimbState(this, stateMachine); 
+        wallSlideState = new KalbWallSlideState(this, stateMachine);    
         
         // Start with idle state
         stateMachine.Initialize(idleState);
@@ -191,6 +198,12 @@ public class KalbController : MonoBehaviour
         
         // Update ground stick timer for smoother transitions
         UpdateGroundStickTimer();
+
+        if (ShouldEnterWallSlideState() && !(stateMachine.CurrentState is KalbWallSlideState))
+        {
+            stateMachine.ChangeState(wallSlideState);
+            return; // Skip further input processing this frame
+        }
 
         // Check for ledge grab
         if (settings.ledgeGrabUnlocked && !IsInLedgeState() && ledgeDetector != null && 
@@ -455,7 +468,7 @@ public class KalbController : MonoBehaviour
         return physics.CoyoteTimeCounter > 0 || physics.JumpBufferCounter > 0;
     }
 
-    private bool CanAttackFromCurrentState()
+    public bool CanAttackFromCurrentState()
     {
         if (swimming.IsSwimming)
             return false;
@@ -478,7 +491,7 @@ public class KalbController : MonoBehaviour
         return false;
     }
 
-    private bool CanDashFromCurrentState()
+    public bool CanDashFromCurrentState()
     {
         if (stateMachine.CurrentState is KalbSwimState)
             return false;
@@ -529,6 +542,26 @@ public class KalbController : MonoBehaviour
     private bool CanTransitionToRunState()
     {
         // Can't transition to run from these states
+        if (stateMachine.CurrentState is KalbDashState ||
+            stateMachine.CurrentState is KalbCombatState ||
+            stateMachine.CurrentState is KalbSwimState ||
+            stateMachine.CurrentState is KalbLedgeState ||
+            stateMachine.CurrentState is KalbLedgeClimbState)
+        {
+            return false;
+        }
+        
+        return true;
+    }
+
+    private bool ShouldEnterWallSlideState()
+    {
+        if (wallJump == null) return false;
+        
+        // Must be wall sliding
+        if (!wallJump.IsWallSliding) return false;
+        
+        // Don't enter from incompatible states
         if (stateMachine.CurrentState is KalbDashState ||
             stateMachine.CurrentState is KalbCombatState ||
             stateMachine.CurrentState is KalbSwimState ||

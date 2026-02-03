@@ -123,4 +123,15 @@ public class KalbSettings : ScriptableObject
     public float doubleJumpForce = 10f;
     public bool doubleJumpMaintainsMomentum = true;
     public float doubleJumpHorizontalBoost = 1.5f;
+
+    [Header("Wall Jump Settings")]
+    public float wallCheckDistance = 0.6f;
+    public float wallSlideSpeed = -2f;
+    public float wallStickTime = 0.25f; // Time player sticks to wall before sliding
+    public LayerMask wallLayer;
+    
+    [Header("Wall Jump Force")]
+    public float wallJumpForce = 15f;
+    public Vector2 wallJumpAngle = new Vector2(1.2f, 1f); // X,Y ratio
+    public float wallJumpHorizontalLockDuration = 0.2f; // Time player can't move toward wall after jump
 }

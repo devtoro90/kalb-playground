@@ -57,7 +57,9 @@
     <Compile Include="Assets/Scripts/Characters/Kalb/KalbController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark02.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbMovement.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbWallSlideState.cs" />
     <Compile Include="Assets/Scripts/Testing/TestDamageTrigger.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbWallJump.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbWalkState.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbInputBuffer.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_ExampleScript_01.cs" />

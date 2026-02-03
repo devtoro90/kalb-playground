@@ -27,6 +27,13 @@ public class KalbAnimationController : MonoBehaviour
     private void UpdateAnimations()
     {
         if (animator == null) return;
+        
+        // Check if wall sliding (add this near the top with other priority checks)
+        if (controller.WallJump != null && controller.WallJump.IsWallSliding)
+        {
+            PlayAnimation("Kalb_wallslide");
+            return;
+        }
 
         // Check if ledge climbing (highest priority)
         if (controller != null && controller.LedgeClimbState != null && controller.LedgeClimbState.IsLedgeClimbing)

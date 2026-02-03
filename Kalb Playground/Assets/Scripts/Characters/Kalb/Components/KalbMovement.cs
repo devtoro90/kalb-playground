@@ -86,6 +86,18 @@ public class KalbMovement : MonoBehaviour
         
         // Skip if swimming
         if (swimming != null && swimming.IsSwimming) return;
+
+        // CRITICAL: Skip air control if wall sliding
+        if (controller.WallJump != null && controller.WallJump.IsWallSliding)
+        {
+            return; // Wall slide state handles its own physics
+        }
+
+        if(controller.WallJump != null)
+        {
+            // Don't apply regular air control during wall jump momentum phase
+            moveInput = controller.WallJump.GetHorizontalInputLock(moveInput);
+        }
         
         // FIXED: Preserve momentum but allow directional control
         if (jumpMomentumTimer > 0)
