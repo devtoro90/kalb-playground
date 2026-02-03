@@ -76,7 +76,7 @@ public class KalbAnimationController : MonoBehaviour
         animator.SetFloat("Speed", speed);
         
         // Set grounded parameter
-        animator.SetBool("IsGrounded", collisionDetector != null && collisionDetector.IsGrounded);
+        animator.SetBool("IsGrounded", collisionDetector != null && controller.IsEffectivelyGrounded());
         
         // Set vertical velocity parameter
         animator.SetFloat("VerticalVelocity", rb.linearVelocity.y);

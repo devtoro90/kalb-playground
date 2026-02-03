@@ -96,7 +96,7 @@ public class KalbCombatState : KalbState
     
     private void TransitionToNextState()
     {
-        if (collisionDetector.IsGrounded)
+        if (controller.IsEffectivelyGrounded())
         {
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
             {

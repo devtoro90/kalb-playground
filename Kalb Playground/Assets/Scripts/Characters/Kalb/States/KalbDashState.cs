@@ -131,7 +131,7 @@ public class KalbDashState : KalbState
         }
         
         // Ground dash - always available
-        if (collisionDetector.IsGrounded)
+        if (controller.IsEffectivelyGrounded())
         {
             return true;
         }
@@ -167,7 +167,7 @@ public class KalbDashState : KalbState
         DetermineDashDirectionType();
         
         // Track air dash - ALL air dashes count toward the limit
-        if (!collisionDetector.IsGrounded || currentDashDirectionType != DashDirectionType.Forward)
+        if (!controller.IsEffectivelyGrounded() || currentDashDirectionType != DashDirectionType.Forward)
         {
             airDashCount++;
             
@@ -320,7 +320,7 @@ public class KalbDashState : KalbState
         }
         
         // Check grounded
-        if (!collisionDetector.IsGrounded)
+        if (!controller.IsEffectivelyGrounded())
         {
             stateMachine.ChangeState(controller.AirState);
             return;
@@ -369,7 +369,7 @@ public class KalbDashState : KalbState
         if (!CanDash()) return false;
         
         // If we're grounded, all directions are available
-        if (collisionDetector.IsGrounded) return true;
+        if (controller.IsEffectivelyGrounded()) return true;
         
         // If we're in air, check air dash count
         

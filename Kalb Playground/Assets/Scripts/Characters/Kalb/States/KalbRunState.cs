@@ -59,7 +59,7 @@ public class KalbRunState : KalbState
     public override void Update()
     {
         // Check for ledge state
-        if (controller.LedgeDetector.LedgeDetected && !collisionDetector.IsGrounded && 
+        if (controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() && 
             controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
         {
             float playerBottom = controller.GetComponent<Collider2D>().bounds.min.y;
@@ -85,7 +85,7 @@ public class KalbRunState : KalbState
             return;
         }
         
-        if (!collisionDetector.IsGrounded)
+        if (!controller.IsEffectivelyGrounded())
         {
             stateMachine.ChangeState(controller.AirState);
             return;
@@ -124,7 +124,7 @@ public class KalbRunState : KalbState
         if (abilitySystem != null && !abilitySystem.CanRun())
             return false;
         
-        if (!collisionDetector.IsGrounded)
+        if (!controller.IsEffectivelyGrounded())
             return false;
         
         if (!inputHandler.DashHeld)
@@ -139,7 +139,7 @@ public class KalbRunState : KalbState
     private bool ShouldContinueRunning()
     {
         // Must meet all run conditions
-        if (!collisionDetector.IsGrounded) return false;
+        if (!controller.IsEffectivelyGrounded()) return false;
         if (!inputHandler.DashHeld) return false;
         if (Mathf.Abs(inputHandler.MoveInput.x) < 0.1f) return false;
         
@@ -213,7 +213,7 @@ public class KalbRunState : KalbState
         {
             stateMachine.ChangeState(controller.SwimState);
         }
-        else if (!collisionDetector.IsGrounded)
+        else if (!controller.IsEffectivelyGrounded())
         {
             stateMachine.ChangeState(controller.AirState);
         }

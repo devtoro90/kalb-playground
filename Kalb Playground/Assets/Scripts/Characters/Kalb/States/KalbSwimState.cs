@@ -162,7 +162,7 @@ public class KalbSwimState : KalbState
             stateMachine.ChangeState(controller.AirState);
         }
         // Check if we're grounded
-        else if (controller.CollisionDetector.IsGrounded)
+        else if (controller.IsEffectivelyGrounded())
         {
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
             {

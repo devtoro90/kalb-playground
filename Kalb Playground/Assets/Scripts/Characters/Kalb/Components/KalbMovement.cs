@@ -3,6 +3,7 @@ using UnityEngine;
 public class KalbMovement : MonoBehaviour
 {
     [Header("References")]
+    [SerializeField] private KalbController controller;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private KalbCollisionDetector collisionDetector;
     [SerializeField] private KalbSettings settings;
@@ -27,6 +28,7 @@ public class KalbMovement : MonoBehaviour
     
     private void Start()
     {
+        if (controller == null) controller = GetComponent<KalbController>();
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (collisionDetector == null) collisionDetector = GetComponent<KalbCollisionDetector>();
         if (swimming == null) swimming = GetComponent<KalbSwimming>();
@@ -80,7 +82,7 @@ public class KalbMovement : MonoBehaviour
     public void ApplyAirControl(float moveInput)
     {
         if (collisionDetector == null || rb == null || settings == null) return;
-        if (collisionDetector.IsGrounded) return;
+        if (controller.IsEffectivelyGrounded()) return;
         
         // Skip if swimming
         if (swimming != null && swimming.IsSwimming) return;

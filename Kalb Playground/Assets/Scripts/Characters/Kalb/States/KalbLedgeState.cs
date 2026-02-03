@@ -98,11 +98,11 @@ public class KalbLedgeState : KalbState
         if (isReleasing) return;
         
         // Check if we should release (e.g., fell off or grounded)
-        if (!ledgeDetector.LedgeDetected || collisionDetector.IsGrounded)
+        if (!ledgeDetector.LedgeDetected || controller.IsEffectivelyGrounded()) // CHANGED
         {
             // Only auto-release if we're significantly away from ledge
             float distanceToLedge = Vector2.Distance(controller.transform.position, grabPosition);
-            if (distanceToLedge > 0.3f || collisionDetector.IsGrounded)
+            if (distanceToLedge > 0.3f || controller.IsEffectivelyGrounded())
             {
                 ReleaseLedge();
                 return;

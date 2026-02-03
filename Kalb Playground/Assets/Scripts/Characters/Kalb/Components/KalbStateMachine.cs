@@ -14,7 +14,7 @@ public class KalbStateMachine
     
     public void ChangeState(KalbState newState)
     {
-        
+        Debug.Log($"KalbStateMachine: Changing state from {currentState.GetType().Name} to {newState.GetType().Name}");
         currentState.Exit();
         currentState = newState;
         currentState.Enter();

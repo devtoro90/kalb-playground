@@ -68,7 +68,7 @@ public class KalbLedgeDetector : MonoBehaviour
         }
         
         // Don't check if grounded or moving upward
-        if (collisionDetector.IsGrounded || controller.Rb.linearVelocity.y >= 0)
+        if (controller.IsEffectivelyGrounded() || controller.Rb.linearVelocity.y >= 0)
         {
             ledgeDetected = false;
             return false;

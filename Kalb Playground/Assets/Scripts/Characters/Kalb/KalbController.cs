@@ -244,7 +244,7 @@ public class KalbController : MonoBehaviour
         }
         
         // Update coyote time and jump buffer
-        if (collisionDetector.IsGrounded && !collisionDetector.IsTouchingCeiling)
+        if (IsEffectivelyGrounded() && !collisionDetector.IsTouchingCeiling)
         {
             physics.SetCoyoteTime();
             physics.ResetDoubleJump();
