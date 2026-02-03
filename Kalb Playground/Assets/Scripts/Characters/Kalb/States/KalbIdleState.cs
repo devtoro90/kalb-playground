@@ -31,7 +31,7 @@ public class KalbIdleState : KalbState
     public override void Update()
     {
         // Check for ledge state
-        if (controller.LedgeDetector.LedgeDetected && !collisionDetector.IsGrounded && 
+        if (controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() && // CHANGED
             controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
         {
             // Check if we should auto-grab
@@ -52,7 +52,7 @@ public class KalbIdleState : KalbState
             return;
         }
         
-        if (!collisionDetector.IsGrounded)
+        if (!controller.IsEffectivelyGrounded()) // CHANGED
         {
             stateMachine.ChangeState(controller.AirState);
             return;
@@ -74,7 +74,7 @@ public class KalbIdleState : KalbState
     public override void FixedUpdate()
     {
         // Apply friction even in idle state to stop any residual movement
-        movement.Move(0, collisionDetector.IsGrounded);
+        movement.Move(0, controller.IsEffectivelyGrounded()); // CHANGED
     }
     
     public override void HandleInput()

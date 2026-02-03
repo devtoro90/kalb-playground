@@ -238,6 +238,8 @@ public class KalbLedgeState : KalbState
         }
         
         // Reset abilities
+
+        
         controller.DashState.ResetAirDash();
         physics.ResetJumpState();
         

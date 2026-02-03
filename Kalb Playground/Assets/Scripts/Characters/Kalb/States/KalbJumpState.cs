@@ -27,6 +27,9 @@ public class KalbJumpState : KalbState
             
             controller.Rb.gravityScale = controller.Settings.normalGravityScale;
         }
+
+
+        controller.GravityManager.SetNormalGravity();
         
         controller.AnimationController.PlayAnimation("Kalb_jump");
 

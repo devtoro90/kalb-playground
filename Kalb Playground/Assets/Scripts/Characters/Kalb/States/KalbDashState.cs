@@ -13,7 +13,7 @@ public class KalbDashState : KalbState
     private bool isDashing = false;
     private float dashTimer = 0f;
     private Vector2 dashDirection = Vector2.right;
-    private int airDashCount = 0;
+    private int airDashCount;
     private float preDashGravityScale;
     
     // Dash direction type
@@ -142,6 +142,8 @@ public class KalbDashState : KalbState
             return false;
         }
         
+        // Check air dash count - ALL air dashes count toward the limit
+        
         if (airDashCount >= settings.maxAirDashes)
         {
             return false;
@@ -164,11 +166,15 @@ public class KalbDashState : KalbState
         // Determine dash direction type for animation
         DetermineDashDirectionType();
         
-        // Track air dash
-        if (!collisionDetector.IsGrounded)
+        // Track air dash - ALL air dashes count toward the limit
+        if (!collisionDetector.IsGrounded || currentDashDirectionType != DashDirectionType.Forward)
         {
             airDashCount++;
+            
+            // Debug log to track air dashes
         }
+        
+        
         
         // Cancel combo
         controller.ComboSystem?.CancelCombo();
@@ -344,16 +350,31 @@ public class KalbDashState : KalbState
     {
         
         airDashCount = 0;
-        
     }
     
     public void ForceResetDash()
     {
+        
         isDashing = false;
         dashTimer = 0f;
         airDashCount = 0;
         
         if (controller.Rb != null)
             controller.Rb.gravityScale = settings.normalGravityScale;
+    }
+    
+    // NEW: Helper method to check if a specific direction dash is available
+    public bool CanDashInDirection(DashDirectionType direction)
+    {
+        if (!CanDash()) return false;
+        
+        // If we're grounded, all directions are available
+        if (collisionDetector.IsGrounded) return true;
+        
+        // If we're in air, check air dash count
+        
+        if (airDashCount >= settings.maxAirDashes) return false;
+        
+        return true;
     }
 }

@@ -38,6 +38,12 @@ public class KalbController : MonoBehaviour
     // Dash cooldown tracking - MOVED HERE from KalbDashState
     private float dashCooldownTimer = 0f;
     
+    // Ground check tolerance to prevent flickering
+    private bool wasGroundedLastFrame = true;
+    private float groundStickTime = 0.1f;
+    private float groundStickTimer = 0f;
+    private const float GROUND_STICK_THRESHOLD = 0.15f; // How long to stay "grounded" after leaving ground
+    
     // Properties for component access
     public KalbInputHandler InputHandler => inputHandler;
     public KalbCollisionDetector CollisionDetector => collisionDetector;
@@ -182,17 +188,20 @@ public class KalbController : MonoBehaviour
         {
             dashCooldownTimer -= Time.deltaTime;
         }
+        
+        // Update ground stick timer for smoother transitions
+        UpdateGroundStickTimer();
 
         // Check for ledge grab
         if (settings.ledgeGrabUnlocked && !IsInLedgeState() && ledgeDetector != null && 
-            rb.linearVelocity.y < 0 && !collisionDetector.IsGrounded)
+            rb.linearVelocity.y < 0 && !IsEffectivelyGrounded())
         {
             // Skip if on cooldown
             if (!ledgeDetector.IsOnCooldown)
             {
                 bool ledgeFound = ledgeDetector.CheckForLedge(this);
                 
-                if (ledgeFound && !collisionDetector.IsGrounded && 
+                if (ledgeFound && !IsEffectivelyGrounded() && 
                     !swimming.IsSwimming && !dashState.IsDashing && 
                     !comboSystem.IsAttacking)
                 {
@@ -226,6 +235,7 @@ public class KalbController : MonoBehaviour
             // Reset air dash when entering swim state
             if (dashState != null)
             {   
+                
                 dashState.ResetAirDash();
             }
 
@@ -241,8 +251,9 @@ public class KalbController : MonoBehaviour
             physics.SetCanDoubleJump(true);
             
             // Reset air dash when grounded
-            if (dashState != null)
+            if (dashState != null && stateMachine.CurrentState is not KalbDashState)
             {
+                
                 dashState.ResetAirDash();
             }
         }
@@ -265,6 +276,7 @@ public class KalbController : MonoBehaviour
 
                     if(inputBuffer.ConsumeBufferedInput("Dash"))
                     {
+                        
                         stateMachine.ChangeState(dashState);
                         inputHandler.ResetDashInput();
                     }
@@ -331,6 +343,36 @@ public class KalbController : MonoBehaviour
         if (health.IsDead) return;
         
         stateMachine.FixedUpdate();
+    }
+    
+    // NEW: Update ground stick timer to prevent flickering
+    private void UpdateGroundStickTimer()
+    {
+        bool currentlyGrounded = collisionDetector.IsGrounded;
+        
+        // If we were grounded and now we're not, start the stick timer
+        if (wasGroundedLastFrame && !currentlyGrounded)
+        {
+            groundStickTimer = GROUND_STICK_THRESHOLD;
+        }
+        // If we're grounded, reset the timer
+        else if (currentlyGrounded)
+        {
+            groundStickTimer = 0f;
+        }
+        // If timer is active, count down
+        else if (groundStickTimer > 0)
+        {
+            groundStickTimer -= Time.deltaTime;
+        }
+        
+        wasGroundedLastFrame = currentlyGrounded;
+    }
+    
+    // NEW: Check if effectively grounded (with stick tolerance)
+    public bool IsEffectivelyGrounded()
+    {
+        return collisionDetector.IsGrounded || groundStickTimer > 0;
     }
     
     // Apply strong forward force for running jumps
@@ -453,7 +495,7 @@ public class KalbController : MonoBehaviour
         if (stateMachine.CurrentState is KalbRunState)
             return true;
         
-        if (stateMachine.CurrentState is KalbAirState)
+        if (stateMachine.CurrentState is KalbAirState && dashState.AirDashCount < settings.maxAirDashes)
             return true;
         
         if (stateMachine.CurrentState is KalbJumpState)
@@ -467,7 +509,7 @@ public class KalbController : MonoBehaviour
         if (!abilitySystem.CanRun())
             return false;
         
-        if (!collisionDetector.IsGrounded)
+        if (!IsEffectivelyGrounded()) // Use effective grounded check
             return false;
         
         if (!inputHandler.DashHeld)
@@ -498,44 +540,14 @@ public class KalbController : MonoBehaviour
         
         return true;
     }
-    
-    private bool ShouldContinueRunState()
-    {
-        return ShouldEnterRunState();
-    }
+
 
     private bool IsInLedgeState()
     {
         return stateMachine.CurrentState is KalbLedgeState || 
             stateMachine.CurrentState is KalbLedgeClimbState;
     }
-    
-    private void ExitToAppropriateState()
-    {
-        if (swimming.IsInWater)
-        {
-            stateMachine.ChangeState(swimState);
-        }
-        else if (!collisionDetector.IsGrounded)
-        {
-            stateMachine.ChangeState(airState);
-        }
-        else if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
-        {
-            if (inputHandler.DashHeld && abilitySystem.CanRun())
-            {
-                stateMachine.ChangeState(runState);
-            }
-            else
-            {
-                stateMachine.ChangeState(walkState);
-            }
-        }
-        else
-        {
-            stateMachine.ChangeState(idleState);
-        }
-    }
+   
     
     public void ResetDashCooldown()
     {
@@ -547,28 +559,4 @@ public class KalbController : MonoBehaviour
         stateMachine.ChangeState(newState);
     }
 
-    private void EnsureProperGravity()
-    {
-        // Skip if swimming (swimming handles its own gravity)
-        if (swimming.IsSwimming || swimming.IsJumpingFromWater)
-            return;
-        
-        // Skip if in states that intentionally modify gravity
-        if (stateMachine.CurrentState is KalbDashState && dashState.IsDashing)
-            return;
-        
-        if (stateMachine.CurrentState is KalbLedgeState || 
-            stateMachine.CurrentState is KalbLedgeClimbState)
-            return;
-        
-        // Skip if in swim dash
-        if (swimming.IsSwimDashing)
-            return;
-        
-        // Reset to normal gravity scale for all other cases
-        if (rb.gravityScale != settings.normalGravityScale)
-        {
-            rb.gravityScale = settings.normalGravityScale;
-        }
-    }
 }

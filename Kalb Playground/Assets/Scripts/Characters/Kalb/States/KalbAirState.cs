@@ -21,6 +21,7 @@ public class KalbAirState : KalbState
     public override void Enter()
     {
         UpdateAnimation();
+        controller.GravityManager.SetNormalGravity();
         controller.InputBuffer?.ClearBufferedInput("Jump");
         controller.InputBuffer?.ClearBufferedInput("Dash");
         controller.InputBuffer?.ClearBufferedInput("Attack");
@@ -29,7 +30,7 @@ public class KalbAirState : KalbState
     public override void Update()
     {
         // Check for ledge state
-        if (controller.LedgeDetector.LedgeDetected && !collisionDetector.IsGrounded && 
+        if (controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() && // CHANGED
             controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
         {
             // Check if we should auto-grab
@@ -52,7 +53,7 @@ public class KalbAirState : KalbState
             return;
         }
         
-        if (collisionDetector.IsGrounded)
+        if (controller.IsEffectivelyGrounded()) // CHANGED
         {
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
             {
@@ -84,7 +85,7 @@ public class KalbAirState : KalbState
             controller.Physics.SetJumpBuffer();
             
             // Check for double jump
-            if (!collisionDetector.IsGrounded && 
+            if (!controller.IsEffectivelyGrounded() && // CHANGED
                 controller.Physics.CanDoubleJump &&
                 controller.AbilitySystem != null && 
                 controller.AbilitySystem.CanDoubleJump())

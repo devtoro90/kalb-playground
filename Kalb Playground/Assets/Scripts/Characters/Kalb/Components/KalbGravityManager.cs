@@ -67,7 +67,7 @@ public class KalbGravityManager : MonoBehaviour
         
         if (showGravityDebug)
         {
-            Debug.Log($"[Gravity] Override set: {gravityScale} from {source} (duration: {duration})");
+            
         }
     }
     
@@ -82,7 +82,7 @@ public class KalbGravityManager : MonoBehaviour
             
             if (showGravityDebug)
             {
-                Debug.Log($"[Gravity] Override cleared by {source ?? "any"}");
+                
             }
         }
     }
@@ -113,7 +113,7 @@ public class KalbGravityManager : MonoBehaviour
             
             if (showGravityDebug)
             {
-                Debug.Log($"[Gravity] Applied: {targetGravity} (source: {overrideSource})");
+                
             }
         }
     }

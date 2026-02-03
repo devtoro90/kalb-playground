@@ -30,7 +30,7 @@ public class KalbWalkState : KalbState
     public override void Update()
     {
         // Check for ledge state
-        if (controller.LedgeDetector.LedgeDetected && !collisionDetector.IsGrounded && 
+        if (controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() && // CHANGED
             controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
         {
             // Check if we should auto-grab
@@ -51,7 +51,7 @@ public class KalbWalkState : KalbState
             return;
         }
         
-        if (!collisionDetector.IsGrounded)
+        if (!controller.IsEffectivelyGrounded()) // CHANGED
         {
             stateMachine.ChangeState(controller.AirState);
             return;
@@ -71,7 +71,7 @@ public class KalbWalkState : KalbState
     
     public override void FixedUpdate()
     {
-        movement.Move(inputHandler.MoveInput.x, collisionDetector.IsGrounded);
+        movement.Move(inputHandler.MoveInput.x, controller.IsEffectivelyGrounded()); // CHANGED
     }
     
     public override void HandleInput()
