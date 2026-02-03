@@ -78,7 +78,8 @@ public class KalbAirState : KalbState
     public override void HandleInput()
     {
         // Check for wall slide state (ADD THIS at the beginning)
-        if (controller.WallJump != null && controller.WallJump.IsWallSliding)
+        if (controller.WallJump != null && controller.WallJump.IsWallSliding &&
+        controller.AbilitySystem != null && controller.AbilitySystem.CanWallJump())
         {
             stateMachine.ChangeState(controller.WallSlideState);
             return;

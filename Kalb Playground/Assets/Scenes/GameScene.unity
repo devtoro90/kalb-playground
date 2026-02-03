@@ -2687,7 +2687,7 @@ MonoBehaviour:
   physics: {fileID: 658198529}
   wallCheckMiddle: {fileID: 1525144135}
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
-  playerCollider: {fileID: 658198523}
+  abilitySystem: {fileID: 658198532}
 --- !u!1 &690632030
 GameObject:
   m_ObjectHideFlags: 0

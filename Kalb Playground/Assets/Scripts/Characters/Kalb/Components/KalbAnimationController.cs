@@ -77,8 +77,7 @@ public class KalbAnimationController : MonoBehaviour
             return;
         }
 
-        
-        // Set movement speed parameter
+// Set movement speed parameter
         float speed = Mathf.Abs(rb.linearVelocity.x);
         animator.SetFloat("Speed", speed);
         

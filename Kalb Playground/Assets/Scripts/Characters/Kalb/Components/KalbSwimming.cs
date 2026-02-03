@@ -410,10 +410,8 @@ public class KalbSwimming : MonoBehaviour
     public void SwimJump()
     {
         if (!isSwimming || isSwimDashing || rb == null || physics == null) return;
-        
-       
-        
-        // Set jumping flag to prevent immediate re-entry
+
+// Set jumping flag to prevent immediate re-entry
         isJumpingFromWater = true;
         waterJumpCooldown = 0.5f; // Half second cooldown
         
@@ -445,9 +443,8 @@ public class KalbSwimming : MonoBehaviour
         
         // 7. Restore original jump force after a delay
         StartCoroutine(RestoreJumpForce(originalJumpForce, 0.1f));
-        
-        
-    }
+
+}
     
     private System.Collections.IEnumerator RestoreJumpForce(float originalForce, float delay)
     {

@@ -150,10 +150,15 @@ public class KalbWallSlideState : KalbState
         // 5. Must not be dashing
         if (controller.DashState.IsDashing) return false;
         
-        // 6. Must not be attacking (if you want to disable during attack)
+        // 6. Check if wall jump/slide ability is unlocked
+        if (controller.AbilitySystem != null && !controller.AbilitySystem.CanWallJump()) // NEW
+        {
+            return false;
+        }
+        // 7. Must not be attacking (if you want to disable during attack)
         // if (controller.ComboSystem.IsAttacking) return false;
-        
-        return true;
+
+return true;
     }
     
     private void ExitToAppropriateState()

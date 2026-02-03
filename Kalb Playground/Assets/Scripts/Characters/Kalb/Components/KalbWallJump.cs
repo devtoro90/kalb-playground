@@ -10,10 +10,9 @@ public class KalbWallJump : MonoBehaviour
     [SerializeField] private KalbPhysics physics;
     [SerializeField] private Transform wallCheckMiddle;
     [SerializeField] private KalbSettings settings;
-    
-    
-    
-    // State
+    [SerializeField] private KalbAbilitySystem abilitySystem;
+
+// State
     private bool isTouchingWall = false;
     private bool isWallSliding = false;
     private int wallSide = 0; // -1 = left, 1 = right, 0 = none
@@ -34,6 +33,7 @@ public class KalbWallJump : MonoBehaviour
         if (collisionDetector == null) collisionDetector = GetComponent<KalbCollisionDetector>();
         if (movement == null) movement = GetComponent<KalbMovement>();
         if (physics == null) physics = GetComponent<KalbPhysics>();
+        if (abilitySystem == null) abilitySystem = GetComponent<KalbAbilitySystem>();
         
         // Create wall check point if not assigned
         if (wallCheckMiddle == null)
@@ -58,6 +58,11 @@ public class KalbWallJump : MonoBehaviour
     
     private void CheckWall()
     {
+        // Check if wall jump/slide ability is unlocked
+        if (abilitySystem != null && !abilitySystem.CanWallJump()) // NEW
+        {
+            return;
+        }
         // Don't check for walls if grounded or swimming
         if (controller.IsEffectivelyGrounded() || controller.Swimming.IsSwimming)
         {
@@ -81,9 +86,8 @@ public class KalbWallJump : MonoBehaviour
         // Check both sides
         CheckWallSide(1);  // Right
         CheckWallSide(-1); // Left
-        
-        Debug.Log("IsTouchingWall: " + isTouchingWall + " WallSide: " + wallSide);
-        // Update wall slide state
+
+// Update wall slide state
         if (isTouchingWall && rb.linearVelocity.y < 0)
         {
                 isWallSliding = true;
@@ -92,7 +96,7 @@ public class KalbWallJump : MonoBehaviour
         {
             isWallSliding = false;
         }
-        Debug.Log("Wall Sliding: " + isWallSliding);
+        
     }
     
     private void CheckWallSide(int direction)
@@ -114,7 +118,7 @@ public class KalbWallJump : MonoBehaviour
             wallSide = direction;
             
         }
-        Debug.Log("IsTouchingWall: " + isTouchingWall + " WallSide: " + wallSide);
+        
     }
     
     public void UpdateTimers()
@@ -128,9 +132,6 @@ public class KalbWallJump : MonoBehaviour
                 justWallJumped = false;
             }
         }
-        Debug.Log("wallJumpHorizontalLockTimer: " + wallJumpHorizontalLockTimer);
-        Debug.Log("justWallJumped: " + justWallJumped);
-        //Debug.Log("wallStickTimer: " + wallStickTimer);
     }
     
     private void ApplyWallSlide()
@@ -152,8 +153,9 @@ public class KalbWallJump : MonoBehaviour
         // 3. Not swimming
         // 4. Not dashing
         // 5. Not in horizontal lock from previous wall jump
-        Debug.Log("CanWallJump: " + isTouchingWall + ", " + !controller.IsEffectivelyGrounded() + ", " + !controller.Swimming.IsSwimming + ", " + !controller.DashState.IsDashing + ", " + (wallJumpHorizontalLockTimer <= 0));
-        return isTouchingWall && 
+        // 6. Wall jump is unlocked
+        return abilitySystem != null && abilitySystem.CanWallJump() &&
+               isTouchingWall &&
                !controller.IsEffectivelyGrounded() && 
                !controller.Swimming.IsSwimming &&
                !controller.DashState.IsDashing &&

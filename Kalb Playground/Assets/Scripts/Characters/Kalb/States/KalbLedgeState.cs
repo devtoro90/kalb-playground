@@ -72,9 +72,8 @@ public class KalbLedgeState : KalbState
         controller.InputBuffer?.ClearBufferedInput("Jump");
         controller.InputBuffer?.ClearBufferedInput("Dash");
         controller.InputBuffer?.ClearBufferedInput("Attack");
-        
-        
-    }
+
+}
     
     public override void Exit()
     {
@@ -85,9 +84,8 @@ public class KalbLedgeState : KalbState
         rb.gravityScale = controller.Settings.normalGravityScale;
         
         currentLedgeHoldTime = 0f;
-        
-       
-    }
+
+}
     
     public override void Update()
     {
@@ -166,9 +164,8 @@ public class KalbLedgeState : KalbState
     
     private void ClimbLedge()
     {
-       
-        
-        // Clear detection but NO COOLDOWN for successful climb
+
+// Clear detection but NO COOLDOWN for successful climb
         if (ledgeDetector != null)
         {
             ledgeDetector.ClearDetection();
@@ -182,9 +179,8 @@ public class KalbLedgeState : KalbState
         if (isReleasing) return;
         
         isReleasing = true;
-       
-        
-        // START COOLDOWN to prevent immediate re-grab
+
+// START COOLDOWN to prevent immediate re-grab
         if (ledgeDetector != null)
         {
             ledgeDetector.StartCooldown();
@@ -196,10 +192,8 @@ public class KalbLedgeState : KalbState
         // Calculate release velocity - push away from wall and down
         float releaseHorizontal = -ledgeSide * controller.Settings.ledgeReleaseForce * 0.5f;
         float releaseVertical = -controller.Settings.ledgeReleaseForce * 0.8f;
-        
-        
-        
-        // Apply release force
+
+// Apply release force
         rb.linearVelocity = new Vector2(releaseHorizontal, releaseVertical);
         
         // Force state change to AirState
@@ -239,8 +233,7 @@ public class KalbLedgeState : KalbState
         
         // Reset abilities
 
-        
-        controller.DashState.ResetAirDash();
+controller.DashState.ResetAirDash();
         physics.ResetJumpState();
         
         // Enable double jump after ledge jump

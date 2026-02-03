@@ -43,9 +43,8 @@ public class KalbCollisionDetector : MonoBehaviour
         if (ceilingCheck == null) return;
         isTouchingCeiling = Physics2D.OverlapCircle(ceilingCheck.position, ceilingCheckRadius, environmentLayer);
     }
-    
-    
-    private void OnDrawGizmosSelected()
+
+private void OnDrawGizmosSelected()
     {
         if (groundCheck != null)
         {

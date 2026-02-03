@@ -111,6 +111,7 @@ MonoBehaviour:
   runUnlocked: 1
   dashUnlocked: 1
   doubleJumpUnlocked: 1
+  wallJumpUnlocked: 0
   runSpeed: 8
   runAcceleration: 20
   runDeceleration: 25
@@ -130,12 +131,12 @@ MonoBehaviour:
   doubleJumpForce: 10
   doubleJumpMaintainsMomentum: 1
   doubleJumpHorizontalBoost: 1.5
-  wallCheckDistance: 0.4
-  wallSlideSpeed: -2
+  wallCheckDistance: 0.45
+  wallSlideSpeed: -4
   wallStickTime: 0.25
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
   wallJumpForce: 15
   wallJumpAngle: {x: 1.2, y: 1}
-  wallJumpHorizontalLockDuration: 0.2
+  wallJumpHorizontalLockDuration: 0.5

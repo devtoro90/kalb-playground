@@ -173,10 +173,8 @@ public class KalbDashState : KalbState
             
             // Debug log to track air dashes
         }
-        
-        
-        
-        // Cancel combo
+
+// Cancel combo
         controller.ComboSystem?.CancelCombo();
         
         // Stop movement

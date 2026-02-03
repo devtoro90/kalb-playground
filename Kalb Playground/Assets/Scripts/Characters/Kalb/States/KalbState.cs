@@ -5,8 +5,7 @@ public abstract class KalbState : IKalbState
     protected KalbController controller;
     protected KalbStateMachine stateMachine;
 
-    
-    protected KalbState(KalbController controller, KalbStateMachine stateMachine)
+protected KalbState(KalbController controller, KalbStateMachine stateMachine)
     {
         this.controller = controller;
         this.stateMachine = stateMachine;

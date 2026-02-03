@@ -9,8 +9,7 @@ public class KalbPhysics : MonoBehaviour
     [SerializeField] private KalbSwimming swimming;
     [SerializeField] private KalbGravityManager gravityManager;
 
-    
-    // Jump state
+// Jump state
     private bool isJumpButtonHeld = false;
     private float coyoteTimeCounter = 0f;
     private float jumpBufferCounter = 0f;
@@ -117,13 +116,10 @@ public class KalbPhysics : MonoBehaviour
         // CRITICAL FIX: Only modify the Y velocity, preserve X completely
         // Don't even read rb.linearVelocity.x here - just set Y
         Vector2 currentVelocity = rb.linearVelocity;
-        
-        
-        rb.linearVelocity = new Vector2(currentVelocity.x, jumpForce);
-        
-        
-        
-        coyoteTimeCounter = 0f;
+
+rb.linearVelocity = new Vector2(currentVelocity.x, jumpForce);
+
+coyoteTimeCounter = 0f;
         jumpBufferCounter = 0f;
     }
     

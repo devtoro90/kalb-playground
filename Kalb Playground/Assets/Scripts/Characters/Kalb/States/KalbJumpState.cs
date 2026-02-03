@@ -28,8 +28,7 @@ public class KalbJumpState : KalbState
             controller.Rb.gravityScale = controller.Settings.normalGravityScale;
         }
 
-
-        controller.GravityManager.SetNormalGravity();
+controller.GravityManager.SetNormalGravity();
         
         controller.AnimationController.PlayAnimation("Kalb_jump");
 
@@ -37,15 +36,11 @@ public class KalbJumpState : KalbState
         controller.ComboSystem?.CancelCombo();
         
         // Apply jump - physics.Jump() preserves horizontal velocity
-        
-        
-        
-        physics.Jump(controller.Settings.jumpForce);
-        physics.SetJumpButtonState(true);
-        
-        
 
-        // Enable double jump after initial jump (if ability unlocked)
+physics.Jump(controller.Settings.jumpForce);
+        physics.SetJumpButtonState(true);
+
+// Enable double jump after initial jump (if ability unlocked)
         if (controller.AbilitySystem != null && controller.AbilitySystem.CanDoubleJump())
         {
             physics.SetCanDoubleJump(true);

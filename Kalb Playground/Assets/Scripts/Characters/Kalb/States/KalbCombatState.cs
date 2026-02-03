@@ -8,9 +8,8 @@ public class KalbCombatState : KalbState
     private KalbPhysics physics;
     private KalbSwimming swimming;
     private KalbCollisionDetector collisionDetector;
-    
-    
-    public KalbCombatState(KalbController controller, KalbStateMachine stateMachine) 
+
+public KalbCombatState(KalbController controller, KalbStateMachine stateMachine) 
         : base(controller, stateMachine)
     {
         inputHandler = controller.InputHandler;

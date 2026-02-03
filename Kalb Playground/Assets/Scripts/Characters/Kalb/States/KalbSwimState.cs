@@ -202,8 +202,6 @@ public class KalbSwimState : KalbState
         
         // Reset jump input so we don't double-jump
         inputHandler.ResetJumpInput();
-        
-        
-       
-    }
+
+}
 }

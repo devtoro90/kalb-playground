@@ -329,9 +329,7 @@ public class KalbController : MonoBehaviour
             }
         }
 
-        
-
-        // Check for attack
+// Check for attack
         if (inputHandler.AttackPressed && comboSystem.CanAttack)
         {
             if (CanAttackFromCurrentState())
@@ -420,9 +418,8 @@ public class KalbController : MonoBehaviour
             
             // Start jump momentum preservation
             movement.StartJumpMomentum(0.4f); // 0.4 seconds of momentum preservation
-            
-            
-        }
+
+}
         else if (Mathf.Abs(currentXVelocity) > 0.1f)
         {
             // Walking jump - preserve momentum with shorter duration
@@ -556,6 +553,12 @@ public class KalbController : MonoBehaviour
 
     private bool ShouldEnterWallSlideState()
     {
+        // Check if wall jump/slide ability is unlocked
+        if (abilitySystem != null && !abilitySystem.CanWallJump()) // NEW
+        {
+            return false;
+        }
+
         if (wallJump == null) return false;
         
         // Must be wall sliding
@@ -574,15 +577,13 @@ public class KalbController : MonoBehaviour
         return true;
     }
 
-
-    private bool IsInLedgeState()
+private bool IsInLedgeState()
     {
         return stateMachine.CurrentState is KalbLedgeState || 
             stateMachine.CurrentState is KalbLedgeClimbState;
     }
-   
-    
-    public void ResetDashCooldown()
+
+public void ResetDashCooldown()
     {
         dashCooldownTimer = 0f;
     }

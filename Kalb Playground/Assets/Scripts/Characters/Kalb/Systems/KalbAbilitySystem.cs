@@ -8,6 +8,7 @@ public class KalbAbilitySystem : MonoBehaviour
     public System.Action<bool> OnRunUnlocked;
     public System.Action<bool> OnDashUnlocked;
     public System.Action<bool> OnDoubleJumpUnlocked;
+    public System.Action<bool> OnWallJumpUnlocked;
     
     // Public methods to unlock abilities
     public void UnlockRun()
@@ -27,12 +28,19 @@ public class KalbAbilitySystem : MonoBehaviour
         settings.doubleJumpUnlocked = true;
         OnDoubleJumpUnlocked?.Invoke(true);
     }
+
+    public void UnlockWallJump()
+    {
+        settings.wallJumpUnlocked = true;
+        OnWallJumpUnlocked?.Invoke(true);
+    }
     
     public void UnlockAllAbilities()
     {
         UnlockRun();
         UnlockDash();
         UnlockDoubleJump();
+        UnlockWallJump();
     }
 
     public void ResetAbilities()
@@ -40,10 +48,12 @@ public class KalbAbilitySystem : MonoBehaviour
         settings.runUnlocked = false;
         settings.dashUnlocked = false;
         settings.doubleJumpUnlocked = false;
+        settings.wallJumpUnlocked = false;
     }
     
     // Helper methods to check abilities
     public bool CanRun() => settings.runUnlocked;
     public bool CanDash() => settings.dashUnlocked;
     public bool CanDoubleJump() => settings.doubleJumpUnlocked;
+    public bool CanWallJump() => settings.wallJumpUnlocked;
 }

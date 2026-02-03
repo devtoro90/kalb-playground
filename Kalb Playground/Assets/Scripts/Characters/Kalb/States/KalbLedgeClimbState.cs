@@ -51,9 +51,8 @@ public class KalbLedgeClimbState : KalbState
         controller.InputBuffer?.ClearBufferedInput("Jump");
         controller.InputBuffer?.ClearBufferedInput("Dash");
         controller.InputBuffer?.ClearBufferedInput("Attack");
-        
-        
-    }
+
+}
     
     public override void Exit()
     {
@@ -69,9 +68,8 @@ public class KalbLedgeClimbState : KalbState
             ledgeDetector.ClearDetection();
             ledgeDetector.StopCooldown(); // No cooldown for successful climb
         }
-        
-       
-    }
+
+}
     
     public override void Update()
     {
@@ -121,9 +119,8 @@ public class KalbLedgeClimbState : KalbState
         if (isFinishing) return;
         
         isFinishing = true;
-       
-        
-        // Restore physics
+
+// Restore physics
         rb.gravityScale = controller.Settings.normalGravityScale;
         
         // Small upward hop at the end for smoother transition (matches original)
@@ -147,7 +144,6 @@ public class KalbLedgeClimbState : KalbState
         {
             stateMachine.ChangeState(controller.IdleState);
         }
-        
-       
-    }
+
+}
 }

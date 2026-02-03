@@ -93,11 +93,11 @@ public class KalbSettings : ScriptableObject
     public float climbSurfaceCheckDistance = 1.5f; // How far to check for platform surface
     public float climbHorizontalBuffer = 0.3f; // Buffer from platform edge
 
-
-    [Header("Ability Unlocks")]
+[Header("Ability Unlocks")]
     public bool runUnlocked = false;
     public bool dashUnlocked = false;
     public bool doubleJumpUnlocked = false;
+    public bool wallJumpUnlocked = false;
     
     [Header("Run Settings")]
     public float runSpeed = 8f;
@@ -125,13 +125,12 @@ public class KalbSettings : ScriptableObject
     public float doubleJumpHorizontalBoost = 1.5f;
 
     [Header("Wall Jump Settings")]
-    public float wallCheckDistance = 0.6f;
-    public float wallSlideSpeed = -2f;
-    public float wallStickTime = 0.25f; // Time player sticks to wall before sliding
+    public float wallCheckDistance = 0.45f;
+    public float wallSlideSpeed = -2.5f;// Time player sticks to wall before sliding
     public LayerMask wallLayer;
     
     [Header("Wall Jump Force")]
-    public float wallJumpForce = 15f;
-    public Vector2 wallJumpAngle = new Vector2(1.2f, 1f); // X,Y ratio
+    public float wallJumpForce = 13f;
+    public Vector2 wallJumpAngle = new Vector2(1f, 1.5f); // X,Y ratio
     public float wallJumpHorizontalLockDuration = 0.2f; // Time player can't move toward wall after jump
 }
