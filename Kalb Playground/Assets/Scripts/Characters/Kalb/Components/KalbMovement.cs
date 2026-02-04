@@ -86,6 +86,17 @@ public class KalbMovement : MonoBehaviour
         
         // Skip if swimming
         if (swimming != null && swimming.IsSwimming) return;
+
+        if (controller.WallJump != null && controller.WallJump.JustWallJumped)
+        {
+            // Allow reduced input during wall jump
+            float inputMultiplier = controller.WallJump.GetHorizontalInputLock(moveInput) != moveInput ? 0.3f : 1f;
+            moveInput *= inputMultiplier;
+            
+            // Apply minimal control during wall jump period
+            ApplyWallJumpAirControl(moveInput);
+            return;
+        }
         
         // Skip during wall slide
         if (controller.WallJump != null && controller.WallJump.IsWallSliding)
@@ -159,6 +170,26 @@ public class KalbMovement : MonoBehaviour
                 Flip(moveInput);
             }
         }
+    }
+
+    private void ApplyWallJumpAirControl(float moveInput)
+    {
+        // During wall jump period, use much slower acceleration
+        float acceleration = settings.airAcceleration * 0.2f; // 20% of normal
+        float maxAirSpeed = settings.maxAirSpeed * 0.8f; // 80% of normal
+        
+        float currentXVelocity = rb.linearVelocity.x;
+        float targetXVelocity = moveInput * maxAirSpeed;
+        
+        // Apply very gradual acceleration
+        float velocityDifference = targetXVelocity - currentXVelocity;
+        float forceMagnitude = velocityDifference * acceleration;
+        
+        // Clamp force more aggressively
+        float maxForce = Mathf.Abs(targetXVelocity - currentXVelocity) * 10f;
+        forceMagnitude = Mathf.Clamp(forceMagnitude, -maxForce, maxForce);
+        
+        rb.AddForce(Vector2.right * forceMagnitude);
     }
     
     private void Flip(float moveInput)

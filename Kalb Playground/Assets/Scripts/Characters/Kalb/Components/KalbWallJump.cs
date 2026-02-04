@@ -221,7 +221,7 @@ public class KalbWallJump : MonoBehaviour
         
         // SHORTER horizontal lock (0.1s instead of 0.2s)
         justWallJumped = true;
-        wallJumpHorizontalLockTimer = 0.1f; // Reduced for more control
+        wallJumpHorizontalLockTimer = settings.wallJumpHorizontalLockDuration; // Reduced for more control
         
         // Allow SOME input during wall jump (not completely locked)
         // This gives HK-style wall jump control

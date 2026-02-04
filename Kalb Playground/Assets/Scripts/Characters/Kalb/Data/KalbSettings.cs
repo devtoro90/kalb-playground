@@ -140,6 +140,6 @@ public class KalbSettings : ScriptableObject
     [Header("Wall Jump Force")]
     public float wallJumpForce = 13f;
     public Vector2 wallJumpAngle = new Vector2(1f, 1.5f); // X,Y ratiopublic 
-    float wallJumpHorizontalLockDuration = 0.1f; // Reduced for more control
+    public float wallJumpHorizontalLockDuration = 0.3f; // Reduced for more control
     public float wallJumpControlReduction = 0.3f; 
 }
