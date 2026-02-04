@@ -406,30 +406,35 @@ public class KalbController : MonoBehaviour
         
         if (isRunningJump)
         {
-            // Apply a strong forward impulse for running jumps
-            Vector2 forwardDirection = movement.FacingRight ? Vector2.right : Vector2.left;
-            
-            // Calculate forward force - stronger for faster runs
+            // Hollow Knight-style: Strong forward preservation with boost
             float runSpeedRatio = Mathf.Clamp01(Mathf.Abs(currentXVelocity) / settings.runSpeed);
-            float forwardForce = settings.runJumpForwardForce * runSpeedRatio;
             
-            // Apply the forward impulse
-            rb.AddForce(forwardDirection * forwardForce, ForceMode2D.Impulse);
+            // Preserve 80-100% of running speed
+            float preservedSpeed = Mathf.Lerp(
+                settings.moveSpeed * settings.jumpHorizontalPreservation,
+                settings.runSpeed * settings.jumpHorizontalPreservation,
+                runSpeedRatio
+            );
+            
+            // Apply forward boost for running jumps
+            Vector2 forwardDirection = movement.FacingRight ? Vector2.right : Vector2.left;
+            float forwardForce = settings.runningJumpBoost * runSpeedRatio;
+            
+            // Set velocity directly for instant response
+            rb.linearVelocity = new Vector2(
+                forwardDirection.x * preservedSpeed + (forwardDirection.x * forwardForce),
+                rb.linearVelocity.y
+            );
             
             // Start jump momentum preservation
-            movement.StartJumpMomentum(0.4f); // 0.4 seconds of momentum preservation
-
-}
+            movement.StartJumpMomentum(0.3f); // Shorter for more control
+        }
         else if (Mathf.Abs(currentXVelocity) > 0.1f)
         {
-            // Walking jump - preserve momentum with shorter duration
-            movement.StartJumpMomentum(0.2f); // 0.2 seconds for walking jumps
-            
-        }
-        else
-        {
-            // Stationary jump - no momentum
-            
+            // Walking jump - preserve momentum
+            float preservedSpeed = currentXVelocity * settings.jumpHorizontalPreservation;
+            rb.linearVelocity = new Vector2(preservedSpeed, rb.linearVelocity.y);
+            movement.StartJumpMomentum(0.15f);
         }
     }
     

@@ -79,87 +79,67 @@ public class KalbMovement : MonoBehaviour
         }
     }
     
-    public void ApplyAirControl(float moveInput)
+    public void ApplyAirControl(float moveInput, bool isTurningAround = false)
     {
         if (collisionDetector == null || rb == null || settings == null) return;
         if (controller.IsEffectivelyGrounded()) return;
         
         // Skip if swimming
         if (swimming != null && swimming.IsSwimming) return;
-
-        // CRITICAL: Skip air control if wall sliding
+        
+        // Skip during wall slide
         if (controller.WallJump != null && controller.WallJump.IsWallSliding)
         {
-            return; // Wall slide state handles its own physics
+            return;
         }
-
-        if(controller.WallJump != null)
+        
+        // Get wall jump input lock if applicable
+        if (controller.WallJump != null)
         {
-            // Don't apply regular air control during wall jump momentum phase
             moveInput = controller.WallJump.GetHorizontalInputLock(moveInput);
         }
         
-        // FIXED: Preserve momentum but allow directional control
-        if (jumpMomentumTimer > 0)
+        // Determine control context for different acceleration values
+        float currentXVelocity = rb.linearVelocity.x;
+        float currentSpeed = Mathf.Abs(currentXVelocity);
+        float inputDirection = Mathf.Sign(moveInput);
+        float currentDirection = Mathf.Sign(currentXVelocity);
+        
+        bool isTurning = Mathf.Abs(moveInput) > 0.1f && 
+                        Mathf.Abs(inputDirection - currentDirection) > 1.5f && 
+                        currentSpeed > 0.5f;
+        
+        // Calculate acceleration based on context (HK-style)
+        float acceleration;
+        if (isTurning)
         {
-            // Calculate momentum preservation factor (decays over time)
-            float momentumPreservation = Mathf.Clamp01(jumpMomentumTimer / 0.3f);
-            
-            // Get current velocity
-            float currentXVelocity = rb.linearVelocity.x;
-            float currentSpeed = Mathf.Abs(currentXVelocity);
-            
-            // Calculate target velocity based on input
-            float targetXVelocity = moveInput * settings.moveSpeed * settings.airControlMultiplier;
-            
-            // Only apply control if:
-            // 1. Player is actively providing input, AND
-            // 2. They're trying to go opposite direction OR current speed is below max air speed
-            if (Mathf.Abs(moveInput) > 0.1f && 
-                (Mathf.Sign(moveInput) != Mathf.Sign(currentXVelocity) || currentSpeed < settings.maxAirSpeed))
-            {
-                // Blend between momentum preservation and player control
-                float blendedVelocity = Mathf.Lerp(
-                    currentXVelocity,
-                    targetXVelocity,
-                    (1f - momentumPreservation) * 0.5f // Reduced control during momentum phase
-                );
-                
-                rb.linearVelocity = new Vector2(blendedVelocity, rb.linearVelocity.y);
-            }
-            
-            // Still update flip for consistency
-            if (flipInAir && moveInput != 0)
-            {
-                Flip(moveInput);
-            }
-            
-            return;
+            // Quick turnaround in air (like HK)
+            acceleration = settings.airTurnAcceleration; // NEW: Add to settings
+        }
+        else if (Mathf.Abs(moveInput) > 0.1f)
+        {
+            // Normal air acceleration
+            acceleration = settings.airAcceleration;
+        }
+        else
+        {
+            // No input - air deceleration
+            acceleration = settings.airDeceleration; // NEW: Add to settings
         }
         
-        // If no input in air, allow some drift but don't slow down too quickly
-        if (moveInput == 0)
-        {
-            // Very gradual slowdown in air (Silksong style - momentum carries)
-            float newXVelocity = Mathf.MoveTowards(rb.linearVelocity.x, 0, 2f * Time.fixedDeltaTime);
-            rb.linearVelocity = new Vector2(newXVelocity, rb.linearVelocity.y);
-            
-            // Don't flip when no input
-            return;
-        }
+        // Calculate target velocity
+        float targetXVelocity = moveInput * settings.maxAirSpeed;
         
-        // Flip in air if enabled
-        if (flipInAir)
-        {
-            Flip(moveInput);
-        }
+        // Apply acceleration toward target velocity
+        float velocityDifference = targetXVelocity - currentXVelocity;
+        float forceMagnitude = velocityDifference * acceleration;
         
-        // Calculate target velocity based on input
-        float targetSpeed = moveInput * settings.moveSpeed * settings.airControlMultiplier;
-        float velocityDifference = targetSpeed - rb.linearVelocity.x;
+        // Clamp force to prevent overshooting
+        float maxForce = Mathf.Abs(targetXVelocity - currentXVelocity) * 50f;
+        forceMagnitude = Mathf.Clamp(forceMagnitude, -maxForce, maxForce);
         
-        // Apply acceleration force toward target velocity
-        rb.AddForce(Vector2.right * velocityDifference * settings.airAcceleration);
+        // Apply force
+        rb.AddForce(Vector2.right * forceMagnitude);
         
         // Clamp to maximum air speed
         if (Mathf.Abs(rb.linearVelocity.x) > settings.maxAirSpeed)
@@ -168,6 +148,16 @@ public class KalbMovement : MonoBehaviour
                 Mathf.Sign(rb.linearVelocity.x) * settings.maxAirSpeed,
                 rb.linearVelocity.y
             );
+        }
+        
+        // Flip sprite if needed
+        if (flipInAir && Mathf.Abs(moveInput) > 0.1f)
+        {
+            bool shouldFaceRight = moveInput > 0;
+            if (shouldFaceRight != facingRight)
+            {
+                Flip(moveInput);
+            }
         }
     }
     

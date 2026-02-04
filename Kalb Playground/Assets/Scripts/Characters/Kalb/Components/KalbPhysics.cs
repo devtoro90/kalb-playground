@@ -4,6 +4,7 @@ public class KalbPhysics : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private KalbController controller;
     [SerializeField] private KalbSettings settings;
     [SerializeField] private KalbCollisionDetector collisionDetector;
     [SerializeField] private KalbSwimming swimming;
@@ -24,6 +25,7 @@ public class KalbPhysics : MonoBehaviour
     private void Start()
     {
         if (rb == null) rb = GetComponent<Rigidbody2D>();
+        if (controller == null) controller = GetComponent<KalbController>();
         if (collisionDetector == null) collisionDetector = GetComponent<KalbCollisionDetector>();
         if (swimming == null) swimming = GetComponent<KalbSwimming>();
         if (gravityManager == null) gravityManager = GetComponent<KalbGravityManager>();
@@ -41,6 +43,7 @@ public class KalbPhysics : MonoBehaviour
     private void FixedUpdate()
     {
         ApplyGravity();
+        ApplyAirFriction();
     }
     
     private void UpdateTimers()
@@ -93,6 +96,23 @@ public class KalbPhysics : MonoBehaviour
         else
         {
             gravityManager?.SetNormalGravity();
+        }
+    }
+
+    private void ApplyAirFriction()
+    {
+        if (settings == null || rb == null) return;
+        if (controller.IsEffectivelyGrounded()) return;
+        if (swimming != null && swimming.IsSwimming) return;
+        
+        // Apply air friction (slows down when no input)
+        float currentXVelocity = rb.linearVelocity.x;
+        
+        if (Mathf.Abs(currentXVelocity) > 0.1f && Mathf.Abs(controller.InputHandler.MoveInput.x) < 0.1f)
+        {
+            // Gradually slow down in air (HK style - not too fast)
+            float frictionForce = -Mathf.Sign(currentXVelocity) * settings.airFriction;
+            rb.AddForce(new Vector2(frictionForce, 0));
         }
     }
     

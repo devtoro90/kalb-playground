@@ -206,7 +206,7 @@ public class KalbWallJump : MonoBehaviour
     {
         if (!CanWallJump()) return;
         
-        // Calculate jump direction (away from wall)
+        // Store initial jump direction
         Vector2 jumpDirection = new Vector2(
             -wallSide * settings.wallJumpAngle.x, // Away from wall
             settings.wallJumpAngle.y              // Upward
@@ -215,13 +215,20 @@ public class KalbWallJump : MonoBehaviour
         // Apply wall jump force
         rb.linearVelocity = jumpDirection * settings.wallJumpForce;
         
-        // Face away from wall (flip)
-        bool shouldFaceRight = wallSide == -1; // If wall is on left, face right
+        // Face away from wall
+        bool shouldFaceRight = wallSide == -1;
         movement.ForceFlip(shouldFaceRight);
         
-        // Set timers and flags
+        // SHORTER horizontal lock (0.1s instead of 0.2s)
         justWallJumped = true;
-        wallJumpHorizontalLockTimer = settings.wallJumpHorizontalLockDuration;
+        wallJumpHorizontalLockTimer = 0.1f; // Reduced for more control
+        
+        // Allow SOME input during wall jump (not completely locked)
+        // This gives HK-style wall jump control
+        rb.linearVelocity = new Vector2(
+            rb.linearVelocity.x * 0.7f, // Reduce initial push to allow player control
+            rb.linearVelocity.y
+        );
         
         // Reset wall state
         isTouchingWall = false;
@@ -233,8 +240,8 @@ public class KalbWallJump : MonoBehaviour
         // Enable double jump after wall jump
         if (controller.AbilitySystem != null && controller.AbilitySystem.CanDoubleJump())
         {
-            physics.ResetDoubleJump(); // Clear any previous double jump
-            physics.SetCanDoubleJump(true); // Enable for next jump
+            physics.ResetDoubleJump();
+            physics.SetCanDoubleJump(true);
         }
         
         // Reset dash count
@@ -246,12 +253,13 @@ public class KalbWallJump : MonoBehaviour
     {
         if (wallJumpHorizontalLockTimer <= 0 || !justWallJumped) return rawInput;
         
-        // If player tries to move back toward wall, block the input
+        // Allow 30% input toward wall (for fine control)
         if (Mathf.Sign(rawInput) == wallSide)
         {
-            return 0f;
+            return rawInput * 0.3f; // Reduced but not zero
         }
         
+        // Full control away from wall
         return rawInput;
     }
 

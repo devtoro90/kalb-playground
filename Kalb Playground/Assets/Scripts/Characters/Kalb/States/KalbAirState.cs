@@ -119,38 +119,45 @@ public class KalbAirState : KalbState
 
     private void ExecuteDoubleJump()
     {
-        
         // Mark as double jumped
-        controller.Physics.ResetDoubleJump(); // This sets hasDoubleJumped = true
+        controller.Physics.ResetDoubleJump();
         
-        // Apply double jump force
+        // Get current velocity and preserve momentum
+        float currentXVelocity = controller.Rb.linearVelocity.x;
         float jumpForce = controller.Settings.doubleJumpForce;
         
-        // Optionally maintain horizontal momentum
+        // Hollow Knight-style double jump: preserves momentum but allows redirection
         if (controller.Settings.doubleJumpMaintainsMomentum)
         {
-            // Keep current horizontal velocity or boost it
-            float currentXVelocity = controller.Rb.linearVelocity.x;
-            float boostedXVelocity = currentXVelocity * controller.Settings.doubleJumpHorizontalBoost;
+            // Current speed ratio (0-1)
+            float speedRatio = Mathf.Clamp01(Mathf.Abs(currentXVelocity) / controller.Settings.moveSpeed);
+            
+            // Preserve 70-100% of horizontal momentum based on speed
+            float momentumPreservation = Mathf.Lerp(0.7f, 1.0f, speedRatio);
+            float preservedXVelocity = currentXVelocity * momentumPreservation;
+            
+            // Allow player to add up to 30% new direction
+            float playerControl = inputHandler.MoveInput.x * controller.Settings.moveSpeed * 0.3f;
             
             controller.Rb.linearVelocity = new Vector2(
-                boostedXVelocity,
+                preservedXVelocity + playerControl,
                 jumpForce
             );
         }
         else
         {
-            // Standard double jump
-            controller.Physics.Jump(jumpForce);
+            // Standard double jump with full player control
+            float targetXVelocity = inputHandler.MoveInput.x * controller.Settings.moveSpeed * 0.7f;
+            controller.Rb.linearVelocity = new Vector2(targetXVelocity, jumpForce);
         }
         
         controller.Physics.SetJumpButtonState(true);
         
-        // Play double jump animation/sound
-        controller.AnimationController.PlayAnimation("Kalb_jump"); // You'll need to create this animation
+        // Play double jump animation
+        controller.AnimationController.PlayAnimation("Kalb_jump");
         
-        // Reset jump buffer to prevent chaining
-        controller.Physics.SetJumpBuffer(); // This clears the buffer
+        // Reset jump buffer
+        controller.Physics.SetJumpBuffer();
         inputHandler.ResetJumpInput();
     }
     

@@ -9,12 +9,18 @@ public class KalbSettings : ScriptableObject
     [Range(0, 0.3f)] public float movementSmoothing = 0.05f;
     
     [Header("Jump & Air")]
-    public float coyoteTime = 0.15f;
-    public float jumpBufferTime = 0.1f;
     public float jumpCutMultiplier = 0.5f;
-    public float airControlMultiplier = 0.5f;
-    public float maxAirSpeed = 10f;
-    public float airAcceleration = 15f;
+    public float jumpHorizontalPreservation = 0.8f; // % of run speed preserved on jump
+    public float runningJumpBoost = 2.5f;           // Extra forward force on running jumps
+    public float coyoteTime = 0.12f;               // Ground forgiveness time
+    public float jumpBufferTime = 0.1f;   
+
+    [Header("Air Control")]
+    public float airAcceleration = 20f;          // Normal air acceleration
+    public float airDeceleration = 15f;          // Slowing down in air (no input)
+    public float airTurnAcceleration = 30f;      // Quick turn acceleration
+    public float maxAirSpeed = 8f;              // Maximum horizontal air speed
+    public float airFriction = 2f;  
     
     [Header("Physics")]
     public float fallingGravityScale = 2.5f;
@@ -133,6 +139,7 @@ public class KalbSettings : ScriptableObject
     
     [Header("Wall Jump Force")]
     public float wallJumpForce = 13f;
-    public Vector2 wallJumpAngle = new Vector2(1f, 1.5f); // X,Y ratio
-    public float wallJumpHorizontalLockDuration = 0.2f; // Time player can't move toward wall after jump
+    public Vector2 wallJumpAngle = new Vector2(1f, 1.5f); // X,Y ratiopublic 
+    float wallJumpHorizontalLockDuration = 0.1f; // Reduced for more control
+    public float wallJumpControlReduction = 0.3f; 
 }
