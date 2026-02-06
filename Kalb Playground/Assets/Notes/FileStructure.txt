@@ -28,6 +28,7 @@ Scripts
 │   │   │   ├── KalbState.cs
 │   │   │   ├── KalbSwimState.cs
 │   │   │   ├── KalbWalkState.cs
+│   │   │   ├── KalbWallLockState.cs
 │   │   │   └── KalbWallSlideState.cs
 │   │   ├── Systems/
 │   │   │   ├── KalbAbilitySystem.cs

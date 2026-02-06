@@ -310,6 +310,14 @@ public class KalbDashState : KalbState
             EndDash();
         }
         
+        // NEW: Check for wall slide immediately after dash
+        if (controller.WallJump != null && controller.WallJump.IsWallSliding &&
+            controller.AbilitySystem != null && controller.AbilitySystem.CanWallJump())
+        {
+            stateMachine.ChangeState(controller.WallSlideState);
+            return;
+        }
+        
         // Check swimming
         if (swimming != null && swimming.IsInWater)
         {

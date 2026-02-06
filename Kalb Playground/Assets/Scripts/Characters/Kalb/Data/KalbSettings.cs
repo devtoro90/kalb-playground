@@ -137,6 +137,9 @@ public class KalbSettings : ScriptableObject
     public LayerMask wallLayer;
     public float wallStickForce = 5f;
     public float wallStickTolerance = 0.1f;
+    public bool requireInputForWallSlide = true; 
+    public float awayInputGracePeriod = 0.25f; // Time before slide disengages when pressing away
+    public float awayInputDisengageDistance = 0.3f;
     
     [Header("Wall Jump Force")]
     public float wallJumpForce = 18f;

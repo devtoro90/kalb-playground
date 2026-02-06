@@ -28,7 +28,7 @@ public class KalbJumpState : KalbState
             controller.Rb.gravityScale = controller.Settings.normalGravityScale;
         }
 
-controller.GravityManager.SetNormalGravity();
+        controller.GravityManager.SetNormalGravity();
         
         controller.AnimationController.PlayAnimation("Kalb_jump");
 
@@ -37,10 +37,10 @@ controller.GravityManager.SetNormalGravity();
         
         // Apply jump - physics.Jump() preserves horizontal velocity
 
-physics.Jump(controller.Settings.jumpForce);
+        physics.Jump(controller.Settings.jumpForce);
         physics.SetJumpButtonState(true);
 
-// Enable double jump after initial jump (if ability unlocked)
+        // Enable double jump after initial jump (if ability unlocked)
         if (controller.AbilitySystem != null && controller.AbilitySystem.CanDoubleJump())
         {
             physics.SetCanDoubleJump(true);
@@ -71,6 +71,14 @@ physics.Jump(controller.Settings.jumpForce);
                 stateMachine.ChangeState(controller.LedgeState);
                 return;
             }
+        }
+
+        // Check for wall slide transition
+        if (controller.WallJump != null && controller.WallJump.IsWallSliding &&
+            controller.AbilitySystem != null && controller.AbilitySystem.CanWallJump())
+        {
+            stateMachine.ChangeState(controller.WallSlideState);
+            return;
         }
         
         // Check for swimming transition
@@ -118,6 +126,12 @@ physics.Jump(controller.Settings.jumpForce);
         {
             physics.SetJumpButtonState(false);
             physics.ApplyJumpCut();
+        }
+
+        if (controller.WallJump != null && controller.WallJump.IsWallSliding &&
+            controller.AbilitySystem != null && controller.AbilitySystem.CanWallJump())
+        {
+            stateMachine.ChangeState(controller.WallSlideState);
         }
     }
 }

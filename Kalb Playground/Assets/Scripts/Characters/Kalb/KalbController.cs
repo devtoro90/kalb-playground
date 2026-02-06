@@ -214,6 +214,16 @@ public class KalbController : MonoBehaviour
         
         // Update ground stick timer for smoother transitions
         UpdateGroundStickTimer();
+        // NEW: Check for wall slide transitions from ANY appropriate state
+        if (ShouldCheckForWallSlide())
+        {
+            // 2. Then check for wall slide
+            if (ShouldEnterWallSlideState() && !(stateMachine.CurrentState is KalbWallSlideState))
+            {
+                stateMachine.ChangeState(wallSlideState);
+                return; // Skip further input processing this frame
+            }
+        }
 
         if (ShouldEnterWallLockState())
         {
@@ -589,7 +599,7 @@ public class KalbController : MonoBehaviour
 
         if (wallJump == null) return false;
         
-        // Must be wall sliding
+        // Must be wall sliding (active state)
         if (!wallJump.IsWallSliding) return false;
         
         // Don't enter from incompatible states
@@ -598,12 +608,21 @@ public class KalbController : MonoBehaviour
             stateMachine.CurrentState is KalbSwimState ||
             stateMachine.CurrentState is KalbLedgeState ||
             stateMachine.CurrentState is KalbLedgeClimbState ||
-            stateMachine.CurrentState is KalbWallLockState) // ADD THIS
+            stateMachine.CurrentState is KalbWallLockState)
         {
             return false;
         }
         
+        // Allow transition from more states
         return true;
+    }
+
+    private bool ShouldCheckForWallSlide()
+    {
+        // Check for wall slide transitions from these states:
+        return stateMachine.CurrentState is KalbAirState ||
+            stateMachine.CurrentState is KalbJumpState ||
+            stateMachine.CurrentState is KalbDashState; // Optional: after dash ends
     }
 
     private bool ShouldEnterWallLockState()
