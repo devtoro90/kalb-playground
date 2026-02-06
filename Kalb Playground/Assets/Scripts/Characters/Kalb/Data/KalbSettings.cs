@@ -16,11 +16,11 @@ public class KalbSettings : ScriptableObject
     public float jumpBufferTime = 0.1f;   
 
     [Header("Air Control")]
-    public float airAcceleration = 20f;          // Normal air acceleration
-    public float airDeceleration = 15f;          // Slowing down in air (no input)
-    public float airTurnAcceleration = 30f;      // Quick turn acceleration
-    public float maxAirSpeed = 8f;              // Maximum horizontal air speed
-    public float airFriction = 2f;  
+    public float airAcceleration = 12f;          // Normal air acceleration
+    public float airDeceleration = 12f;          // Slowing down in air (no input)
+    public float airTurnAcceleration = 12f;      // Quick turn acceleration
+    public float maxAirSpeed = 10f;              // Maximum horizontal air speed
+    public float airFriction = 5f;  
     
     [Header("Physics")]
     public float fallingGravityScale = 2.5f;
@@ -99,11 +99,12 @@ public class KalbSettings : ScriptableObject
     public float climbSurfaceCheckDistance = 1.5f; // How far to check for platform surface
     public float climbHorizontalBuffer = 0.3f; // Buffer from platform edge
 
-[Header("Ability Unlocks")]
+    [Header("Ability Unlocks")]
     public bool runUnlocked = false;
     public bool dashUnlocked = false;
     public bool doubleJumpUnlocked = false;
     public bool wallJumpUnlocked = false;
+    public bool wallLockUnlocked = false;
     
     [Header("Run Settings")]
     public float runSpeed = 8f;
@@ -132,14 +133,19 @@ public class KalbSettings : ScriptableObject
 
     [Header("Wall Jump Settings")]
     public float wallCheckDistance = 0.45f;
-    public float wallSlideSpeed = -2.5f;// Time player sticks to wall before sliding
+    public float wallSlideSpeed = -2f;// Time player sticks to wall before sliding
     public LayerMask wallLayer;
     public float wallStickForce = 5f;
     public float wallStickTolerance = 0.1f;
     
     [Header("Wall Jump Force")]
-    public float wallJumpForce = 13f;
+    public float wallJumpForce = 18f;
     public Vector2 wallJumpAngle = new Vector2(1f, 1.5f); // X,Y ratiopublic 
-    public float wallJumpHorizontalLockDuration = 0.3f; // Reduced for more control
-    public float wallJumpControlReduction = 0.3f; 
+    public float wallJumpHorizontalLockDuration = 0.2f; // Reduced for more control
+    public float wallJumpControlReduction = 0.1f; 
+
+    [Header("Wall Lock Settings")]
+    public float wallLockEnterSpeed = 0.2f; // Time to transition into lock
+    public float wallLockExitSpeed = 0.15f; // Time to transition out of lock
+    public float wallLockInputThreshold = 0.3f; // Minimum input to trigger lock
 }

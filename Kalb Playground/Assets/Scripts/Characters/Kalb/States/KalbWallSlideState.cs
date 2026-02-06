@@ -56,6 +56,15 @@ public class KalbWallSlideState : KalbState
     
     public override void Update()
     {
+        // Check if we should transition to wall lock
+        if (controller.AbilitySystem.CanWallLock() && 
+            controller.WallLockCooldownTimer <= 0 &&
+            IsPushingTowardWall() && 
+            !(stateMachine.CurrentState is KalbWallLockState))
+        {
+            stateMachine.ChangeState(controller.WallLockState);
+            return;
+        }
         // Check if we should exit wall slide
         if (!ShouldContinueWallSliding())
         {
@@ -171,7 +180,18 @@ public class KalbWallSlideState : KalbState
         // 7. Must not be attacking (if you want to disable during attack)
         // if (controller.ComboSystem.IsAttacking) return false;
 
-return true;
+        return true;
+    }
+    private bool IsPushingTowardWall()
+    {
+        if (!wallJump.IsTouchingWall)
+            return false;
+        
+        float inputDirection = Mathf.Sign(inputHandler.MoveInput.x);
+        float wallSide = wallJump.WallSide;
+        
+        return Mathf.Abs(inputHandler.MoveInput.x) > controller.Settings.wallLockInputThreshold && 
+            Mathf.Approximately(inputDirection, wallSide);
     }
     
     private void ExitToAppropriateState()

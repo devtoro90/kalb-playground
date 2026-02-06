@@ -27,6 +27,13 @@ public class KalbAnimationController : MonoBehaviour
     private void UpdateAnimations()
     {
         if (animator == null) return;
+
+        // Check if wall locked (add with other priority checks)
+        if (controller.WallLockState != null && controller.WallLockState.IsWallLocked)
+        {
+            PlayAnimation("Kalb_walllock");
+            return;
+        }
         
         // Check if wall sliding (add this near the top with other priority checks)
         if (controller.WallJump != null && controller.WallJump.IsWallSliding)

@@ -36,6 +36,7 @@ public class KalbController : MonoBehaviour
     private KalbLedgeState ledgeState;
     private KalbLedgeClimbState ledgeClimbState;
     private KalbWallSlideState wallSlideState;
+    private KalbWallLockState wallLockState;
     
     // Dash cooldown tracking - MOVED HERE from KalbDashState
     private float dashCooldownTimer = 0f;
@@ -44,6 +45,8 @@ public class KalbController : MonoBehaviour
     private bool wasGroundedLastFrame = true;
     private float groundStickTimer = 0f;
     private const float GROUND_STICK_THRESHOLD = 0.15f; // How long to stay "grounded" after leaving ground
+
+    private float wallLockCooldownTimer = 0f;
     
     // Properties for component access
     public KalbInputHandler InputHandler => inputHandler;
@@ -61,6 +64,11 @@ public class KalbController : MonoBehaviour
     public KalbGravityManager GravityManager => gravityManager;
     public KalbInputBuffer InputBuffer => inputBuffer;
     public KalbWallJump WallJump => wallJump;
+    public float WallLockCooldownTimer
+    {
+        get => wallLockCooldownTimer;
+        set => wallLockCooldownTimer = value;
+    }
     
     // Dash cooldown property - NEW
     public float DashCooldownTimer
@@ -81,6 +89,7 @@ public class KalbController : MonoBehaviour
     public KalbLedgeState LedgeState => ledgeState;
     public KalbLedgeClimbState LedgeClimbState => ledgeClimbState;
     public KalbWallSlideState WallSlideState => wallSlideState;
+    public KalbWallLockState WallLockState => wallLockState;
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     
@@ -160,6 +169,7 @@ public class KalbController : MonoBehaviour
         ledgeState = new KalbLedgeState(this, stateMachine);        
         ledgeClimbState = new KalbLedgeClimbState(this, stateMachine); 
         wallSlideState = new KalbWallSlideState(this, stateMachine);    
+        wallLockState = new KalbWallLockState(this, stateMachine);
         
         // Start with idle state
         stateMachine.Initialize(idleState);
@@ -195,10 +205,23 @@ public class KalbController : MonoBehaviour
         {
             dashCooldownTimer -= Time.deltaTime;
         }
+
+        // Update wall lock cooldown timer
+        if (wallLockCooldownTimer > 0)
+        {
+            wallLockCooldownTimer -= Time.deltaTime;
+        }
         
         // Update ground stick timer for smoother transitions
         UpdateGroundStickTimer();
 
+        if (ShouldEnterWallLockState())
+        {
+            stateMachine.ChangeState(wallLockState);
+            return; // Skip further processing this frame
+        }
+        
+        // 2. Then check for wall slide
         if (ShouldEnterWallSlideState() && !(stateMachine.CurrentState is KalbWallSlideState))
         {
             stateMachine.ChangeState(wallSlideState);
@@ -559,7 +582,7 @@ public class KalbController : MonoBehaviour
     private bool ShouldEnterWallSlideState()
     {
         // Check if wall jump/slide ability is unlocked
-        if (abilitySystem != null && !abilitySystem.CanWallJump()) // NEW
+        if (abilitySystem != null && !abilitySystem.CanWallJump())
         {
             return false;
         }
@@ -574,6 +597,42 @@ public class KalbController : MonoBehaviour
             stateMachine.CurrentState is KalbCombatState ||
             stateMachine.CurrentState is KalbSwimState ||
             stateMachine.CurrentState is KalbLedgeState ||
+            stateMachine.CurrentState is KalbLedgeClimbState ||
+            stateMachine.CurrentState is KalbWallLockState) // ADD THIS
+        {
+            return false;
+        }
+        
+        return true;
+    }
+
+    private bool ShouldEnterWallLockState()
+    {
+        if (!abilitySystem.CanWallLock())
+            return false;
+        
+        // Don't check if we're already in wall lock or transitioning to it
+        if (stateMachine.CurrentState is KalbWallLockState)
+            return false;
+        
+        if (!wallJump.IsWallSliding)
+            return false;
+        
+        // Check if pushing toward wall
+        float inputDirection = Mathf.Sign(inputHandler.MoveInput.x);
+        float wallSide = wallJump.WallSide;
+        
+        bool pushingTowardWall = Mathf.Abs(inputHandler.MoveInput.x) > settings.wallLockInputThreshold && 
+                                Mathf.Approximately(inputDirection, wallSide);
+        
+        if (!pushingTowardWall)
+            return false;
+        
+        // Don't enter from incompatible states
+        if (stateMachine.CurrentState is KalbDashState ||
+            stateMachine.CurrentState is KalbCombatState ||
+            stateMachine.CurrentState is KalbSwimState ||
+            stateMachine.CurrentState is KalbLedgeState ||
             stateMachine.CurrentState is KalbLedgeClimbState)
         {
             return false;
@@ -582,13 +641,13 @@ public class KalbController : MonoBehaviour
         return true;
     }
 
-private bool IsInLedgeState()
+    private bool IsInLedgeState()
     {
         return stateMachine.CurrentState is KalbLedgeState || 
             stateMachine.CurrentState is KalbLedgeClimbState;
     }
 
-public void ResetDashCooldown()
+    public void ResetDashCooldown()
     {
         dashCooldownTimer = 0f;
     }
