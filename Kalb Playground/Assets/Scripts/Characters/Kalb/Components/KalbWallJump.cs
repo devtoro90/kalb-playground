@@ -19,6 +19,9 @@ public class KalbWallJump : MonoBehaviour
     private int wallSide = 0; // -1 = left, 1 = right, 0 = none
     private float wallJumpHorizontalLockTimer = 0f;
     private bool justWallJumped = false;
+    private float wallEngageBufferTimer = 0f;
+    private int bufferedWallSide = 0;
+    private const float WALL_ENGAGE_BUFFER_TIME = 0.1f;
     
     // Away input grace period
     private float awayInputTimer = 0f;
@@ -135,6 +138,20 @@ public class KalbWallJump : MonoBehaviour
             isTouchingWall = true;
             wallSide = direction;
         }
+        else if (IsPushingTowardWall() && direction == Mathf.RoundToInt(Mathf.Sign(controller.InputHandler.MoveInput.x)))
+        {
+            // Not touching wall but pressing toward it - buffer the input
+            bufferedWallSide = direction;
+            wallEngageBufferTimer = WALL_ENGAGE_BUFFER_TIME;
+        }
+    }
+    private bool HasBufferedWallEngagement()
+    {
+        if (wallEngageBufferTimer <= 0 || bufferedWallSide == 0)
+            return false;
+        
+        // Check if we're now touching the wall on the buffered side
+        return isTouchingWall && wallSide == bufferedWallSide;
     }
     
     public void UpdateTimers()
@@ -153,6 +170,16 @@ public class KalbWallJump : MonoBehaviour
         if (wallSlideCooldownTimer > 0)
         {
             wallSlideCooldownTimer -= Time.deltaTime;
+        }
+        
+        // Update wall engage buffer timer
+        if (wallEngageBufferTimer > 0)
+        {
+            wallEngageBufferTimer -= Time.deltaTime;
+            if (wallEngageBufferTimer <= 0)
+            {
+                bufferedWallSide = 0;
+            }
         }
     }
     
@@ -236,17 +263,27 @@ public class KalbWallJump : MonoBehaviour
             return;
         }
         
-        // ENGAGEMENT RULE: Only engage when falling AND pushing toward wall
+        // ENGAGEMENT RULE: Can engage when moving in ANY vertical direction (up or down)
+        // as long as we're touching a wall (or have buffered wall touch) and pushing toward it
         if (!isWallSliding)
         {
-            bool shouldEngage = isTouchingWall && 
-                               rb.linearVelocity.y < 0 && 
-                               IsPushingTowardWall() &&
-                               !controller.IsEffectivelyGrounded();
+            bool shouldEngage = (isTouchingWall || HasBufferedWallEngagement()) && 
+                            IsPushingTowardWall() &&
+                            !controller.IsEffectivelyGrounded();
             
             if (shouldEngage)
             {
                 EngageWallSlide();
+                
+                // Clear buffer on successful engagement
+                wallEngageBufferTimer = 0f;
+                bufferedWallSide = 0;
+                
+                // If we were moving upward, clamp upward velocity to prevent flying up the wall
+                if (rb.linearVelocity.y > 0)
+                {
+                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+                }
             }
         }
         else
@@ -263,9 +300,6 @@ public class KalbWallJump : MonoBehaviour
                 shouldDisengage = true;
             
             // Rule 3: Pressing away after grace period (handled in UpdateAwayInputGracePeriod)
-            // This is handled by the awayInputTimer logic
-            
-            // Rule 4: Pressed jump (handled by wall jump)
             
             if (shouldDisengage)
             {
@@ -282,8 +316,17 @@ public class KalbWallJump : MonoBehaviour
         awayInputTimer = 0f;
         isPressingAwayFromWall = false;
         
-        // Apply initial stick to wall
-        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        // If we were moving upward when engaging, zero out the upward velocity
+        // to prevent sliding up the wall
+        if (rb.linearVelocity.y > 0)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+        }
+        else
+        {
+            // Apply initial stick to wall
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        }
     }
 
     public void DisengageWallSlide()
