@@ -200,49 +200,37 @@ public class KalbController : MonoBehaviour
     {
         if (health.IsDead) return;
         
-        // Update dash cooldown timer
+        // Update timers
         if (dashCooldownTimer > 0)
         {
             dashCooldownTimer -= Time.deltaTime;
         }
 
-        // Update wall lock cooldown timer
         if (wallLockCooldownTimer > 0)
         {
             wallLockCooldownTimer -= Time.deltaTime;
         }
         
-        // Update ground stick timer for smoother transitions
         UpdateGroundStickTimer();
-        // NEW: Check for wall slide transitions from ANY appropriate state
-        if (ShouldCheckForWallSlide())
-        {
-            // 2. Then check for wall slide
-            if (ShouldEnterWallSlideState() && !(stateMachine.CurrentState is KalbWallSlideState))
-            {
-                stateMachine.ChangeState(wallSlideState);
-                return; // Skip further input processing this frame
-            }
-        }
-
+        
+        // CRITICAL: Check for wall lock first (highest priority when pushing toward wall)
         if (ShouldEnterWallLockState())
         {
             stateMachine.ChangeState(wallLockState);
-            return; // Skip further processing this frame
+            return;
         }
         
-        // 2. Then check for wall slide
+        // Then check for wall slide
         if (ShouldEnterWallSlideState() && !(stateMachine.CurrentState is KalbWallSlideState))
         {
             stateMachine.ChangeState(wallSlideState);
-            return; // Skip further input processing this frame
+            return;
         }
 
         // Check for ledge grab
         if (settings.ledgeGrabUnlocked && !IsInLedgeState() && ledgeDetector != null && 
             rb.linearVelocity.y < 0 && !IsEffectivelyGrounded())
         {
-            // Skip if on cooldown
             if (!ledgeDetector.IsOnCooldown)
             {
                 bool ledgeFound = ledgeDetector.CheckForLedge(this);
@@ -251,7 +239,6 @@ public class KalbController : MonoBehaviour
                     !swimming.IsSwimming && !dashState.IsDashing && 
                     !comboSystem.IsAttacking)
                 {
-                    // Check if player is at appropriate height to grab
                     Collider2D playerCollider = GetComponent<Collider2D>();
                     if (playerCollider != null)
                     {
@@ -599,6 +586,12 @@ public class KalbController : MonoBehaviour
 
         if (wallJump == null) return false;
         
+        // Don't enter if we're on wall slide cooldown (from ledge release)
+        if (wallJump.CooldownRemaining > 0)
+        {
+            return false;
+        }
+        
         // Must be wall sliding (active state)
         if (!wallJump.IsWallSliding) return false;
         
@@ -613,7 +606,6 @@ public class KalbController : MonoBehaviour
             return false;
         }
         
-        // Allow transition from more states
         return true;
     }
 
@@ -660,7 +652,7 @@ public class KalbController : MonoBehaviour
         return true;
     }
 
-    private bool IsInLedgeState()
+    public bool IsInLedgeState()
     {
         return stateMachine.CurrentState is KalbLedgeState || 
             stateMachine.CurrentState is KalbLedgeClimbState;

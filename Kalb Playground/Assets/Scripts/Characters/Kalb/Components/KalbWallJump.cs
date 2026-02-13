@@ -12,22 +12,28 @@ public class KalbWallJump : MonoBehaviour
     [SerializeField] private KalbSettings settings;
     [SerializeField] private KalbAbilitySystem abilitySystem;
 
-// State
+    // State
     private bool isTouchingWall = false;
-    private bool isWallSliding = false;
-    private bool isWallSlidingActive = false;
+    private bool isWallSliding = false; // This is the STICKY wall slide state
+    private bool wasWallSliding = false; // Track previous frame for transitions
     private int wallSide = 0; // -1 = left, 1 = right, 0 = none
-    //private float wallStickTimer = 0f;
     private float wallJumpHorizontalLockTimer = 0f;
     private bool justWallJumped = false;
+    
+    // Away input grace period
     private float awayInputTimer = 0f;
     private bool isPressingAwayFromWall = false;
+    
+    // Cooldown to prevent immediate re-engagement after ledge release
+    private float wallSlideCooldownTimer = 0f;
+    private const float WALL_SLIDE_COOLDOWN = 0.2f;
     
     // Properties
     public bool IsTouchingWall => isTouchingWall;
     public bool IsWallSliding => isWallSliding;
     public int WallSide => wallSide;
     public bool JustWallJumped => justWallJumped;
+    public float CooldownRemaining => wallSlideCooldownTimer;
     
     private void Awake()
     {
@@ -54,6 +60,8 @@ public class KalbWallJump : MonoBehaviour
         UpdateTimers();
         UpdateWallSlideEngagement();
         UpdateAwayInputGracePeriod();
+        
+        wasWallSliding = isWallSliding;
     }
     
     private void FixedUpdate()
@@ -66,27 +74,29 @@ public class KalbWallJump : MonoBehaviour
         // Check if wall jump/slide ability is unlocked
         if (abilitySystem != null && !abilitySystem.CanWallJump())
         {
-            isTouchingWall = false;
-            isWallSliding = false;
-            isWallSlidingActive = false;
+            ClearWallStates();
             return;
         }
         
-        // Don't check for walls if grounded or swimming
-        if (controller.IsEffectivelyGrounded() || controller.Swimming.IsSwimming)
+        // Don't check for walls if swimming
+        if (controller.Swimming.IsSwimming)
         {
-            isTouchingWall = false;
-            isWallSliding = false;
-            isWallSlidingActive = false;
+            ClearWallStates();
             return;
         }
         
         // Don't check during dash or attacking
         if (controller.DashState.IsDashing || controller.ComboSystem.IsAttacking)
         {
-            isTouchingWall = false;
-            isWallSliding = false;
-            isWallSlidingActive = false;
+            ClearWallStates();
+            return;
+        }
+        
+        // CRITICAL: Don't check walls during or immediately after ledge release
+        if (controller.LedgeDetector.IsOnCooldown || 
+            (controller.LedgeDetector.CooldownRemaining > 0))
+        {
+            ClearWallStates();
             return;
         }
         
@@ -98,33 +108,21 @@ public class KalbWallJump : MonoBehaviour
         // Check both sides
         CheckWallSide(1);  // Right
         CheckWallSide(-1); // Left
-        
-        // NEW: Update wall slide state with input requirement
-        if (isTouchingWall && rb.linearVelocity.y < 0)
-        {
-            // Only set wall sliding state if not requiring input OR pushing toward wall
-            if (!settings.requireInputForWallSlide || IsPushingTowardWall())
-            {
-                isWallSliding = true;
-            }
-        }
-        else
-        {
-            isWallSliding = false;
-        }
-        
-        // If we just lost wall contact, disengage active slide
-        if (wasTouchingWall && !isTouchingWall)
-        {
-            isWallSlidingActive = false;
-        }
+    }
+    
+    private void ClearWallStates()
+    {
+        isTouchingWall = false;
+        isWallSliding = false;
+        wallSide = 0;
+        awayInputTimer = 0f;
+        isPressingAwayFromWall = false;
     }
     
     private void CheckWallSide(int direction)
     {
         Vector2 checkPosition = wallCheckMiddle.position;
         
-        // Raycast to check for wall
         RaycastHit2D hit = Physics2D.Raycast(
             checkPosition,
             Vector2.right * direction,
@@ -134,12 +132,9 @@ public class KalbWallJump : MonoBehaviour
         
         if (hit.collider != null)
         {
-            // Found a wall
             isTouchingWall = true;
             wallSide = direction;
-            
         }
-        
     }
     
     public void UpdateTimers()
@@ -153,11 +148,17 @@ public class KalbWallJump : MonoBehaviour
                 justWallJumped = false;
             }
         }
+        
+        // Update wall slide cooldown
+        if (wallSlideCooldownTimer > 0)
+        {
+            wallSlideCooldownTimer -= Time.deltaTime;
+        }
     }
-
+    
     private void UpdateAwayInputGracePeriod()
     {
-        if (!isWallSlidingActive) 
+        if (!isWallSliding) 
         {
             awayInputTimer = 0f;
             isPressingAwayFromWall = false;
@@ -184,17 +185,10 @@ public class KalbWallJump : MonoBehaviour
             // Count down grace period
             awayInputTimer -= Time.deltaTime;
             
-            // Early disengagement if we've drifted too far from wall
-            float distanceToWall = GetDistanceToWall();
-            if (distanceToWall > settings.awayInputDisengageDistance)
+            // If grace period expires, disengage wall slide
+            if (awayInputTimer <= 0)
             {
-                // Drifted too far - disengage immediately
-                ForceDisengageWallSlide();
-            }
-            else if (awayInputTimer <= 0)
-            {
-                // Grace period expired - disengage wall slide
-                ForceDisengageWallSlide();
+                DisengageWallSlide();
             }
         }
     }
@@ -221,47 +215,81 @@ public class KalbWallJump : MonoBehaviour
 
     private void UpdateWallSlideEngagement()
     {
-        if (!isTouchingWall || !settings.requireInputForWallSlide)
+        // If on cooldown (from ledge release), don't engage wall slide
+        if (wallSlideCooldownTimer > 0)
         {
-            isWallSlidingActive = isWallSliding;
+            isWallSliding = false;
             return;
         }
         
-        // Check if we should engage wall slide
-        if (!isWallSlidingActive)
+        // Don't engage if we just wall jumped
+        if (justWallJumped && wallJumpHorizontalLockTimer > 0)
         {
-            // Only engage if: falling AND (not requiring input OR pushing against wall)
-            bool shouldEngage = rb.linearVelocity.y < 0 && 
-                            (!settings.requireInputForWallSlide || IsPushingTowardWall());
+            isWallSliding = false;
+            return;
+        }
+        
+        // Don't engage if we're in a ledge state
+        if (controller.IsInLedgeState())
+        {
+            isWallSliding = false;
+            return;
+        }
+        
+        // ENGAGEMENT RULE: Only engage when falling AND pushing toward wall
+        if (!isWallSliding)
+        {
+            bool shouldEngage = isTouchingWall && 
+                               rb.linearVelocity.y < 0 && 
+                               IsPushingTowardWall() &&
+                               !controller.IsEffectivelyGrounded();
             
             if (shouldEngage)
             {
-                isWallSlidingActive = true;
-                awayInputTimer = 0f; // Reset grace period
-                isPressingAwayFromWall = false;
+                EngageWallSlide();
             }
         }
         else
         {
-            // Once engaged, only disengage if:
-            // 1. No longer touching wall
-            // 2. No longer falling (going up)
-            // 3. Not wall sliding state anymore
-            // 4. Grace period expired (handled in UpdateAwayInputGracePeriod)
-            bool shouldDisengage = !isTouchingWall || 
-                                rb.linearVelocity.y >= 0 || 
-                                !isWallSliding;
+            // DISENGAGEMENT RULES (STICKY - only disengage when specific conditions met)
+            bool shouldDisengage = false;
+            
+            // Rule 1: No longer touching wall
+            if (!isTouchingWall)
+                shouldDisengage = true;
+            
+            // Rule 2: Reached ground
+            else if (controller.IsEffectivelyGrounded())
+                shouldDisengage = true;
+            
+            // Rule 3: Pressing away after grace period (handled in UpdateAwayInputGracePeriod)
+            // This is handled by the awayInputTimer logic
+            
+            // Rule 4: Pressed jump (handled by wall jump)
             
             if (shouldDisengage)
             {
-                ForceDisengageWallSlide();
+                DisengageWallSlide();
             }
         }
     }
 
-    public void ForceDisengageWallSlide()
+    public void EngageWallSlide()
     {
-        isWallSlidingActive = false;
+        if (isWallSliding) return;
+        
+        isWallSliding = true;
+        awayInputTimer = 0f;
+        isPressingAwayFromWall = false;
+        
+        // Apply initial stick to wall
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+    }
+
+    public void DisengageWallSlide()
+    {
+        if (!isWallSliding) return;
+        
         isWallSliding = false;
         awayInputTimer = 0f;
         isPressingAwayFromWall = false;
@@ -269,28 +297,25 @@ public class KalbWallJump : MonoBehaviour
 
     public void ForceDisengageForWallJump()
     {
-        // Called when executing a wall jump to immediately disengage
-        isWallSlidingActive = false;
         isWallSliding = false;
         awayInputTimer = 0f;
         isPressingAwayFromWall = false;
-        justWallJumped = true; // This will help prevent immediate re-engagement
+        justWallJumped = true;
+    }
+
+    public void SetWallSlideCooldown()
+    {
+        wallSlideCooldownTimer = WALL_SLIDE_COOLDOWN;
     }
 
     public bool CanWallJumpDuringGracePeriod()
     {
-        // Can wall jump during grace period even if pressing away
         return isPressingAwayFromWall && awayInputTimer > 0;
-    }
-
-    public float GetAwayInputTimerRemaining()
-    {
-        return awayInputTimer;
     }
     
     private void ApplyWallSlide()
     {
-        if (!isWallSlidingActive) return;
+        if (!isWallSliding) return;
         
         // Apply wall slide speed (clamp downward velocity)
         if (rb.linearVelocity.y < settings.wallSlideSpeed)
@@ -303,24 +328,18 @@ public class KalbWallJump : MonoBehaviour
         
         if (currentDistanceToWall > settings.wallStickTolerance)
         {
-            // Apply force toward the wall
             float forceMultiplier = Mathf.Clamp((currentDistanceToWall - settings.wallStickTolerance) * 10f, 0, 10f);
             Vector2 wallForce = new Vector2(wallSide * settings.wallStickForce * forceMultiplier * Time.fixedDeltaTime, 0);
             rb.AddForce(wallForce);
         }
         
-        // If no horizontal input, clamp horizontal velocity
-        if (controller.InputHandler == null || Mathf.Abs(controller.InputHandler.MoveInput.x) < 0.1f)
+        // Clamp horizontal velocity to prevent drifting
+        if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
         {
-            // Allow very slight movement but prevent drifting
-            float maxDrift = 0.05f;
-            if (Mathf.Abs(rb.linearVelocity.x) > maxDrift)
-            {
-                rb.linearVelocity = new Vector2(
-                    Mathf.MoveTowards(rb.linearVelocity.x, 0, 20f * Time.fixedDeltaTime),
-                    rb.linearVelocity.y
-                );
-            }
+            rb.linearVelocity = new Vector2(
+                Mathf.MoveTowards(rb.linearVelocity.x, 0, 20f * Time.fixedDeltaTime),
+                rb.linearVelocity.y
+            );
         }
     }
 
@@ -341,13 +360,6 @@ public class KalbWallJump : MonoBehaviour
     
     public bool CanWallJump()
     {
-        // Can wall jump if:
-        // 1. Touching a wall
-        // 2. Not grounded
-        // 3. Not swimming
-        // 4. Not dashing
-        // 5. Not in horizontal lock from previous wall jump
-        // 6. Wall jump is unlocked
         return abilitySystem != null && abilitySystem.CanWallJump() &&
                isTouchingWall &&
                !controller.IsEffectivelyGrounded() && 
@@ -358,93 +370,62 @@ public class KalbWallJump : MonoBehaviour
     
     public void ExecuteWallJump()
     {
-        // NEW: Check if we're in grace period
         bool isInGracePeriod = isPressingAwayFromWall && awayInputTimer > 0;
         
-        // Can wall jump if: normal conditions OR in grace period
         if (!CanWallJump() && !isInGracePeriod) return;
         
-        // Store initial jump direction
         Vector2 jumpDirection = new Vector2(
-            -wallSide * settings.wallJumpAngle.x, // Away from wall
-            settings.wallJumpAngle.y              // Upward
+            -wallSide * settings.wallJumpAngle.x,
+            settings.wallJumpAngle.y
         ).normalized;
         
-        // Apply wall jump force
         rb.linearVelocity = jumpDirection * settings.wallJumpForce;
         
-        // Face away from wall
         bool shouldFaceRight = wallSide == -1;
         movement.ForceFlip(shouldFaceRight);
         
-        // SHORTER horizontal lock (0.1s instead of 0.2s)
         justWallJumped = true;
         wallJumpHorizontalLockTimer = settings.wallJumpHorizontalLockDuration;
         
-        // Allow SOME input during wall jump (not completely locked)
-        rb.linearVelocity = new Vector2(
-            rb.linearVelocity.x * 0.7f, // Reduce initial push to allow player control
-            rb.linearVelocity.y
-        );
-        
-        // NEW: Force disengage wall slide for wall jump
         ForceDisengageForWallJump();
         
-        // Reset physics state
         physics.ResetJumpState();
         
-        // Enable double jump after wall jump
         if (controller.AbilitySystem != null && controller.AbilitySystem.CanDoubleJump())
         {
             physics.ResetDoubleJump();
             physics.SetCanDoubleJump(true);
         }
         
-        // Reset dash count
         controller.DashState.ResetAirDash();
     }
     
-    // Call this to prevent input toward wall after wall jump
     public float GetHorizontalInputLock(float rawInput)
     {
         if (wallJumpHorizontalLockTimer <= 0 || !justWallJumped) return rawInput;
         
-        // Allow 30% input toward wall (for fine control)
         if (Mathf.Sign(rawInput) == wallSide)
         {
-            return rawInput * 0.3f; // Reduced but not zero
+            return rawInput * 0.3f;
         }
         
-        // Full control away from wall
         return rawInput;
-    }
-
-    public void ResetWallSlide()
-    {
-        isWallSliding = false;
     }
     
     private void OnDrawGizmosSelected()
     {
         if (wallCheckMiddle != null)
         {
-            // Draw wall check rays
             Gizmos.color = isTouchingWall ? Color.green : Color.yellow;
-            
-            // Right check
             Gizmos.DrawRay(wallCheckMiddle.position, Vector2.right * settings.wallCheckDistance);
-            
-            // Left check
             Gizmos.DrawRay(wallCheckMiddle.position, Vector2.left * settings.wallCheckDistance);
             
-            // Draw wall slide indicator
             if (isWallSliding)
             {
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawWireSphere(transform.position + Vector3.up * 1f, 0.3f);
             }
             
-            // Draw wall jump lock indicator
             if (wallJumpHorizontalLockTimer > 0)
             {
                 Gizmos.color = Color.magenta;

@@ -15,7 +15,6 @@ public class KalbWallLockState : KalbState
     private Vector2 lockPosition;
     private bool isTransitioningIn = false;
     private bool isTransitioningOut = false;
-    private bool wantsToRelease = false;
     
     // Properties
     public bool IsWallLocked => isWallLocked;
@@ -46,12 +45,9 @@ public class KalbWallLockState : KalbState
         isWallLocked = false;
         isTransitioningIn = true;
         isTransitioningOut = false;
-        wantsToRelease = false;
         
-        // Start transition
         StartLockTransition();
         
-        // Play lock animation
         controller.AnimationController.PlayAnimation("Kalb_walllock");
         
         controller.InputBuffer?.ClearAllBuffersOnStateChange();
@@ -62,28 +58,23 @@ public class KalbWallLockState : KalbState
         isWallLocked = false;
         isTransitioningIn = false;
         isTransitioningOut = false;
-        wantsToRelease = false;
         
-        // Restore gravity
         controller.GravityManager.ClearOverride("WallLock");
     }
     
     public override void Update()
     {
-        // Don't check conditions while transitioning
         if (isTransitioningIn || isTransitioningOut)
             return;
         
         if (isWallLocked)
         {
-            // Check for jump input (highest priority)
             if (inputHandler.JumpPressed)
             {
                 ExecuteWallJumpFromLock();
                 return;
             }
             
-            // Check for dash input
             if (inputHandler.DashPressed && controller.AbilitySystem.CanDash())
             {
                 if (controller.CanDashFromCurrentState() && controller.DashCooldownTimer <= 0)
@@ -96,6 +87,7 @@ public class KalbWallLockState : KalbState
             // Check if still holding toward wall
             if (!IsPushingTowardWall())
             {
+                // RELEASE INPUT: Transition to STICKY wall slide, not fall
                 StartReleaseTransition();
             }
         }
@@ -105,21 +97,17 @@ public class KalbWallLockState : KalbState
     {
         if (isTransitioningIn)
         {
-            // Smoothly transition to lock position
             float transitionTime = controller.Settings.wallLockEnterSpeed;
             float elapsed = transitionTime - controller.Settings.wallLockEnterSpeed * Time.fixedDeltaTime;
             float t = Mathf.Clamp01(elapsed / transitionTime);
             
             Vector2 targetPos = lockPosition;
-            
-            // Add slight inward movement during transition
             float inwardOffset = Mathf.Lerp(0.05f, 0f, t);
             targetPos.x += lockWallSide * inwardOffset;
             
             rb.MovePosition(Vector2.Lerp(rb.position, targetPos, t));
             rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, Vector2.zero, t);
             
-            // Check if transition complete
             if (t >= 0.95f)
             {
                 CompleteLockTransition();
@@ -127,22 +115,19 @@ public class KalbWallLockState : KalbState
         }
         else if (isWallLocked)
         {
-            // Maintain lock position
             rb.linearVelocity = Vector2.zero;
             rb.MovePosition(lockPosition);
         }
         else if (isTransitioningOut)
         {
-            // Smoothly transition back to wall slide
             float transitionTime = controller.Settings.wallLockExitSpeed;
             float elapsed = transitionTime - controller.Settings.wallLockExitSpeed * Time.fixedDeltaTime;
             float t = Mathf.Clamp01(elapsed / transitionTime);
             
-            // Gradually restore downward velocity
+            // Transition to wall slide speed, not free fall
             Vector2 targetVelocity = new Vector2(0, controller.Settings.wallSlideSpeed);
             rb.linearVelocity = Vector2.Lerp(Vector2.zero, targetVelocity, t);
             
-            // Check if transition complete
             if (t >= 0.95f)
             {
                 CompleteReleaseTransition();
@@ -152,20 +137,17 @@ public class KalbWallLockState : KalbState
     
     public override void HandleInput()
     {
-        // Input is handled in Update for priority
+        // Input handled in Update
     }
     
     private bool CanEnterWallLock()
     {
-        // Check ability
         if (abilitySystem == null || !abilitySystem.CanWallLock())
             return false;
         
-        // Must be wall sliding
         if (!wallJump.IsWallSliding)
             return false;
         
-        // Must be pushing toward wall
         if (!IsPushingTowardWall())
             return false;
         
@@ -180,14 +162,12 @@ public class KalbWallLockState : KalbState
         float inputDirection = Mathf.Sign(inputHandler.MoveInput.x);
         float wallSide = wallJump.WallSide;
         
-        // Check if input is toward wall (with threshold)
         return Mathf.Abs(inputHandler.MoveInput.x) > controller.Settings.wallLockInputThreshold && 
                Mathf.Approximately(inputDirection, wallSide);
     }
     
     private void StartLockTransition()
     {
-        // Set zero gravity during lock
         controller.GravityManager.SetZeroGravity("WallLock");
     }
     
@@ -196,7 +176,6 @@ public class KalbWallLockState : KalbState
         isTransitioningIn = false;
         isWallLocked = true;
         
-        // Ensure perfect position lock
         rb.position = lockPosition;
         rb.linearVelocity = Vector2.zero;
     }
@@ -206,7 +185,7 @@ public class KalbWallLockState : KalbState
         isWallLocked = false;
         isTransitioningOut = true;
         
-        // Start restoring gravity
+        // Restore normal gravity but we'll control velocity in FixedUpdate
         controller.GravityManager.SetNormalGravity();
     }
     
@@ -214,23 +193,16 @@ public class KalbWallLockState : KalbState
     {
         isTransitioningOut = false;
         
-        // Return to wall slide state
+        // Return to STICKY wall slide state, not fall
         ExitToWallSlide();
     }
     
     private void ExecuteWallJumpFromLock()
     {
-        // Execute normal wall jump
         wallJump.ExecuteWallJump();
-        
-        // Play jump animation
         controller.AnimationController.PlayAnimation("Kalb_jump");
-        
-        // Reset jump buffer
         physics.SetJumpBuffer();
         inputHandler.ResetJumpInput();
-        
-        // Transition to air state
         stateMachine.ChangeState(controller.AirState);
     }
     
@@ -240,7 +212,6 @@ public class KalbWallLockState : KalbState
         
         if (controller.InputBuffer.ConsumeBufferedInput("Dash"))
         {
-            // Quick release before dashing
             controller.GravityManager.SetNormalGravity();
             stateMachine.ChangeState(controller.DashState);
             inputHandler.ResetDashInput();
