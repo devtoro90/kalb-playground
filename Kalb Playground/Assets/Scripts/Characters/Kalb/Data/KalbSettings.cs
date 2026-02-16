@@ -135,8 +135,6 @@ public class KalbSettings : ScriptableObject
     public float wallCheckDistance = 0.45f;
     public float wallSlideSpeed = -2f;// Time player sticks to wall before sliding
     public LayerMask wallLayer;
-    public float wallStickForce = 5f;
-    public float wallStickTolerance = 0.1f;
     public bool requireInputForWallSlide = true; 
     public float awayInputGracePeriod = 0.25f; // Time before slide disengages when pressing away
     public float awayInputDisengageDistance = 0.3f;
@@ -151,4 +149,31 @@ public class KalbSettings : ScriptableObject
     public float wallLockEnterSpeed = 0.2f; // Time to transition into lock
     public float wallLockExitSpeed = 0.15f; // Time to transition out of lock
     public float wallLockInputThreshold = 0.3f; // Minimum input to trigger lock
+
+    [Header("Wall Sliding Physics")]
+    [Tooltip("Initial slide speed when first grabbing wall")]
+    public float wallSlideMinSpeed = -2f;        // Initial downward speed
+    [Tooltip("Maximum slide speed after acceleration")]
+    public float wallSlideMaxSpeed = -8f;        // Max downward speed
+    [Tooltip("How quickly slide speed increases (units per second squared)")]
+    public float wallSlideAcceleration = 15f;    // Acceleration rate
+    [Tooltip("How quickly slide speed decreases when releasing")]
+    public float wallSlideDeceleration = 20f;    // Deceleration rate
+    [Tooltip("How long player sticks to wall before sliding")]
+    public float wallStickDuration = 0.15f;      // Initial stickiness
+    [Tooltip("Force pushing player toward wall")]
+    public float wallStickForce = 10f;
+    [Tooltip("Distance tolerance for wall sticking")]
+    public float wallStickTolerance = 0.1f;
+    [Tooltip("Multiplier for slide speed when not holding toward wall")]
+    public float neutralSlideMultiplier = 0.5f;  // Slower slide when not pressing toward wall
+    [Tooltip("How much slide momentum is preserved in wall jump")]
+    [Range(0f, 1f)]
+    public float wallJumpMomentumRetention = 0.4f; // Percentage of slide speed kept in jump
+    [Tooltip("Bonus speed when tapping toward wall repeatedly")]
+    public float wallTapBoostAmount = 1.5f;      // Speed boost per tap
+    [Tooltip("Time window for tap boost detection")]
+    public float wallTapBoostWindow = 0.3f;      // Time to register consecutive taps
+    [Tooltip("Maximum number of tap boosts")]
+    public int maxWallTapBoosts = 3;              // Max speed boosts from tapping
 }

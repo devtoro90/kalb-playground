@@ -29,16 +29,13 @@ public class KalbWallSlideState : KalbState
         
         // Stop horizontal movement when starting wall slide
         movement.StopHorizontalMovement();
-
-        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         
         // Set gravity for wall slide
         controller.GravityManager.SetNormalGravity();
 
-        // Apply immediate force toward the wall
+        // Apply immediate force toward the wall to ensure contact
         if (wallJump != null && wallJump.WallSide != 0)
         {
-            // Push slightly toward the wall to ensure contact
             Vector2 wallPush = new Vector2(wallJump.WallSide * 2f, 0);
             rb.AddForce(wallPush, ForceMode2D.Impulse);
         }
@@ -65,12 +62,12 @@ public class KalbWallSlideState : KalbState
             stateMachine.ChangeState(controller.WallLockState);
             return;
         }
+        
         // Check if we should exit wall slide
         if (!ShouldContinueWallSliding())
         {
-            // Add a small tolerance for drifting
             float currentDistanceToWall = wallJump.GetDistanceToWall();
-            if (currentDistanceToWall > 0.3f) // Only exit if significantly away from wall
+            if (currentDistanceToWall > 0.3f)
             {
                 ExitToAppropriateState();
                 return;
@@ -98,8 +95,8 @@ public class KalbWallSlideState : KalbState
             return;
         }
         
-        // Update animation
-        controller.AnimationController.PlayAnimation("Kalb_wallslide");
+        // Update animation with slide speed parameter
+        UpdateAnimation();
     }
     
     public override void FixedUpdate()
@@ -137,10 +134,9 @@ public class KalbWallSlideState : KalbState
             }
         }
         
-        // Check for attack input (optional - can be disabled if you prefer)
+        // Check for attack input
         if (inputHandler.AttackPressed && controller.ComboSystem.CanAttack)
         {
-            // Allow attacking while wall sliding
             if (controller.CanAttackFromCurrentState())
             {
                 controller.InputBuffer.BufferAttack();
@@ -156,32 +152,16 @@ public class KalbWallSlideState : KalbState
     
     private bool ShouldContinueWallSliding()
     {
-        // Must meet all wall slide conditions:
-        // 1. Must be touching wall
         if (!wallJump.IsTouchingWall) return false;
-        
-        // 2. Must be wall sliding (not just touching)
         if (!wallJump.IsWallSliding) return false;
-        
-        // 3. Must not be grounded
         if (controller.IsEffectivelyGrounded()) return false;
-        
-        // 4. Must not be swimming
         if (swimming != null && swimming.IsSwimming) return false;
-        
-        // 5. Must not be dashing
         if (controller.DashState.IsDashing) return false;
+        if (controller.AbilitySystem != null && !controller.AbilitySystem.CanWallJump()) return false;
         
-        // 6. Check if wall jump/slide ability is unlocked
-        if (controller.AbilitySystem != null && !controller.AbilitySystem.CanWallJump()) // NEW
-        {
-            return false;
-        }
-        // 7. Must not be attacking (if you want to disable during attack)
-        // if (controller.ComboSystem.IsAttacking) return false;
-
         return true;
     }
+    
     private bool IsPushingTowardWall()
     {
         if (!wallJump.IsTouchingWall)
@@ -196,7 +176,6 @@ public class KalbWallSlideState : KalbState
     
     private void ExitToAppropriateState()
     {
-        // Check if we're grounded
         if (controller.IsEffectivelyGrounded())
         {
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
@@ -210,14 +189,12 @@ public class KalbWallSlideState : KalbState
             return;
         }
         
-        // Check if we're swimming
         if (swimming != null && swimming.IsInWater)
         {
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
         
-        // Otherwise, go to air state
         stateMachine.ChangeState(controller.AirState);
     }
     
@@ -226,15 +203,22 @@ public class KalbWallSlideState : KalbState
         if (wallJump == null) return;
         
         wallJump.ExecuteWallJump();
-        
-        // Play jump animation
         controller.AnimationController.PlayAnimation("Kalb_jump");
-        
-        // Reset jump buffer
         controller.Physics.SetJumpBuffer();
         inputHandler.ResetJumpInput();
-        
-        // Transition to air state after wall jump
         stateMachine.ChangeState(controller.AirState);
+    }
+    
+    private void UpdateAnimation()
+    {
+        // Get slide speed ratio for animation blending
+        float speedRatio = wallJump.SlideSpeedRatio;
+        
+        // You can use this to blend between different wall slide animations
+        // or to control the speed of the slide animation
+        controller.AnimationController.PlayAnimation("Kalb_wallslide");
+        
+        // Optional: Set animator parameter for slide speed
+        // animator.SetFloat("SlideSpeed", speedRatio);
     }
 }

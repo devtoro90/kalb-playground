@@ -15,10 +15,23 @@ public class KalbWallJump : MonoBehaviour
     // State
     private bool isTouchingWall = false;
     private bool isWallSliding = false; // This is the STICKY wall slide state
-    private bool wasWallSliding = false; // Track previous frame for transitions
     private int wallSide = 0; // -1 = left, 1 = right, 0 = none
+    
+    // Wall sliding acceleration system
+    private float currentSlideSpeed = 0f;
+    private float wallStickTimer = 0f;
+    private bool isStickingToWall = false;
+    private float neutralSlideMultiplier = 1f;
     private float wallJumpHorizontalLockTimer = 0f;
     private bool justWallJumped = false;
+    
+    // Tap boost system
+    private float lastTapTime = 0f;
+    private int tapCount = 0;
+    private float currentTapBoost = 0f;
+    private float tapBoostDecayTimer = 0f;
+    
+    // Wall engage buffer
     private float wallEngageBufferTimer = 0f;
     private int bufferedWallSide = 0;
     private const float WALL_ENGAGE_BUFFER_TIME = 0.1f;
@@ -37,6 +50,8 @@ public class KalbWallJump : MonoBehaviour
     public int WallSide => wallSide;
     public bool JustWallJumped => justWallJumped;
     public float CooldownRemaining => wallSlideCooldownTimer;
+    public float CurrentSlideSpeed => currentSlideSpeed;
+    public float SlideSpeedRatio => Mathf.Abs(currentSlideSpeed / settings.wallSlideMaxSpeed);
     
     private void Awake()
     {
@@ -63,13 +78,13 @@ public class KalbWallJump : MonoBehaviour
         UpdateTimers();
         UpdateWallSlideEngagement();
         UpdateAwayInputGracePeriod();
-        
-        wasWallSliding = isWallSliding;
+        UpdateTapBoostSystem();
+        UpdateWallStick();
     }
     
     private void FixedUpdate()
     {
-        ApplyWallSlide();
+        ApplyWallSlidePhysics();
     }
     
     private void CheckWall()
@@ -120,6 +135,9 @@ public class KalbWallJump : MonoBehaviour
         wallSide = 0;
         awayInputTimer = 0f;
         isPressingAwayFromWall = false;
+        currentSlideSpeed = 0f;
+        isStickingToWall = false;
+        wallStickTimer = 0f;
     }
     
     private void CheckWallSide(int direction)
@@ -145,6 +163,7 @@ public class KalbWallJump : MonoBehaviour
             wallEngageBufferTimer = WALL_ENGAGE_BUFFER_TIME;
         }
     }
+    
     private bool HasBufferedWallEngagement()
     {
         if (wallEngageBufferTimer <= 0 || bufferedWallSide == 0)
@@ -179,6 +198,33 @@ public class KalbWallJump : MonoBehaviour
             if (wallEngageBufferTimer <= 0)
             {
                 bufferedWallSide = 0;
+            }
+        }
+        
+        // Update wall stick timer
+        if (wallStickTimer > 0)
+        {
+            wallStickTimer -= Time.deltaTime;
+            if (wallStickTimer <= 0)
+            {
+                isStickingToWall = false;
+            }
+        }
+    }
+    
+    private void UpdateWallStick()
+    {
+        // Handle initial stickiness when grabbing wall
+        if (isWallSliding && isStickingToWall)
+        {
+            // During stick period, we don't slide
+            currentSlideSpeed = 0f;
+            
+            // Apply extra force toward wall during stick
+            if (isTouchingWall)
+            {
+                Vector2 stickForce = new Vector2(wallSide * settings.wallStickForce * 2f, 0);
+                rb.AddForce(stickForce);
             }
         }
     }
@@ -219,6 +265,60 @@ public class KalbWallJump : MonoBehaviour
             }
         }
     }
+    
+    private void UpdateTapBoostSystem()
+    {
+        if (!isWallSliding) 
+        {
+            // Reset tap boost when not sliding
+            tapCount = 0;
+            currentTapBoost = 0f;
+            tapBoostDecayTimer = 0f;
+            return;
+        }
+        
+        // Decay tap boost over time
+        if (tapBoostDecayTimer > 0)
+        {
+            tapBoostDecayTimer -= Time.deltaTime;
+            if (tapBoostDecayTimer <= 0)
+            {
+                currentTapBoost = 0f;
+                tapCount = 0;
+            }
+        }
+    }
+    
+    public void RegisterTapTowardWall()
+    {
+        if (!isWallSliding) return;
+        
+        float currentTime = Time.time;
+        
+        // Check if this tap is within the boost window
+        if (currentTime - lastTapTime <= settings.wallTapBoostWindow)
+        {
+            tapCount = Mathf.Min(tapCount + 1, settings.maxWallTapBoosts);
+            currentTapBoost = tapCount * settings.wallTapBoostAmount;
+        }
+        else
+        {
+            // Start new tap sequence
+            tapCount = 1;
+            currentTapBoost = settings.wallTapBoostAmount;
+        }
+        
+        lastTapTime = currentTime;
+        tapBoostDecayTimer = settings.wallTapBoostWindow * 2f; // Keep boost for twice the window
+        
+        // Cap at max speed
+        float maxTotalSpeed = Mathf.Abs(settings.wallSlideMaxSpeed);
+        float currentTotal = Mathf.Abs(currentSlideSpeed) + currentTapBoost;
+        if (currentTotal > maxTotalSpeed)
+        {
+            currentTapBoost = maxTotalSpeed - Mathf.Abs(currentSlideSpeed);
+        }
+    }
 
     private bool IsPressingAwayFromWall()
     {
@@ -231,6 +331,16 @@ public class KalbWallJump : MonoBehaviour
     }
 
     private bool IsPushingTowardWall()
+    {
+        if (controller == null || controller.InputHandler == null)
+            return false;
+        
+        float inputDirection = Mathf.Sign(controller.InputHandler.MoveInput.x);
+        return Mathf.Abs(controller.InputHandler.MoveInput.x) > 0.1f && 
+            Mathf.Approximately(inputDirection, wallSide);
+    }
+
+    private bool IsHoldingTowardWall()
     {
         if (controller == null || controller.InputHandler == null)
             return false;
@@ -278,12 +388,6 @@ public class KalbWallJump : MonoBehaviour
                 // Clear buffer on successful engagement
                 wallEngageBufferTimer = 0f;
                 bufferedWallSide = 0;
-                
-                // If we were moving upward, clamp upward velocity to prevent flying up the wall
-                if (rb.linearVelocity.y > 0)
-                {
-                    rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
-                }
             }
         }
         else
@@ -299,8 +403,6 @@ public class KalbWallJump : MonoBehaviour
             else if (controller.IsEffectivelyGrounded())
                 shouldDisengage = true;
             
-            // Rule 3: Pressing away after grace period (handled in UpdateAwayInputGracePeriod)
-            
             if (shouldDisengage)
             {
                 DisengageWallSlide();
@@ -313,8 +415,18 @@ public class KalbWallJump : MonoBehaviour
         if (isWallSliding) return;
         
         isWallSliding = true;
+        isStickingToWall = true;
+        wallStickTimer = settings.wallStickDuration;
+        
+        // FIX: Always initialize to min speed
+        currentSlideSpeed = settings.wallSlideMinSpeed;  // Make sure this is set
+        
         awayInputTimer = 0f;
         isPressingAwayFromWall = false;
+        
+        // Reset tap boost system
+        tapCount = 0;
+        currentTapBoost = 0f;
         
         // If we were moving upward when engaging, zero out the upward velocity
         // to prevent sliding up the wall
@@ -334,6 +446,8 @@ public class KalbWallJump : MonoBehaviour
         if (!isWallSliding) return;
         
         isWallSliding = false;
+        isStickingToWall = false;
+        currentSlideSpeed = 0f;
         awayInputTimer = 0f;
         isPressingAwayFromWall = false;
     }
@@ -341,9 +455,11 @@ public class KalbWallJump : MonoBehaviour
     public void ForceDisengageForWallJump()
     {
         isWallSliding = false;
+        isStickingToWall = false;
         awayInputTimer = 0f;
         isPressingAwayFromWall = false;
         justWallJumped = true;
+        currentTapBoost = 0f; // Reset tap boost on wall jump
     }
 
     public void SetWallSlideCooldown()
@@ -356,17 +472,78 @@ public class KalbWallJump : MonoBehaviour
         return isPressingAwayFromWall && awayInputTimer > 0;
     }
     
-    private void ApplyWallSlide()
+    private void ApplyWallSlidePhysics()
     {
         if (!isWallSliding) return;
         
-        // Apply wall slide speed (clamp downward velocity)
-        if (rb.linearVelocity.y < settings.wallSlideSpeed)
+        // If we're still in stick period, don't slide
+        if (isStickingToWall)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, settings.wallSlideSpeed);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+            ApplyWallStickForce();
+            return;
         }
-
+        
+        bool holdingAway = IsPressingAwayFromWall();
+        
+        float acceleration;
+        float targetSpeed;
+        
+        if (holdingAway && awayInputTimer > 0)
+        {
+            // In grace period when pressing away - decelerate
+            acceleration = settings.wallSlideDeceleration;
+            targetSpeed = 0f;
+        }
+        else
+        {
+            acceleration = settings.wallSlideAcceleration;
+            targetSpeed = settings.wallSlideMaxSpeed - currentTapBoost;
+            
+            if (IsHoldingTowardWall() && controller.InputHandler.DashPressed)
+            {
+                RegisterTapTowardWall();
+            }
+        }
+        
+        // Apply acceleration to slide speed (negative values = downward)
+        float currentAbsSpeed = Mathf.Abs(currentSlideSpeed);
+        float targetAbsSpeed = Mathf.Abs(targetSpeed);
+        
+        if (currentAbsSpeed < targetAbsSpeed)
+        {
+            // Accelerating
+            currentAbsSpeed += acceleration * Time.fixedDeltaTime;
+            currentAbsSpeed = Mathf.Min(currentAbsSpeed, targetAbsSpeed);
+        }
+        else if (currentAbsSpeed > targetAbsSpeed)
+        {
+            // Decelerating
+            currentAbsSpeed -= settings.wallSlideDeceleration * Time.fixedDeltaTime;
+            currentAbsSpeed = Mathf.Max(currentAbsSpeed, targetAbsSpeed);
+        }
+        
+        // FIX: Ensure we never go below min speed when accelerating
+        // This prevents dropping below min speed during transition
+        if (!holdingAway && currentAbsSpeed < Mathf.Abs(settings.wallSlideMinSpeed))
+        {
+            currentAbsSpeed = Mathf.Abs(settings.wallSlideMinSpeed);
+        }
+        
+        // Apply sign (always downward)
+        currentSlideSpeed = -currentAbsSpeed;
+        
+        // Apply the slide velocity
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, currentSlideSpeed);
+        
         // Apply force toward the wall to prevent drifting
+        ApplyWallStickForce();
+    }
+    
+    private void ApplyWallStickForce()
+    {
+        if (!isTouchingWall) return;
+        
         float currentDistanceToWall = GetDistanceToWall();
         
         if (currentDistanceToWall > settings.wallStickTolerance)
@@ -417,12 +594,19 @@ public class KalbWallJump : MonoBehaviour
         
         if (!CanWallJump() && !isInGracePeriod) return;
         
+        // Store current slide speed for momentum preservation
+        float slideMomentum = currentSlideSpeed * settings.wallJumpMomentumRetention;
+        
         Vector2 jumpDirection = new Vector2(
             -wallSide * settings.wallJumpAngle.x,
             settings.wallJumpAngle.y
         ).normalized;
         
-        rb.linearVelocity = jumpDirection * settings.wallJumpForce;
+        // Apply jump force with slide momentum
+        Vector2 jumpVelocity = jumpDirection * settings.wallJumpForce;
+        jumpVelocity.y += Mathf.Abs(slideMomentum); // Add downward momentum as upward boost
+        
+        rb.linearVelocity = jumpVelocity;
         
         bool shouldFaceRight = wallSide == -1;
         movement.ForceFlip(shouldFaceRight);
@@ -454,6 +638,19 @@ public class KalbWallJump : MonoBehaviour
         
         return rawInput;
     }
+
+    public void ResetSlideSpeed()
+    {
+        if (isWallSliding)
+        {
+            // Reset to minimum slide speed when coming from wall lock
+            currentSlideSpeed = settings.wallSlideMinSpeed;
+            
+            // Also reset stick timer if you want the initial stickiness
+            isStickingToWall = true;
+            wallStickTimer = settings.wallStickDuration;
+        }
+    }
     
     private void OnDrawGizmosSelected()
     {
@@ -467,6 +664,11 @@ public class KalbWallJump : MonoBehaviour
             {
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawWireSphere(transform.position + Vector3.up * 1f, 0.3f);
+                
+                // Draw slide speed indicator
+                float speedRatio = Mathf.Abs(currentSlideSpeed / settings.wallSlideMaxSpeed);
+                Gizmos.color = Color.Lerp(Color.green, Color.red, speedRatio);
+                Gizmos.DrawLine(transform.position, transform.position + Vector3.down * speedRatio * 2f);
             }
             
             if (wallJumpHorizontalLockTimer > 0)

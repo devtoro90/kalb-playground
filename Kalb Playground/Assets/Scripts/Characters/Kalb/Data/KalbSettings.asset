@@ -15,12 +15,16 @@ MonoBehaviour:
   moveSpeed: 5
   jumpForce: 15
   movementSmoothing: 0.05
+  jumpCutMultiplier: 0.5
+  jumpHorizontalPreservation: 0.8
+  runningJumpBoost: 2.5
   coyoteTime: 0.15
   jumpBufferTime: 0.1
-  jumpCutMultiplier: 0.5
-  airControlMultiplier: 0.5
+  airAcceleration: 12
+  airDeceleration: 12
+  airTurnAcceleration: 12
   maxAirSpeed: 10
-  airAcceleration: 15
+  airFriction: 5
   fallingGravityScale: 2.5
   normalGravityScale: 2
   quickFallGravityMultiplier: 1.2
@@ -111,7 +115,8 @@ MonoBehaviour:
   runUnlocked: 1
   dashUnlocked: 1
   doubleJumpUnlocked: 1
-  wallJumpUnlocked: 0
+  wallJumpUnlocked: 1
+  wallLockUnlocked: 1
   runSpeed: 8
   runAcceleration: 20
   runDeceleration: 25
@@ -132,11 +137,19 @@ MonoBehaviour:
   doubleJumpMaintainsMomentum: 1
   doubleJumpHorizontalBoost: 1.5
   wallCheckDistance: 0.45
-  wallSlideSpeed: -4
-  wallStickTime: 0.25
+  wallSlideSpeed: -2
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
-  wallJumpForce: 15
-  wallJumpAngle: {x: 1.2, y: 1}
-  wallJumpHorizontalLockDuration: 0.5
+  wallStickForce: 5
+  wallStickTolerance: 0.1
+  requireInputForWallSlide: 1
+  awayInputGracePeriod: 0.3
+  awayInputDisengageDistance: 0.3
+  wallJumpForce: 18
+  wallJumpAngle: {x: 1.2, y: 1.5}
+  wallJumpHorizontalLockDuration: 0.2
+  wallJumpControlReduction: 0.1
+  wallLockEnterSpeed: 0.2
+  wallLockExitSpeed: 0.15
+  wallLockInputThreshold: 0.3

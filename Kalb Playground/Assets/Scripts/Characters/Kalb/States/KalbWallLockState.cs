@@ -187,8 +187,15 @@ public class KalbWallLockState : KalbState
         
         // Restore normal gravity but we'll control velocity in FixedUpdate
         controller.GravityManager.SetNormalGravity();
+        
+        // FIX: Reset wall jump's slide speed to minimum when releasing from lock
+        if (controller.WallJump != null)
+        {
+            // Tell wall jump system we're transitioning from lock to slide
+            controller.WallJump.ResetSlideSpeed();
+        }
     }
-    
+
     private void CompleteReleaseTransition()
     {
         isTransitioningOut = false;
