@@ -4,7 +4,7 @@ using UnityEngine;
 public class KalbSettings : ScriptableObject
 {
     [Header("Basic Movement")]
-    public float moveSpeed = 5f;
+    public float moveSpeed = 7f;
     public float jumpForce = 15f;
     [Range(0, 0.3f)] public float movementSmoothing = 0.05f;
     
@@ -16,11 +16,10 @@ public class KalbSettings : ScriptableObject
     public float jumpBufferTime = 0.1f;   
 
     [Header("Air Control")]
-    public float airAcceleration = 12f;          // Normal air acceleration
-    public float airDeceleration = 12f;          // Slowing down in air (no input)
-    public float airTurnAcceleration = 12f;      // Quick turn acceleration
-    public float maxAirSpeed = 10f;              // Maximum horizontal air speed
-    public float airFriction = 5f;  
+    public float airAcceleration = 10f;          // Normal air acceleration
+    public float airDeceleration = 8f;          // Slowing down in air (no input)
+    public float airTurnAcceleration = 10f;      // Quick turn acceleration
+    public float airFriction = 4f;  
     
     [Header("Physics")]
     public float fallingGravityScale = 2.5f;
@@ -81,6 +80,14 @@ public class KalbSettings : ScriptableObject
     public Color comboFlashColor = Color.white;
     public float comboFlashDuration = 0.1f;
 
+    [Header("Ability Unlocks")]
+    public bool ledgeGrabUnlocked = true;
+    public bool runUnlocked = false;
+    public bool dashUnlocked = false;
+    public bool doubleJumpUnlocked = false;
+    public bool wallJumpUnlocked = false;
+    public bool wallLockUnlocked = false;
+
     [Header("Ledge Settings")]
     public float ledgeDetectionDistance = 0.5f;
     public float ledgeGrabOffsetY = 0.15f;
@@ -97,17 +104,9 @@ public class KalbSettings : ScriptableObject
     public float maxClimbDistance = 2f; // Maximum allowed climb distance
     public float climbSurfaceCheckDistance = 1.5f; // How far to check for platform surface
     public float climbHorizontalBuffer = 0.3f; // Buffer from platform edge
-
-    [Header("Ability Unlocks")]
-    public bool ledgeGrabUnlocked = true;
-    public bool runUnlocked = false;
-    public bool dashUnlocked = false;
-    public bool doubleJumpUnlocked = false;
-    public bool wallJumpUnlocked = false;
-    public bool wallLockUnlocked = false;
     
     [Header("Run Settings")]
-    public float runSpeed = 8f;
+    public float runSpeed = 10f;
     public float runAcceleration = 20f;
     public float runDeceleration = 25f;
     public float runTurnaroundMultiplier = 0.7f;

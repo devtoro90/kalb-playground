@@ -51,8 +51,6 @@ public class KalbMovement : MonoBehaviour
         // Skip if swimming - swimming state handles its own movement
         if (swimming != null && swimming.IsSwimming)
         {
-            // Don't apply regular movement when swimming
-            // Swimming movement is handled in KalbSwimState
             return;
         }
         
@@ -120,12 +118,12 @@ public class KalbMovement : MonoBehaviour
                         Mathf.Abs(inputDirection - currentDirection) > 1.5f && 
                         currentSpeed > 0.5f;
         
-        // Calculate acceleration based on context (HK-style)
+        // Calculate acceleration based on context
         float acceleration;
         if (isTurning)
         {
-            // Quick turnaround in air (like HK)
-            acceleration = settings.airTurnAcceleration; // NEW: Add to settings
+            // Quick turnaround in air
+            acceleration = settings.airTurnAcceleration;
         }
         else if (Mathf.Abs(moveInput) > 0.1f)
         {
@@ -135,11 +133,29 @@ public class KalbMovement : MonoBehaviour
         else
         {
             // No input - air deceleration
-            acceleration = settings.airDeceleration; // NEW: Add to settings
+            acceleration = settings.airDeceleration;
         }
         
-        // Calculate target velocity
-        float targetXVelocity = moveInput * settings.maxAirSpeed;
+        // NEW: Determine max air speed based on run input
+        float maxAirSpeed;
+        bool isRunPressed = controller.InputHandler != null && 
+                           controller.InputHandler.DashHeld && 
+                           controller.AbilitySystem != null && 
+                           controller.AbilitySystem.CanRun();
+        
+        if (isRunPressed)
+        {
+            // If holding run, max air speed equals run speed
+            maxAirSpeed = settings.runSpeed;
+        }
+        else
+        {
+            // If not holding run, max air speed equals walk speed
+            maxAirSpeed = settings.moveSpeed;
+        }
+        
+        // Calculate target velocity with dynamic max speed
+        float targetXVelocity = moveInput * maxAirSpeed;
         
         // Apply acceleration toward target velocity
         float velocityDifference = targetXVelocity - currentXVelocity;
@@ -152,11 +168,11 @@ public class KalbMovement : MonoBehaviour
         // Apply force
         rb.AddForce(Vector2.right * forceMagnitude);
         
-        // Clamp to maximum air speed
-        if (Mathf.Abs(rb.linearVelocity.x) > settings.maxAirSpeed)
+        // Clamp to maximum air speed (dynamic based on run input)
+        if (Mathf.Abs(rb.linearVelocity.x) > maxAirSpeed)
         {
             rb.linearVelocity = new Vector2(
-                Mathf.Sign(rb.linearVelocity.x) * settings.maxAirSpeed,
+                Mathf.Sign(rb.linearVelocity.x) * maxAirSpeed,
                 rb.linearVelocity.y
             );
         }
@@ -175,8 +191,16 @@ public class KalbMovement : MonoBehaviour
     private void ApplyWallJumpAirControl(float moveInput)
     {
         // During wall jump period, use much slower acceleration
-        float acceleration = settings.airAcceleration * 0.2f; // 20% of normal
-        float maxAirSpeed = settings.maxAirSpeed * 0.8f; // 80% of normal
+        float acceleration = settings.airAcceleration * 0.2f;
+        
+        // Determine max speed based on run input (even during wall jump)
+        bool isRunPressed = controller.InputHandler != null && 
+                           controller.InputHandler.DashHeld && 
+                           controller.AbilitySystem != null && 
+                           controller.AbilitySystem.CanRun();
+        
+        float maxAirSpeed = isRunPressed ? settings.runSpeed : settings.moveSpeed;
+        maxAirSpeed *= 0.8f; // Reduced during wall jump lock
         
         float currentXVelocity = rb.linearVelocity.x;
         float targetXVelocity = moveInput * maxAirSpeed;
@@ -190,6 +214,17 @@ public class KalbMovement : MonoBehaviour
         forceMagnitude = Mathf.Clamp(forceMagnitude, -maxForce, maxForce);
         
         rb.AddForce(Vector2.right * forceMagnitude);
+    }
+    
+    // NEW: Helper method to get current max air speed
+    public float GetCurrentMaxAirSpeed()
+    {
+        bool isRunPressed = controller.InputHandler != null && 
+                           controller.InputHandler.DashHeld && 
+                           controller.AbilitySystem != null && 
+                           controller.AbilitySystem.CanRun();
+        
+        return isRunPressed ? settings.runSpeed : settings.moveSpeed;
     }
     
     private void Flip(float moveInput)
