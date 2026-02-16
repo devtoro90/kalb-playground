@@ -92,7 +92,6 @@ public class KalbSettings : ScriptableObject
     public float minLedgeHoldTime = 0.3f;
     public float ledgeReleaseForce = 5f;
     public float ledgeReleaseCooldown = 0.2f;
-    public bool ledgeGrabUnlocked = true;
 
     [Header("Ledge Climb Validation")]
     public float maxClimbDistance = 2f; // Maximum allowed climb distance
@@ -100,6 +99,7 @@ public class KalbSettings : ScriptableObject
     public float climbHorizontalBuffer = 0.3f; // Buffer from platform edge
 
     [Header("Ability Unlocks")]
+    public bool ledgeGrabUnlocked = true;
     public bool runUnlocked = false;
     public bool dashUnlocked = false;
     public bool doubleJumpUnlocked = false;

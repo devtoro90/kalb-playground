@@ -14,8 +14,8 @@ public class KalbLedgeDetector : MonoBehaviour
     [SerializeField] private LayerMask environmentLayer;
     
     [Header("Cooldown Settings")]
-    [SerializeField] private float ledgeGrabCooldown = 0.5f; // Time before can grab again
-    [SerializeField] private float verticalReleaseThreshold = -2f; // Min downward velocity to regrab
+    [SerializeField] private float ledgeGrabCooldown = 0.5f;
+    [SerializeField] private float verticalReleaseThreshold = -2f;
     
     [Header("State")]
     private bool ledgeDetected = false;
@@ -60,6 +60,13 @@ public class KalbLedgeDetector : MonoBehaviour
     
     public bool CheckForLedge(KalbController controller)
     {
+        // CRITICAL: Check if ledge grab ability is unlocked
+        if (controller.AbilitySystem != null && !controller.AbilitySystem.CanLedgeGrab())
+        {
+            ledgeDetected = false;
+            return false;
+        }
+        
         // Don't check if on cooldown
         if (isOnCooldown)
         {
@@ -158,7 +165,6 @@ public class KalbLedgeDetector : MonoBehaviour
     {
         if (!ledgeDetected) return Vector3.zero;
         
-        // SIMPLIFIED: Just use the ledge position with offsets
         float playerHeight = playerCollider.bounds.size.y;
         float grabX = ledgePosition.x - (ledgeSide * ledgeGrabOffsetX);
         float grabY = ledgePosition.y - (playerHeight * ledgeGrabOffsetY);
@@ -172,36 +178,23 @@ public class KalbLedgeDetector : MonoBehaviour
         
         float playerHeight = playerCollider.bounds.size.y;
         
-        // Check for platform surface directly above the ledge (as in original script)
         Vector2 rayStart = new Vector2(ledgePosition.x, ledgePosition.y + 0.1f);
-        float rayLength = controller.Settings.climbSurfaceCheckDistance; // Use setting
+        float rayLength = controller.Settings.climbSurfaceCheckDistance;
         
         RaycastHit2D hit = Physics2D.Raycast(rayStart, Vector2.up, rayLength, environmentLayer);
         
         if (hit.collider != null)
         {
-            // Found platform surface
             float surfaceY = hit.point.y;
-            
-            // Calculate X position: move onto the platform with buffer
-            // For right ledge (ledgeSide = 1), move slightly right
-            // For left ledge (ledgeSide = -1), move slightly left
             float targetX = ledgePosition.x + (ledgeSide * controller.Settings.climbHorizontalBuffer);
-            
-            // Ensure we're placing feet on surface
             float feetOffset = playerHeight * 0.5f;
             
-            return new Vector3(
-                targetX,
-                surfaceY + feetOffset,
-                transform.position.z
-            );
+            return new Vector3(targetX, surfaceY + feetOffset, transform.position.z);
         }
         
-        // Fallback: if no surface found, use original calculation
         return new Vector3(
             ledgePosition.x + (ledgeSide * 0.3f),
-            ledgePosition.y + playerHeight * 0.8f, // Above the ledge
+            ledgePosition.y + playerHeight * 0.8f,
             transform.position.z
         );
     }
@@ -211,8 +204,7 @@ public class KalbLedgeDetector : MonoBehaviour
     {
         isOnCooldown = true;
         lastLedgeReleaseTime = Time.time;
-        ledgeDetected = false; // Clear detection
-        
+        ledgeDetected = false;
     }
     
     // Call this when player climbs successfully (no cooldown needed)
@@ -230,9 +222,6 @@ public class KalbLedgeDetector : MonoBehaviour
     public bool CanClimb()
     {
         if (!ledgeDetected) return false;
-        
-        // SIMPLIFIED: Just check if ledge is detected
-        // The animation will handle the rest
         return true;
     }
     
@@ -243,19 +232,16 @@ public class KalbLedgeDetector : MonoBehaviour
             Gizmos.color = isOnCooldown ? Color.red : Color.magenta;
             Gizmos.DrawWireSphere(ledgeCheckPoint.position, 0.1f);
             
-            // Draw ledge position if detected
             if (ledgeDetected && Application.isPlaying)
             {
                 Gizmos.color = Color.white;
                 Gizmos.DrawWireCube(ledgePosition, new Vector3(0.3f, 0.1f, 0));
                 
-                // Draw grab position
                 Vector3 grabPos = CalculateGrabPosition();
                 Gizmos.color = Color.green;
                 Gizmos.DrawWireSphere(grabPos, 0.15f);
             }
             
-            // Draw cooldown indicator
             if (isOnCooldown && Application.isPlaying)
             {
                 Gizmos.color = Color.red;
@@ -265,29 +251,8 @@ public class KalbLedgeDetector : MonoBehaviour
             if (ledgeDetected && Application.isPlaying)
             {
                 Vector3 climbTarget = CalculateClimbTarget();
-                
-                // Climb target
                 Gizmos.color = Color.blue;
                 Gizmos.DrawWireSphere(climbTarget, 0.2f);
-                
-                // Climb validation rays
-                Gizmos.color = Color.cyan;
-                
-                // Surface check ray
-                float playerHeight = playerCollider.bounds.size.y;
-                Vector2 surfaceCheckStart = new Vector2(
-                    ledgePosition.x + (ledgeSide * 0.3f),
-                    ledgePosition.y + 0.1f
-                );
-                Gizmos.DrawRay(surfaceCheckStart, Vector2.up * playerHeight * 0.8f);
-                
-                // Horizontal space check ray
-                float playerWidth = playerCollider.bounds.size.x;
-                Vector2 horizontalCheckStart = new Vector2(
-                    ledgePosition.x + (ledgeSide * playerWidth * 0.5f),
-                    ledgePosition.y + playerHeight * 0.5f
-                );
-                Gizmos.DrawRay(horizontalCheckStart, Vector2.right * ledgeSide * playerWidth * 0.6f);
             }
         }
     }

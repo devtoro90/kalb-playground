@@ -5,6 +5,7 @@ public class KalbAbilitySystem : MonoBehaviour
     [SerializeField] private KalbSettings settings;
     
     // Events for ability unlocks (optional, for future use)
+    public System.Action<bool> OnLedgeGrabUnlocked;
     public System.Action<bool> OnRunUnlocked;
     public System.Action<bool> OnDashUnlocked;
     public System.Action<bool> OnDoubleJumpUnlocked;
@@ -12,6 +13,11 @@ public class KalbAbilitySystem : MonoBehaviour
     public System.Action<bool> OnWallLockUnlocked;
     
     // Public methods to unlock abilities
+    public void UnlockLedgeGrab()
+    {
+        settings.ledgeGrabUnlocked = true;
+        OnLedgeGrabUnlocked?.Invoke(true);
+    }
     public void UnlockRun()
     {
         settings.runUnlocked = true;
@@ -43,6 +49,7 @@ public class KalbAbilitySystem : MonoBehaviour
     
     public void UnlockAllAbilities()
     {
+        UnlockLedgeGrab();
         UnlockRun();
         UnlockDash();
         UnlockDoubleJump();
@@ -52,6 +59,7 @@ public class KalbAbilitySystem : MonoBehaviour
 
     public void ResetAbilities()
     {
+        settings.ledgeGrabUnlocked = false;
         settings.runUnlocked = false;
         settings.dashUnlocked = false;
         settings.doubleJumpUnlocked = false;
@@ -60,6 +68,7 @@ public class KalbAbilitySystem : MonoBehaviour
     }
     
     // Helper methods to check abilities
+    public bool CanLedgeGrab() => settings.ledgeGrabUnlocked;
     public bool CanRun() => settings.runUnlocked;
     public bool CanDash() => settings.dashUnlocked;
     public bool CanDoubleJump() => settings.doubleJumpUnlocked;

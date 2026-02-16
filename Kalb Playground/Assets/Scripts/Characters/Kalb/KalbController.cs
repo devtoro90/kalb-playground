@@ -228,7 +228,7 @@ public class KalbController : MonoBehaviour
         }
 
         // Check for ledge grab
-        if (settings.ledgeGrabUnlocked && !IsInLedgeState() && ledgeDetector != null && 
+        if (abilitySystem.CanLedgeGrab() && !IsInLedgeState() && ledgeDetector != null && 
             rb.linearVelocity.y < 0 && !IsEffectivelyGrounded())
         {
             if (!ledgeDetector.IsOnCooldown)

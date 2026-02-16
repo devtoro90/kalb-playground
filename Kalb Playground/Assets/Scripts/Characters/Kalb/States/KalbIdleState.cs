@@ -31,7 +31,7 @@ public class KalbIdleState : KalbState
     public override void Update()
     {
         // Check for ledge state
-        if (controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() && // CHANGED
+        if (controller.AbilitySystem.CanLedgeGrab() && controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() && // CHANGED
             controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
         {
             // Check if we should auto-grab
