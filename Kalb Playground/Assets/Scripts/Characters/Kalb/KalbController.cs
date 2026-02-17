@@ -37,7 +37,6 @@ public class KalbController : MonoBehaviour
     private KalbLedgeClimbState ledgeClimbState;
     private KalbWallSlideState wallSlideState;
     private KalbWallLockState wallLockState;
-    private KalbWallAttackState wallAttackState;
     
     // Dash cooldown tracking - MOVED HERE from KalbDashState
     private float dashCooldownTimer = 0f;
@@ -91,7 +90,6 @@ public class KalbController : MonoBehaviour
     public KalbLedgeClimbState LedgeClimbState => ledgeClimbState;
     public KalbWallSlideState WallSlideState => wallSlideState;
     public KalbWallLockState WallLockState => wallLockState;
-    public KalbWallAttackState WallAttackState => wallAttackState;
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     public bool IsLookingUp => animationController != null ? animationController.IsLookingUp : false;
@@ -175,7 +173,6 @@ public class KalbController : MonoBehaviour
         ledgeClimbState = new KalbLedgeClimbState(this, stateMachine); 
         wallSlideState = new KalbWallSlideState(this, stateMachine);    
         wallLockState = new KalbWallLockState(this, stateMachine);
-        wallAttackState = new KalbWallAttackState(this, stateMachine);
         
         // Start with idle state
         stateMachine.Initialize(idleState);
@@ -359,15 +356,14 @@ public class KalbController : MonoBehaviour
         //if (inputHandler.AttackPressed && comboSystem.CanAttack)
         if (inputHandler.AttackPressed)
         {
-            // Check for wall attack FIRST (highest priority)
-            if (CanPerformWallAttack())
+            if (stateMachine.CurrentState is KalbWallLockState)
             {
-                // Wall attack is handled within the current wall state
-                // Just trigger the attack in combo system, don't change state
-                comboSystem.StartAttack();
-                inputHandler.ResetAttackInput();
+                if (CanPerformWallAttack())
+                {
+                    comboSystem.StartWallAttack();
+                    inputHandler.ResetAttackInput();
+                }
             }
-            // Then check for regular attack
             else if (CanAttackFromCurrentState())
             {
                 inputBuffer.BufferAttack();
@@ -707,22 +703,23 @@ public class KalbController : MonoBehaviour
     }
 
     private bool CanPerformWallAttack()
-    {
-        // Must be in wall state
-        bool isInWallState = stateMachine.CurrentState is KalbWallLockState;
-        
-        if (!isInWallState) return false;
-        
-        // Must have wall attack enabled
-        if (!settings.enableWallAttack) return false;
-        
-        // Must be touching a wall
-        if (wallJump == null || !wallJump.IsTouchingWall) return false;
-        
-        // Check if combo system allows wall attack
-        if (comboSystem == null || !comboSystem.CanPerformWallAttack()) return false;
-        
-        return true;
-    }
+{
+    if (!(stateMachine.CurrentState is KalbWallLockState))
+        return false;
+    
+    if (comboSystem == null)
+        return false;
+    
+    if (!settings.enableWallAttack)
+        return false;
+    
+    if (comboSystem.IsAnyAttackActive)
+        return false;
+    
+    if (wallJump == null || !wallJump.IsTouchingWall)
+        return false;
+    
+    return comboSystem.CanPerformWallAttack;
+}
 
 }

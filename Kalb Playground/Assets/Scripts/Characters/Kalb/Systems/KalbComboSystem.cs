@@ -21,12 +21,13 @@ public class KalbComboSystem : MonoBehaviour
     private bool isComboFinishing = false;
     private bool attackQueued = false;
     
-    // NEW: Upward attack state
+    // Separate attack states
     private bool isUpwardAttacking = false;
+    private bool isWallAttacking = false;
+    
+    // Cooldowns
     private bool canUpwardAttack = true;
     private float upwardAttackCooldownTimer = 0f;
-
-    private bool isWallAttacking = false;
     private bool canWallAttack = true;
     private float wallAttackCooldownTimer = 0f;
     private int wallAttackSide = 0;
@@ -43,11 +44,14 @@ public class KalbComboSystem : MonoBehaviour
     public bool IsWallAttacking => isWallAttacking;
     public int WallAttackSide => wallAttackSide; 
     public bool IsComboFinishing => isComboFinishing;
-    public bool CanAttack => (!isAttacking && !isUpwardAttacking && !isWallAttacking && attackCooldownTimer <= 0 && currentCombo < settings.maxComboHits) || 
-                             (isUpwardAttacking && upwardAttackCooldownTimer <= 0) ||
-                             (isWallAttacking && wallAttackCooldownTimer <= 0);
+    public bool CanAttack => !IsAnyAttackActive && attackCooldownTimer <= 0 && currentCombo < settings.maxComboHits;
     public float ComboWindowTimer => comboWindowTimer;
     public bool IsInComboWindow => comboWindowTimer > 0;
+    public bool IsAnyAttackActive => isAttacking || isUpwardAttacking || isWallAttacking;
+    
+    // Separate ability checks
+    public bool CanPerformUpwardAttack => settings.enableUpwardAttack && canUpwardAttack && upwardAttackCooldownTimer <= 0;
+    public bool CanPerformWallAttack => settings.enableWallAttack && canWallAttack && wallAttackCooldownTimer <= 0;
     
     private void Start()
     {
@@ -276,25 +280,6 @@ public class KalbComboSystem : MonoBehaviour
         if (wallJump == null || !wallJump.IsTouchingWall) return false;
         return true;
     }
-
-    public bool CanPerformWallAttack()
-    {
-        if (!settings.enableWallAttack) return false;
-        if (!canWallAttack) return false;
-        
-        KalbController controller = GetComponent<KalbController>();
-        if (controller == null) return false;
-        
-        // Check if we're in wall slide or wall lock state
-        bool isInWallState = controller.StateMachine.CurrentState is KalbWallLockState;
-        
-        if (!isInWallState) return false;
-        
-        // Check if we're actually touching a wall
-        if (wallJump == null || !wallJump.IsTouchingWall) return false;
-        
-        return true;
-    }
     
     
     // MODIFIED: Start attack with upward detection
@@ -466,39 +451,24 @@ public class KalbComboSystem : MonoBehaviour
 
     public void StartWallAttack()
     {
-        Debug.Log("StartWallAttack");
-        if (!canWallAttack || !ShouldPerformWallAttack()) return;
+        if (!CanPerformWallAttack || isWallAttacking || isUpwardAttacking) return;
         
-        // Get wall side
         wallAttackSide = wallJump.WallSide;
-        
-        // Update attack point position based on wall side
         UpdateWallAttackPointPosition(wallAttackSide);
         
-        // Set wall attack state
         isWallAttacking = true;
         attackTimer = settings.wallAttackDuration;
         wallAttackCooldownTimer = settings.wallAttackCooldown;
         canWallAttack = false;
         
-        // Reset ground combo
-        ResetCombo();
-        
-        // Execute wall attack
         ExecuteWallAttack();
-        
-        // Play wall attack animation
         PlayWallAttackAnimation();
     }
     
-    // NEW: Execute wall attack hit detection
     private void ExecuteWallAttack()
     {
-
-        Debug.Log("ExecuteWallAttack");
         if (wallAttackPoint == null) return;
         
-        // Check for enemies in wall attack range
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
             wallAttackPoint.position, 
             settings.wallAttackRange, 
@@ -507,19 +477,7 @@ public class KalbComboSystem : MonoBehaviour
         
         foreach (Collider2D enemy in hitEnemies)
         {
-            // Apply damage
-            /*var health = enemy.GetComponent<Health>(); // Replace with your health component
-            if (health != null)
-            {
-                health.TakeDamage((int)settings.wallAttackDamage);
-            }*/
-            
-            // Apply knockback - direction away from wall
             Vector2 knockbackDirection = settings.wallAttackKnockbackDirection;
-            
-            // Adjust horizontal direction based on wall side
-            // If wall on left (side = -1), knockback to the right (positive)
-            // If wall on right (side = 1), knockback to the left (negative)
             knockbackDirection.x *= wallAttackSide;
             
             var enemyRb = enemy.GetComponent<Rigidbody2D>();
@@ -529,7 +487,6 @@ public class KalbComboSystem : MonoBehaviour
             }
         }
         
-        // Spawn hit effect if available
         if (settings.hitEffectPrefab != null && hitEnemies.Length > 0)
         {
             GameObject effect = Instantiate(settings.hitEffectPrefab, wallAttackPoint.position, Quaternion.identity);
@@ -537,10 +494,8 @@ public class KalbComboSystem : MonoBehaviour
         }
     }
     
-    // NEW: Play wall attack animation
     private void PlayWallAttackAnimation()
     {
-        Debug.Log("PlayWallAttackAnimation");
         if (animationController == null) return;
         
         if (!string.IsNullOrEmpty(settings.wallAttackAnimation))
@@ -548,15 +503,10 @@ public class KalbComboSystem : MonoBehaviour
             animationController.PlayAnimation(settings.wallAttackAnimation);
         }
     }
-    
-    // NEW: End wall attack
+
     private void EndWallAttack()
     {
-        Debug.Log("EndWallAttack");
         isWallAttacking = false;
-        CancelCombo();
-        
-        // Optional: Small cooldown before next wall attack
         wallAttackCooldownTimer = settings.wallAttackCooldown * 0.5f;
     }
     

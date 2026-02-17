@@ -496,7 +496,6 @@
 "Assets/Scripts/Characters/Kalb/States/KalbState.cs"
 "Assets/Scripts/Characters/Kalb/States/KalbSwimState.cs"
 "Assets/Scripts/Characters/Kalb/States/KalbWalkState.cs"
-"Assets/Scripts/Characters/Kalb/States/KalbWallAttackState.cs"
 "Assets/Scripts/Characters/Kalb/States/KalbWallLockState.cs"
 "Assets/Scripts/Characters/Kalb/States/KalbWallSlideState.cs"
 "Assets/Scripts/Characters/Kalb/Systems/KalbAbilitySystem.cs"
