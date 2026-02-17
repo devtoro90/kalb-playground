@@ -894,6 +894,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MetroidvaniaCamera
   player: {fileID: 658198519}
+  playerController: {fileID: 0}
   followMode: 0
   cameraSpeed: 5
   useCameraBounds: 1
@@ -955,6 +956,24 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   enableImpactPause: 1
+  enableLookUpDown: 1
+  lookUpOffset: 3.5
+  lookDownOffset: -2.5
+  lookSmoothTime: 0.15
+  returnSmoothTime: 0.2
+  invertLook: 0
+  useModifierKey: 0
+  lookModifierKey: 51
+  useSeparateLookKeys: 1
+  lookUpKey: 63
+  lookDownKey: 64
+  verticalInputThreshold: 0.5
+  autoReturnToCenter: 1
+  lookHoldDelay: 0.1
+  limitLookToBounds: 1
+  requireIdleAndGrounded: 1
+  allowLookInAir: 0
+  allowLookWhileMoving: 0
   deadzoneRadius: 0.5
   responsiveness: 5
   cameraSmoothTime: 0.1
@@ -2677,6 +2696,8 @@ MonoBehaviour:
   abilitySystem: {fileID: 658198532}
   comboSystem: {fileID: 658198533}
   controller: {fileID: 658198527}
+  isLookingUp: 1
+  lookUpInputThreshold: 0.5
 --- !u!114 &658198527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2718,6 +2739,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KalbPhysics
   rb: {fileID: 658198517}
+  controller: {fileID: 0}
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
   collisionDetector: {fileID: 658198524}
   swimming: {fileID: 658198531}

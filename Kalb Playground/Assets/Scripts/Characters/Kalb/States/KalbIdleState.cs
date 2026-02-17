@@ -30,8 +30,12 @@ public class KalbIdleState : KalbState
     
     public override void Update()
     {
+        // Check for looking up input first (highest priority in idle)
+        float verticalInput = inputHandler.MoveInput.y;
+        bool isLookingUp = verticalInput > 0.5f;
+        
         // Check for ledge state
-        if (controller.AbilitySystem.CanLedgeGrab() && controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() && // CHANGED
+        if (controller.AbilitySystem.CanLedgeGrab() && controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() &&
             controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
         {
             // Check if we should auto-grab
@@ -52,14 +56,17 @@ public class KalbIdleState : KalbState
             return;
         }
         
-        if (!controller.IsEffectivelyGrounded()) // CHANGED
+        if (!controller.IsEffectivelyGrounded())
         {
             stateMachine.ChangeState(controller.AirState);
             return;
         }
         
+        // Only transition to movement states if not looking up
+        // OR if looking up but input is very strong (prioritize movement)
         if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
         {
+            // If we were looking up, we might want a quick transition or just go to walk/run
             if (abilitySystem != null && abilitySystem.CanRun() && inputHandler.DashHeld)
             {
                 stateMachine.ChangeState(controller.RunState);

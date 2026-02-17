@@ -51,6 +51,9 @@ public class KalbInputHandler : MonoBehaviour
         // Read movement input
         moveInput = moveAction.ReadValue<Vector2>();
         
+        // DEBUG: Log move input
+        
+        
         // Read jump input
         jumpPressed = jumpAction.WasPressedThisFrame();
         jumpHeld = jumpAction.IsPressed();

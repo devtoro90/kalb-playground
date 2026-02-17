@@ -32,10 +32,12 @@ public class KalbCollisionDetector : MonoBehaviour
         CheckCeiling();
     }
     
+
     private void CheckGround()
     {
         if (groundCheck == null) return;
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, environmentLayer);
+        
     }
 
     private void CheckCeiling()

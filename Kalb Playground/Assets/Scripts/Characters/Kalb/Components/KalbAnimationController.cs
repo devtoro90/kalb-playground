@@ -11,6 +11,12 @@ public class KalbAnimationController : MonoBehaviour
     [SerializeField] private KalbAbilitySystem abilitySystem;
     [SerializeField] private KalbComboSystem comboSystem;
     [SerializeField] private KalbController controller; 
+
+    [Header("Looking Up")]
+    [SerializeField] private bool isLookingUp = false;
+    [SerializeField] private float lookUpInputThreshold = 0.5f;
+
+    public bool IsLookingUp => isLookingUp;
     
     private void Start()
     {
@@ -27,6 +33,13 @@ public class KalbAnimationController : MonoBehaviour
     private void UpdateAnimations()
     {
         if (animator == null) return;
+        UpdateLookingUpState();
+
+        if (isLookingUp)
+        {
+            PlayAnimation("Kalb_look_up");
+            return;
+        }
 
         // Check if wall locked (add with other priority checks)
         if (controller.WallLockState != null && controller.WallLockState.IsWallLocked)
@@ -35,7 +48,7 @@ public class KalbAnimationController : MonoBehaviour
             return;
         }
         
-        // Check if wall sliding (add this near the top with other priority checks)
+        // Check if wall sliding
         if (controller.WallJump != null && controller.WallJump.IsWallSliding)
         {
             PlayAnimation("Kalb_wallslide");
@@ -77,14 +90,14 @@ public class KalbAnimationController : MonoBehaviour
             return;
         }
 
-        // Check if running (NEW)
+        // Check if running
         if (controller != null && controller.RunState != null && controller.RunState.IsRunning)
         {
             PlayAnimation("Kalb_run");
             return;
         }
 
-// Set movement speed parameter
+        // Set movement speed parameter
         float speed = Mathf.Abs(rb.linearVelocity.x);
         animator.SetFloat("Speed", speed);
         
@@ -99,6 +112,9 @@ public class KalbAnimationController : MonoBehaviour
         {
             animator.SetBool("FacingRight", movement.FacingRight);
         }
+        
+        // Set looking up parameter
+        animator.SetBool("IsLookingUp", isLookingUp);
     }
     
     private void UpdateDashAnimation()
@@ -189,6 +205,44 @@ public class KalbAnimationController : MonoBehaviour
         if (animator != null)
         {
             animator.Play(animationName);
+        }
+    }
+
+    private void UpdateLookingUpState()
+    {
+        if (controller == null || controller.InputHandler == null) return;
+        
+        // Log each condition to see what's failing
+        bool isGrounded = controller.IsEffectivelyGrounded();
+        bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
+        bool isInActionState = controller.DashState.IsDashing || 
+                            comboSystem.IsAttacking || 
+                            swimming.IsSwimming ||
+                            (controller.WallJump != null && controller.WallJump.IsWallSliding) ||
+                            controller.IsInLedgeState();
+        
+        float verticalInput = controller.InputHandler.MoveInput.y;
+        bool lookingUpInputHeld = verticalInput > lookUpInputThreshold;
+        
+        // Check if in idle state specifically
+        bool isInIdleState = controller.StateMachine != null && 
+                            controller.StateMachine.CurrentState is KalbIdleState;
+        
+        // Can look up when grounded, not moving, not in action state, and input held
+        isLookingUp = isGrounded && !isMoving && !isInActionState && lookingUpInputHeld;
+        
+        // Also check if we're in idle state specifically
+        if (!isInIdleState)
+        {
+            isLookingUp = false;
+            
+        }
+        else
+        {
+            if (!isLookingUp)
+            {
+                PlayAnimation("Kalb_idle");
+            }
         }
     }
 }

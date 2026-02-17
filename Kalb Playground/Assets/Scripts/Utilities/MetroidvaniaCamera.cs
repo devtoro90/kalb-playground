@@ -36,6 +36,7 @@ public class MetroidvaniaCamera : MonoBehaviour
     
     [Header("Core Settings")]
     public Transform player;
+    [SerializeField] private KalbController playerController; // Reference to player controller
     public CameraFollowMode followMode = CameraFollowMode.Basic;
     public float cameraSpeed = 5f;
     
@@ -57,29 +58,47 @@ public class MetroidvaniaCamera : MonoBehaviour
     public AnimationCurve shakeDecayCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
     
     [Header("Impact Effects")]
-    public float impactPauseDuration = 0.1f; // How long to pause camera follow
-    public float impactPauseStrength = 0.05f; // How much to slow down (0 = stop, 1 = normal)
+    public float impactPauseDuration = 0.1f;
+    public float impactPauseStrength = 0.05f;
     public AnimationCurve pauseRecoveryCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     public bool enableImpactPause = true;
     
-    // Multiple shake sources support
-    private struct ShakeData
-    {
-        public float intensity;
-        public float duration;
-        public float timer;
-        public Vector3 direction;
-        public bool isHardImpact; // Flag for hard landings
-    }
+    // ====================================================================
+    // NEW SECTION: LOOK UP/DOWN FUNCTIONALITY
+    // ====================================================================
     
-    private ShakeData activeShake;
-    private Vector3 shakeOffset = Vector3.zero;
-    private float shakeNoiseOffset;
-    private float originalCameraSpeed;
-    private float currentCameraSpeedModifier = 1f;
-    private Coroutine impactPauseCoroutine;
-
+    [Header("Look Up/Down Settings")]
+    [SerializeField] private bool enableLookUpDown = true;
+    [SerializeField] private float lookUpOffset = 3.5f;      // How far up to look
+    [SerializeField] private float lookDownOffset = -2.5f;   // How far down to look
+    [SerializeField] private float lookSmoothTime = 0.15f;   // Smoothing for look movement
+    [SerializeField] private float returnSmoothTime = 0.2f;  // Smoothing when returning to center
+    [SerializeField] private bool invertLook = false;        // Invert up/down direction
     
+    [Header("Look Input Settings")]
+    [SerializeField] private bool useModifierKey = false;    // Require modifier key (Shift/Ctrl)
+    [SerializeField] private Key lookModifierKey = Key.LeftShift; // Modifier key if enabled
+    [SerializeField] private bool useSeparateLookKeys = true; // Use dedicated up/down keys
+    [SerializeField] private Key lookUpKey = Key.UpArrow;     // Key to look up
+    [SerializeField] private Key lookDownKey = Key.DownArrow; // Key to look down
+    [SerializeField] private float verticalInputThreshold = 0.5f; // Threshold for gamepad stick
+    
+    [Header("Look Behavior")]
+    [SerializeField] private bool autoReturnToCenter = true;  // Auto return when not looking
+    [SerializeField] private float lookHoldDelay = 0.1f;      // Delay before starting look
+    [SerializeField] private bool limitLookToBounds = true;   // Keep look within camera bounds
+    
+    // NEW: Condition settings
+    [Header("Look Conditions")]
+    [SerializeField] private bool requireIdleAndGrounded = true; // Only look when idle & grounded
+    
+    // Private look variables
+    private float currentLookOffset = 0f;
+    private float targetLookOffset = 0f;
+    private float lookVelocity = 0f;
+    private bool isLooking = false;
+    private float lookHoldTimer = 0f;
+    private Vector3 baseTargetPosition;
     
     // ====================================================================
     // SECTION 2: BASIC FOLLOW (Unlocked by default)
@@ -93,13 +112,34 @@ public class MetroidvaniaCamera : MonoBehaviour
     public float responsiveness = 5f;
 
     [Header("Camera Smoothing")]
-    public float cameraSmoothTime = 0.1f; // Lower = faster, Higher = slower
-    public float maxCameraSpeed = 15f; // Limit maximum speed
+    public float cameraSmoothTime = 0.1f;
+    public float maxCameraSpeed = 15f;
     
     private Vector3 currentVelocity = Vector3.zero;    
     private Vector3 velocity = Vector3.zero;
     private Camera cam;
     private Vector2 cameraHalfSize;
+    
+    // Multiple shake sources support
+    private struct ShakeData
+    {
+        public float intensity;
+        public float duration;
+        public float timer;
+        public Vector3 direction;
+        public bool isHardImpact;
+    }
+    
+    private ShakeData activeShake;
+    private Vector3 shakeOffset = Vector3.zero;
+    private float shakeNoiseOffset;
+    private float originalCameraSpeed;
+    private float currentCameraSpeedModifier = 1f;
+    private Coroutine impactPauseCoroutine;
+    
+    // Private fields
+    private Vector3 targetPosition;
+    private Vector3 smoothedPosition;
     
     // ====================================================================
     // SECTION 10: INITIALIZATION
@@ -115,6 +155,12 @@ public class MetroidvaniaCamera : MonoBehaviour
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
         }
         
+        // Try to get player controller if not assigned
+        if (playerController == null && player != null)
+        {
+            playerController = player.GetComponent<KalbController>();
+        }
+        
         // Calculate camera half size in world units
         float height = cam.orthographicSize;
         float width = height * cam.aspect;
@@ -126,6 +172,7 @@ public class MetroidvaniaCamera : MonoBehaviour
             Vector3 playerPos = player.position;
             targetPosition = new Vector3(playerPos.x, playerPos.y, transform.position.z);
             transform.position = targetPosition;
+            baseTargetPosition = targetPosition;
         }
 
         // Initialize shake with random offset for Perlin noise
@@ -139,10 +186,16 @@ public class MetroidvaniaCamera : MonoBehaviour
     {
         if (player == null) return;
         
-        // Update screen shake FIRST (before calculating target position)
+        // Update look up/down input with conditions
+        if (enableLookUpDown)
+        {
+            UpdateLookInput();
+        }
+        
+        // Update screen shake FIRST
         UpdateEnhancedScreenShake();
         
-        // Calculate target position
+        // Calculate base target position (player position)
         Vector3 playerPos = player.position;
         Vector3 cameraPos = transform.position;
         
@@ -152,13 +205,27 @@ public class MetroidvaniaCamera : MonoBehaviour
             new Vector2(cameraPos.x, cameraPos.y)
         );
         
+        // Base target is player position
+        baseTargetPosition = new Vector3(playerPos.x, playerPos.y, transform.position.z);
+        
         // Only move if outside deadzone
         if (distance > deadzoneRadius)
         {
-            targetPosition = new Vector3(playerPos.x, playerPos.y, transform.position.z);
+            targetPosition = baseTargetPosition;
         }
         
-        // Apply boundaries
+        // Apply look up/down offset to target Y position
+        if (enableLookUpDown)
+        {
+            // Smooth the look offset
+            float smoothTimeToUse = isLooking ? lookSmoothTime : returnSmoothTime;
+            currentLookOffset = Mathf.SmoothDamp(currentLookOffset, targetLookOffset, ref lookVelocity, smoothTimeToUse, Mathf.Infinity, Time.fixedDeltaTime);
+            
+            // Apply the offset to target position
+            targetPosition.y += currentLookOffset;
+        }
+        
+        // Apply boundaries (including look offset limits)
         if (useCameraBounds)
         {
             ApplyBoundaries();
@@ -171,11 +238,11 @@ public class MetroidvaniaCamera : MonoBehaviour
         float effectiveCameraSpeed = cameraSpeed * currentCameraSpeedModifier;
         
         // Smooth movement using SmoothDamp with modified speed
-        Vector3 smoothedPosition = Vector3.SmoothDamp(
+        smoothedPosition = Vector3.SmoothDamp(
             transform.position, 
             finalTargetPosition, 
             ref currentVelocity, 
-            1f / effectiveCameraSpeed, // Use effective speed
+            1f / effectiveCameraSpeed,
             maxCameraSpeed,
             Time.fixedDeltaTime
         );
@@ -185,6 +252,151 @@ public class MetroidvaniaCamera : MonoBehaviour
         smoothedPosition.y = Mathf.Round(smoothedPosition.y * 100f) / 100f;
         
         transform.position = smoothedPosition;
+    }
+    
+    // ====================================================================
+    // NEW SECTION: LOOK UP/DOWN INPUT HANDLING
+    // ====================================================================
+    
+    private bool CanLook()
+    {
+        // If we don't have player controller, default to allowing look
+        if (playerController == null) return true;
+        
+        // Check if we require idle and grounded
+        if (requireIdleAndGrounded)
+        {
+            // Check if player is idle (not moving horizontally) and grounded
+            bool isIdle = Mathf.Abs(playerController.InputHandler.MoveInput.x) < 0.1f;
+            bool isGrounded = playerController.IsEffectivelyGrounded();
+            
+            // Also check if player is in idle state specifically (optional, more precise)
+            bool isInIdleState = playerController.IdleState != null && 
+                                 playerController.GetType().GetField("stateMachine")?.GetValue(playerController) is KalbStateMachine stateMachine &&
+                                 stateMachine.CurrentState is KalbIdleState;
+            
+            // For platformers, being grounded with no input is usually sufficient
+            return isIdle && isGrounded;
+        }
+        
+        return true;
+    }
+    
+    private void UpdateLookInput()
+    {
+        // Skip if Keyboard.current is not available
+        if (Keyboard.current == null && Gamepad.current == null) return;
+        
+        // Check if we can look based on player state
+        bool canLook = CanLook();
+        
+        bool wantsToLookUp = false;
+        bool wantsToLookDown = false;
+        
+        // Only process input if we can look
+        if (canLook)
+        {
+            // Check keyboard input
+            if (Keyboard.current != null)
+            {
+                // Check modifier key if required
+                bool modifierPressed = !useModifierKey || 
+                    (lookModifierKey == Key.LeftShift && Keyboard.current.leftShiftKey.isPressed) ||
+                    (lookModifierKey == Key.RightShift && Keyboard.current.rightShiftKey.isPressed) ||
+                    (lookModifierKey == Key.LeftCtrl && Keyboard.current.leftCtrlKey.isPressed) ||
+                    (lookModifierKey == Key.RightCtrl && Keyboard.current.rightCtrlKey.isPressed);
+                
+                if (useSeparateLookKeys)
+                {
+                    // Dedicated look keys
+                    wantsToLookUp = Keyboard.current[lookUpKey].isPressed && modifierPressed;
+                    wantsToLookDown = Keyboard.current[lookDownKey].isPressed && modifierPressed;
+                }
+                else
+                {
+                    // Use vertical arrows with optional modifier
+                    wantsToLookUp = (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed) && modifierPressed;
+                    wantsToLookDown = (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed) && modifierPressed;
+                }
+            }
+            
+            // Check gamepad input if available
+            if (Gamepad.current != null)
+            {
+                Vector2 rightStick = Gamepad.current.rightStick.ReadValue();
+                
+                // Use right stick for look (more natural for gamepad)
+                if (Mathf.Abs(rightStick.y) > verticalInputThreshold)
+                {
+                    if (rightStick.y > 0)
+                        wantsToLookUp = true;
+                    else
+                        wantsToLookDown = true;
+                }
+            }
+            
+            // Apply inversion
+            if (invertLook)
+            {
+                bool temp = wantsToLookUp;
+                wantsToLookUp = wantsToLookDown;
+                wantsToLookDown = temp;
+            }
+        }
+        
+        // Update look state with hold timer
+        if ((wantsToLookUp || wantsToLookDown) && canLook)
+        {
+            lookHoldTimer += Time.fixedDeltaTime;
+            
+            if (lookHoldTimer >= lookHoldDelay)
+            {
+                if (wantsToLookUp)
+                {
+                    targetLookOffset = lookUpOffset;
+                    isLooking = true;
+                }
+                else if (wantsToLookDown)
+                {
+                    targetLookOffset = lookDownOffset;
+                    isLooking = true;
+                }
+            }
+        }
+        else
+        {
+            // No input or can't look - reset look
+            lookHoldTimer = 0f;
+            
+            if (autoReturnToCenter)
+            {
+                targetLookOffset = 0f;
+                isLooking = false;
+            }
+        }
+        
+        // Ensure look offset stays within camera bounds if enabled
+        if (limitLookToBounds && useCameraBounds)
+        {
+            float camHeight = cam.orthographicSize;
+            float playerY = player.position.y;
+            float topBound = maxBounds.y - camHeight;
+            float bottomBound = minBounds.y + camHeight;
+            
+            // Calculate maximum possible look offset while staying in bounds
+            float maxLookUp = topBound - playerY;
+            float maxLookDown = bottomBound - playerY;
+            
+            // Clamp target offset
+            if (targetLookOffset > 0)
+            {
+                targetLookOffset = Mathf.Min(targetLookOffset, maxLookUp);
+            }
+            else if (targetLookOffset < 0)
+            {
+                targetLookOffset = Mathf.Max(targetLookOffset, maxLookDown);
+            }
+        }
     }
     
     // ====================================================================
@@ -215,7 +427,7 @@ public class MetroidvaniaCamera : MonoBehaviour
     
     private void DebugDrawBounds(float left, float right, float bottom, float top)
     {
-        // Draw camera center bounds (what you had before)
+        // Draw camera center bounds
         Debug.DrawLine(new Vector3(minBounds.x, minBounds.y, 0), new Vector3(maxBounds.x, minBounds.y, 0), Color.green);
         Debug.DrawLine(new Vector3(maxBounds.x, minBounds.y, 0), new Vector3(maxBounds.x, maxBounds.y, 0), Color.green);
         Debug.DrawLine(new Vector3(maxBounds.x, maxBounds.y, 0), new Vector3(minBounds.x, maxBounds.y, 0), Color.green);
@@ -263,7 +475,7 @@ public class MetroidvaniaCamera : MonoBehaviour
             // Apply optional directional bias
             if (activeShake.direction != Vector3.zero)
             {
-                float directionalBias = 0.7f; // 70% in the direction, 30% random
+                float directionalBias = 0.7f;
                 Vector3 directionalShake = activeShake.direction.normalized * currentIntensity * directionalBias;
                 shakeX += directionalShake.x;
                 shakeY += directionalShake.y;
@@ -339,14 +551,14 @@ public class MetroidvaniaCamera : MonoBehaviour
         float impactFactor = (normalizedFallSpeed * 0.7f) + (normalizedFallDistance * 0.3f);
         
         // Scale intensity and duration based on impact
-        float intensity = Mathf.Lerp(0.15f, 0.35f, impactFactor); // Increased range
+        float intensity = Mathf.Lerp(0.15f, 0.35f, impactFactor);
         float duration = Mathf.Lerp(0.2f, 0.4f, impactFactor);
         
         // Add strong upward bias for hard landings
-        Vector3 direction = new Vector3(0, 0.8f, 0); // 80% upward bias
+        Vector3 direction = new Vector3(0, 0.8f, 0);
         
         // Calculate pause strength based on impact
-        float pauseStrength = Mathf.Lerp(0.3f, 0.05f, impactFactor); // Lower = stronger pause
+        float pauseStrength = Mathf.Lerp(0.3f, 0.05f, impactFactor);
         
         // Update pause settings based on impact
         impactPauseDuration = Mathf.Lerp(0.08f, 0.15f, impactFactor);
@@ -379,7 +591,7 @@ public class MetroidvaniaCamera : MonoBehaviour
         
         // Smooth recovery to normal speed
         float recoveryTimer = 0f;
-        float recoveryDuration = 0.1f; // Brief recovery period
+        float recoveryDuration = 0.1f;
         
         while (recoveryTimer < recoveryDuration)
         {
@@ -407,15 +619,9 @@ public class MetroidvaniaCamera : MonoBehaviour
         // Calculate impact strength
         float impactFactor = Mathf.Clamp01((Mathf.Abs(fallSpeed) + fallDistance) / 40f);
         
-        // 1. Brief freeze (optional - comment out if you don't want to affect game time)
-        // float freezeTime = Mathf.Lerp(0.03f, 0.07f, impactFactor);
-        // Time.timeScale = 0.1f; // Slow down time
-        // yield return new WaitForSecondsRealtime(freezeTime * 0.5f);
-        // Time.timeScale = 1f; // Resume time
-        
         // 2. Camera pause (slows camera follow without affecting game time)
         float pauseTime = Mathf.Lerp(0.1f, 0.2f, impactFactor);
-        float pauseStrength = Mathf.Lerp(0.2f, 0.05f, impactFactor); // Lower = stronger pause
+        float pauseStrength = Mathf.Lerp(0.2f, 0.05f, impactFactor);
         
         // Store original values
         float originalPauseDuration = impactPauseDuration;
@@ -445,6 +651,44 @@ public class MetroidvaniaCamera : MonoBehaviour
             impactPauseCoroutine = null;
         }
         currentCameraSpeedModifier = 1f;
+    }
+    
+    // ====================================================================
+    // PUBLIC METHODS FOR LOOK UP/DOWN
+    // ====================================================================
+    
+    /// <summary>
+    /// Manually set the look offset (for scripted camera movements)
+    /// </summary>
+    public void SetLookOffset(float offset)
+    {
+        targetLookOffset = offset;
+        isLooking = (offset != 0);
+    }
+    
+    /// <summary>
+    /// Reset look to center
+    /// </summary>
+    public void ResetLook()
+    {
+        targetLookOffset = 0f;
+        isLooking = false;
+    }
+    
+    /// <summary>
+    /// Get current look offset value
+    /// </summary>
+    public float GetCurrentLookOffset()
+    {
+        return currentLookOffset;
+    }
+    
+    /// <summary>
+    /// Check if camera is currently looking up/down
+    /// </summary>
+    public bool IsLooking()
+    {
+        return isLooking;
     }
     
     // ====================================================================
@@ -494,9 +738,34 @@ public class MetroidvaniaCamera : MonoBehaviour
         // Draw deadzone
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, deadzoneRadius);
+        
+        // Draw look up/down range
+        if (enableLookUpDown && player != null)
+        {
+            Gizmos.color = Color.cyan;
+            Vector3 playerPos = player.position;
+            
+            // Draw look up range
+            Gizmos.DrawLine(
+                new Vector3(playerPos.x - 0.5f, playerPos.y + lookUpOffset, 0),
+                new Vector3(playerPos.x + 0.5f, playerPos.y + lookUpOffset, 0)
+            );
+            
+            // Draw look down range
+            Gizmos.DrawLine(
+                new Vector3(playerPos.x - 0.5f, playerPos.y + lookDownOffset, 0),
+                new Vector3(playerPos.x + 0.5f, playerPos.y + lookDownOffset, 0)
+            );
+            
+            // Draw current look offset
+            if (Application.isPlaying)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(
+                    new Vector3(playerPos.x - 0.5f, playerPos.y + currentLookOffset, 0),
+                    new Vector3(playerPos.x + 0.5f, playerPos.y + currentLookOffset, 0)
+                );
+            }
+        }
     }
-    
-    // Private fields that were missing
-    private Vector3 targetPosition;
-    private Vector3 smoothedPosition;
 }

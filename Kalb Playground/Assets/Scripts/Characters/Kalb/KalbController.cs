@@ -92,6 +92,9 @@ public class KalbController : MonoBehaviour
     public KalbWallLockState WallLockState => wallLockState;
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
+    public bool IsLookingUp => animationController != null ? animationController.IsLookingUp : false;
+
+    public KalbStateMachine StateMachine => stateMachine;
     
     private void Awake()
     {
@@ -400,10 +403,11 @@ public class KalbController : MonoBehaviour
         wasGroundedLastFrame = currentlyGrounded;
     }
     
-    // NEW: Check if effectively grounded (with stick tolerance)
     public bool IsEffectivelyGrounded()
     {
-        return collisionDetector.IsGrounded || groundStickTimer > 0;
+        bool result = collisionDetector.IsGrounded || groundStickTimer > 0;
+        
+        return result;
     }
     
     // Apply strong forward force for running jumps
@@ -666,6 +670,20 @@ public class KalbController : MonoBehaviour
     public void ForceStateChange(KalbState newState)
     {
         stateMachine.ChangeState(newState);
+    }
+
+    public bool CanLookUp()
+    {
+        // Can look up when grounded, not moving significantly, and not in action states
+        bool isGrounded = IsEffectivelyGrounded();
+        bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
+        bool isInActionState = dashState.IsDashing || 
+                            comboSystem.IsAttacking || 
+                            swimming.IsSwimming ||
+                            (wallJump != null && wallJump.IsWallSliding) ||
+                            IsInLedgeState();
+        
+        return isGrounded && !isMoving && !isInActionState;
     }
 
 }

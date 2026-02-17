@@ -21,7 +21,6 @@ public class KalbWallJump : MonoBehaviour
     private float currentSlideSpeed = 0f;
     private float wallStickTimer = 0f;
     private bool isStickingToWall = false;
-    private float neutralSlideMultiplier = 1f;
     private float wallJumpHorizontalLockTimer = 0f;
     private bool justWallJumped = false;
     

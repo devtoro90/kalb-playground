@@ -698,7 +698,7 @@ TextureImporter:
         width: 108
         height: 164
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -720,7 +720,7 @@ TextureImporter:
         width: 109
         height: 159
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -742,7 +742,7 @@ TextureImporter:
         width: 163
         height: 151
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -764,7 +764,7 @@ TextureImporter:
         width: 165
         height: 134
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -773,6 +773,270 @@ TextureImporter:
       bones: []
       spriteID: e1dc1590a16c0460e88ddd0d74191646
       internalID: -1567562563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_4
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 1415
+        width: 124
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f88af240cc2743a2a61260bb59da574
+      internalID: 1578022193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_5
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 1416
+        width: 124
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65c2ad719b4fb462ea2a5a94f0ad6675
+      internalID: -36781538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_6
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 1614
+        width: 123
+        height: 174
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 324aeffb837f146abb77f2844d925d20
+      internalID: 122845308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_7
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 1615
+        width: 123
+        height: 174
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 99a3a3046e0814bb497d0ae05241e463
+      internalID: -2035602286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_8
+      rect:
+        serializedVersion: 2
+        x: 407
+        y: 1608
+        width: 161
+        height: 187
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a425b259b463b480a9c60836898178fb
+      internalID: -566633413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_9
+      rect:
+        serializedVersion: 2
+        x: 591
+        y: 1605
+        width: 195
+        height: 187
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1eea67b3f284047ea9fd06310595bb59
+      internalID: -665310960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_10
+      rect:
+        serializedVersion: 2
+        x: 809
+        y: 1603
+        width: 156
+        height: 187
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec5754d6673c44295854ece1528ebf85
+      internalID: -1949544348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_11
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 1816
+        width: 122
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5980e7e9f9be3488fa8d5aa8029ee8ed
+      internalID: 2049203301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_12
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 1819
+        width: 122
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 16d334a6aba654787be105ffabb193a6
+      internalID: 794656406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_13
+      rect:
+        serializedVersion: 2
+        x: 427
+        y: 1820
+        width: 122
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 84af2e13c1c9d425bb49001b95ab8f28
+      internalID: 2111893706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_14
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 1814
+        width: 138
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86faccc849ce94efa8f86befadb034d4
+      internalID: -580099916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb2_15
+      rect:
+        serializedVersion: 2
+        x: 822
+        y: 1812
+        width: 138
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a904cacf69d774171b07550a9343b9ab
+      internalID: -1010207304
       vertices: []
       indices: 
       edges: []
@@ -793,8 +1057,20 @@ TextureImporter:
     nameFileIdTable:
       Kalb2_0: 752273693
       Kalb2_1: -1286278811
+      Kalb2_10: -1949544348
+      Kalb2_11: 2049203301
+      Kalb2_12: 794656406
+      Kalb2_13: 2111893706
+      Kalb2_14: -580099916
+      Kalb2_15: -1010207304
       Kalb2_2: 579171837
       Kalb2_3: -1567562563
+      Kalb2_4: 1578022193
+      Kalb2_5: -36781538
+      Kalb2_6: 122845308
+      Kalb2_7: -2035602286
+      Kalb2_8: -566633413
+      Kalb2_9: -665310960
       Player2_0: 3345508739736421500
       Player2_1: 1889441527787109331
       Player2_10: 2080635569
