@@ -8,6 +8,7 @@ public class KalbWallLockState : KalbState
     private Rigidbody2D rb;
     private KalbPhysics physics;
     private KalbAbilitySystem abilitySystem;
+    private KalbComboSystem comboSystem; // NEW: Add reference
     
     // Wall Lock state
     private bool isWallLocked = false;
@@ -29,6 +30,7 @@ public class KalbWallLockState : KalbState
         rb = controller.Rb;
         physics = controller.Physics;
         abilitySystem = controller.AbilitySystem;
+        comboSystem = controller.ComboSystem; // NEW
     }
     
     public override void Enter()
@@ -69,6 +71,20 @@ public class KalbWallLockState : KalbState
         
         if (isWallLocked)
         {
+            // NEW: Check for wall attack input (highest priority)
+            /*if (inputHandler.AttackPressed && comboSystem != null && 
+                controller.Settings.enableWallAttack && comboSystem.ShouldPerformWallAttack())
+            {
+                controller.InputBuffer.BufferAttack();
+                
+                if (controller.InputBuffer.ConsumeBufferedInput("Attack"))
+                {
+                    stateMachine.ChangeState(controller.WallAttackState);
+                    inputHandler.ResetAttackInput();
+                    return;
+                }
+            }*/
+            
             if (inputHandler.JumpPressed)
             {
                 ExecuteWallJumpFromLock();
@@ -87,7 +103,6 @@ public class KalbWallLockState : KalbState
             // Check if still holding toward wall
             if (!IsPushingTowardWall())
             {
-                // RELEASE INPUT: Transition to STICKY wall slide, not fall
                 StartReleaseTransition();
             }
         }
@@ -124,7 +139,6 @@ public class KalbWallLockState : KalbState
             float elapsed = transitionTime - controller.Settings.wallLockExitSpeed * Time.fixedDeltaTime;
             float t = Mathf.Clamp01(elapsed / transitionTime);
             
-            // Transition to wall slide speed, not free fall
             Vector2 targetVelocity = new Vector2(0, controller.Settings.wallSlideSpeed);
             rb.linearVelocity = Vector2.Lerp(Vector2.zero, targetVelocity, t);
             
@@ -185,13 +199,10 @@ public class KalbWallLockState : KalbState
         isWallLocked = false;
         isTransitioningOut = true;
         
-        // Restore normal gravity but we'll control velocity in FixedUpdate
         controller.GravityManager.SetNormalGravity();
         
-        // FIX: Reset wall jump's slide speed to minimum when releasing from lock
         if (controller.WallJump != null)
         {
-            // Tell wall jump system we're transitioning from lock to slide
             controller.WallJump.ResetSlideSpeed();
         }
     }
@@ -199,8 +210,6 @@ public class KalbWallLockState : KalbState
     private void CompleteReleaseTransition()
     {
         isTransitioningOut = false;
-        
-        // Return to STICKY wall slide state, not fall
         ExitToWallSlide();
     }
     

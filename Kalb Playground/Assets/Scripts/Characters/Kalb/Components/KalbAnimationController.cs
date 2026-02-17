@@ -41,7 +41,14 @@ public class KalbAnimationController : MonoBehaviour
             return;
         }
 
-        // Check if wall locked (add with other priority checks)
+        // NEW: Check for wall attack (highest priority on wall)
+        if (comboSystem != null && comboSystem.IsWallAttacking)
+        {
+            // Wall attack animation is already playing
+            return;
+        }
+
+        // Check if wall locked
         if (controller.WallLockState != null && controller.WallLockState.IsWallLocked)
         {
             PlayAnimation("Kalb_walllock");
@@ -76,10 +83,9 @@ public class KalbAnimationController : MonoBehaviour
             return;
         }
 
-        // NEW: Check if upward attacking (highest priority among attacks)
+        // Check if upward attacking
         if (comboSystem != null && comboSystem.IsUpwardAttacking)
         {
-            // Upward attack animation is already set by combo system
             return;
         }
 

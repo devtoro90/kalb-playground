@@ -96,6 +96,22 @@ public class KalbSettings : ScriptableObject
     public float upwardAirAttackDamage = 20f;
     public float upwardAirAttackKnockback = 6f;
     public string upwardAirAttackAnimation = "Kalb_attack_up";
+    
+    [Header("Wall Attack Settings")]
+    public bool enableWallAttack = true;
+    public float wallAttackDamage = 30f;
+    public float wallAttackKnockback = 10f;
+    public float wallAttackRange = 0.8f;
+    public float wallAttackDuration = 0.25f;
+    public float wallAttackCooldown = 0.3f;
+    public Vector2 wallAttackPointOffset = new Vector2(0.8f, 0f); // Horizontal offset from player center
+    public Vector2 wallAttackKnockbackDirection = new Vector2(2f, 1f); // Away from wall and up
+    public string wallAttackAnimation = "Kalb_attack_wall";
+    
+    [Header("Wall Attack Exit Options")]
+    public bool stayInWallLockAfterAttack = true; // Stay in wall lock after attack
+    public bool allowWallJumpDuringAttack = true; // Can jump to cancel attack
+    public float wallAttackExitDelay = 0.1f; // Delay before exiting wall lock
 
     [Header("Ability Unlocks")]
     public bool ledgeGrabUnlocked = true;

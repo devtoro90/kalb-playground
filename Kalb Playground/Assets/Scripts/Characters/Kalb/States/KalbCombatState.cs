@@ -45,7 +45,7 @@ public class KalbCombatState : KalbState
         }
         
         // If attack is finished, transition to appropriate state
-        if (!comboSystem.IsAttacking && !comboSystem.IsUpwardAttacking)
+        if (!comboSystem.IsAttacking && !comboSystem.IsUpwardAttacking && !comboSystem.IsWallAttacking)
         {
             TransitionToNextState();
         }
@@ -54,7 +54,21 @@ public class KalbCombatState : KalbState
     public override void FixedUpdate()
     {
         // MODIFIED: Different movement handling for upward attacks
-        if (comboSystem.IsUpwardAttacking)
+        if (comboSystem.IsWallAttacking)
+        {
+            // During wall attack, maintain wall position
+            // Don't apply movement
+            if (controller.WallJump != null && controller.WallJump.IsTouchingWall)
+            {
+                // Stay attached to wall
+                controller.Rb.linearVelocity = Vector2.zero;
+                
+                // Apply stick force to wall
+                Vector2 wallStickForce = new Vector2(controller.WallJump.WallSide * 10f, 0);
+                controller.Rb.AddForce(wallStickForce);
+            }
+        }
+        else if (comboSystem.IsUpwardAttacking)
         {
             // During upward attack, minimal horizontal movement
             // The upward attack already applies its own upward force
@@ -103,6 +117,23 @@ public class KalbCombatState : KalbState
     
     private void TransitionToNextState()
     {
+        // If we were wall attacking, return to appropriate wall state
+        if (comboSystem.IsWallAttacking)
+        {
+            if (controller.WallJump != null && controller.WallJump.IsTouchingWall)
+            {
+                if (controller.WallLockState != null && Mathf.Abs(inputHandler.MoveInput.x) > controller.Settings.wallLockInputThreshold)
+                {
+                    stateMachine.ChangeState(controller.WallLockState);
+                }
+                else
+                {
+                    stateMachine.ChangeState(controller.WallSlideState);
+                }
+                return;
+            }
+        }
+        
         if (controller.IsEffectivelyGrounded())
         {
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
