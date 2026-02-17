@@ -9,7 +9,7 @@ public class KalbCombatState : KalbState
     private KalbSwimming swimming;
     private KalbCollisionDetector collisionDetector;
 
-public KalbCombatState(KalbController controller, KalbStateMachine stateMachine) 
+    public KalbCombatState(KalbController controller, KalbStateMachine stateMachine) 
         : base(controller, stateMachine)
     {
         inputHandler = controller.InputHandler;
@@ -22,7 +22,7 @@ public KalbCombatState(KalbController controller, KalbStateMachine stateMachine)
     
     public override void Enter()
     {
-        // Start the combo attack
+        // Start the combo attack - combo system will determine if it's upward
         comboSystem.StartAttack();
         controller.InputBuffer?.ClearBufferedInput("Jump");
         controller.InputBuffer?.ClearBufferedInput("Dash");
@@ -44,17 +44,8 @@ public KalbCombatState(KalbController controller, KalbStateMachine stateMachine)
             return;
         }
         
-        /*
-        // Check if player fell off ground during attack
-        if (collisionDetector.IsGrounded && controller.Rb.linearVelocity.y < -5f)
-        {
-            comboSystem.CancelCombo();
-            stateMachine.ChangeState(controller.AirState);
-            return;
-        }*/
-        
         // If attack is finished, transition to appropriate state
-        if (!comboSystem.IsAttacking)
+        if (!comboSystem.IsAttacking && !comboSystem.IsUpwardAttacking)
         {
             TransitionToNextState();
         }
@@ -62,18 +53,27 @@ public KalbCombatState(KalbController controller, KalbStateMachine stateMachine)
     
     public override void FixedUpdate()
     {
-        // Limited movement during attack
-        // Allow some horizontal control for first two hits
-        if (comboSystem.CurrentCombo < 3 && comboSystem.IsInComboWindow)
+        // MODIFIED: Different movement handling for upward attacks
+        if (comboSystem.IsUpwardAttacking)
         {
-            // Slow horizontal movement during attack
-            float moveInput = inputHandler.MoveInput.x * 0.3f; // Reduced control
-            movement.ApplyAirControl(moveInput);
-        }
-        else
-        {
-            // Stop movement for final hit
+            // During upward attack, minimal horizontal movement
+            // The upward attack already applies its own upward force
             movement.StopHorizontalMovement();
+        }
+        else if (comboSystem.IsAttacking)
+        {
+            // Limited movement during normal combo attacks
+            if (comboSystem.CurrentCombo < 3 && comboSystem.IsInComboWindow)
+            {
+                // Slow horizontal movement during attack
+                float moveInput = inputHandler.MoveInput.x * 0.3f; // Reduced control
+                movement.ApplyAirControl(moveInput);
+            }
+            else
+            {
+                // Stop movement for final hit
+                movement.StopHorizontalMovement();
+            }
         }
     }
     
@@ -83,6 +83,14 @@ public KalbCombatState(KalbController controller, KalbStateMachine stateMachine)
         if (inputHandler.AttackPressed && comboSystem.IsAttacking && comboSystem.IsInComboWindow)
         {
             // The combo system will handle the queued attack
+        }
+        
+        // NEW: Allow upward attack during normal combo if conditions met
+        if (inputHandler.AttackPressed && comboSystem.IsAttacking && comboSystem.ShouldPerformUpwardAttack())
+        {
+            // Cancel current combo and perform upward attack
+            comboSystem.CancelCombo();
+            comboSystem.StartAttack(); // This will trigger upward attack
         }
         
         // Allow jump input (will cancel combo)

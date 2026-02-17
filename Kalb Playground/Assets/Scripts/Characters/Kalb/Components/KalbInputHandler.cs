@@ -19,6 +19,10 @@ public class KalbInputHandler : MonoBehaviour
     private bool dashReleased;
     private bool attackPressed;
     
+    // NEW: Track if up is held during attack
+    private bool isUpHeld = false;
+    private bool isDownHeld = false;
+    
     public Vector2 MoveInput => moveInput;
     public bool JumpPressed => jumpPressed;
     public bool JumpHeld => jumpHeld;
@@ -27,6 +31,11 @@ public class KalbInputHandler : MonoBehaviour
     public bool DashHeld => dashHeld;
     public bool DashReleased => dashReleased;
     public bool AttackPressed => attackPressed;
+    
+    // NEW: Public properties for vertical input
+    public bool IsUpHeld => isUpHeld;
+    public bool IsDownHeld => isDownHeld;
+    public float VerticalInput => moveInput.y;
     
     private void Awake()
     {
@@ -50,6 +59,10 @@ public class KalbInputHandler : MonoBehaviour
     {
         // Read movement input
         moveInput = moveAction.ReadValue<Vector2>();
+        
+        // NEW: Track vertical input state
+        isUpHeld = moveInput.y > 0.5f;
+        isDownHeld = moveInput.y < -0.5f;
         
         // DEBUG: Log move input
         

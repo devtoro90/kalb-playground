@@ -80,6 +80,23 @@ public class KalbSettings : ScriptableObject
     public Color comboFlashColor = Color.white;
     public float comboFlashDuration = 0.1f;
 
+    [Header("Upward Attack Settings")]
+    public bool enableUpwardAttack = true;
+    public float upwardAttackDamage = 25f;
+    public float upwardAttackKnockback = 8f;
+    public float upwardAttackRange = 0.7f;
+    public float upwardAttackDuration = 0.2f;
+    public float upwardAttackCooldown = 0.3f;
+    public Vector2 upwardAttackPointOffset = new Vector2(0f, 0.8f); // Above player
+    public Vector2 upwardAttackKnockbackDirection = new Vector2(0f, 1f); // Straight up
+    public string upwardAttackAnimation = "Kalb_attack_up";
+    public float upwardAttackForwardForce = 0f; // No forward movement
+    public float upwardAttackUpwardForce = 5f; // Slight upward boost
+    public bool enableUpwardAirAttack = true;
+    public float upwardAirAttackDamage = 20f;
+    public float upwardAirAttackKnockback = 6f;
+    public string upwardAirAttackAnimation = "Kalb_attack_up";
+
     [Header("Ability Unlocks")]
     public bool ledgeGrabUnlocked = true;
     public bool runUnlocked = false;

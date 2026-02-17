@@ -76,6 +76,13 @@ public class KalbAnimationController : MonoBehaviour
             return;
         }
 
+        // NEW: Check if upward attacking (highest priority among attacks)
+        if (comboSystem != null && comboSystem.IsUpwardAttacking)
+        {
+            // Upward attack animation is already set by combo system
+            return;
+        }
+
         // Check if attacking 
         if (comboSystem != null && comboSystem.IsAttacking)
         {
@@ -148,7 +155,7 @@ public class KalbAnimationController : MonoBehaviour
         }
     }
     
-    private void UpdateComboAnimations() // NEW
+    private void UpdateComboAnimations()
     {
         if (comboSystem.IsComboFinishing)
         {
@@ -215,8 +222,11 @@ public class KalbAnimationController : MonoBehaviour
         // Log each condition to see what's failing
         bool isGrounded = controller.IsEffectivelyGrounded();
         bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
+        
+        // MODIFIED: Include upward attack in action state check
         bool isInActionState = controller.DashState.IsDashing || 
                             comboSystem.IsAttacking || 
+                            comboSystem.IsUpwardAttacking || // NEW
                             swimming.IsSwimming ||
                             (controller.WallJump != null && controller.WallJump.IsWallSliding) ||
                             controller.IsInLedgeState();

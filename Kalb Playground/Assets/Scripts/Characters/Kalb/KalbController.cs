@@ -352,8 +352,9 @@ public class KalbController : MonoBehaviour
             }
         }
 
-// Check for attack
-        if (inputHandler.AttackPressed && comboSystem.CanAttack)
+       // Check for attack
+        //if (inputHandler.AttackPressed && comboSystem.CanAttack)
+        if (inputHandler.AttackPressed)
         {
             if (CanAttackFromCurrentState())
             {
@@ -502,11 +503,16 @@ public class KalbController : MonoBehaviour
         if (stateMachine.CurrentState is KalbDashState)
             return false;
         
+        // NEW: Allow attack during any of these states
         if (stateMachine.CurrentState is KalbIdleState || 
             stateMachine.CurrentState is KalbWalkState ||
             stateMachine.CurrentState is KalbAirState ||
             stateMachine.CurrentState is KalbJumpState ||
             stateMachine.CurrentState is KalbRunState)
+            return true;
+        
+        // NEW: Allow attack during combat state if we're doing an upward attack
+        if (stateMachine.CurrentState is KalbCombatState && comboSystem.IsUpwardAttacking)
             return true;
         
         if (swimming.IsJumpingFromWater && rb.linearVelocity.y > 0)

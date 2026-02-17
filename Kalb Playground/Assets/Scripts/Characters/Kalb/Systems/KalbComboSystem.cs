@@ -7,15 +7,22 @@ public class KalbComboSystem : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private KalbAnimationController animationController;
     [SerializeField] private KalbMovement movement;
+    [SerializeField] private KalbInputHandler inputHandler; // NEW: Add reference
     
     [Header("Attack Point")]
     [SerializeField] private Transform attackPoint;
+    [SerializeField] private Transform upwardAttackPoint; // NEW: Separate attack point for upward
     
     [Header("Combo State")]
     private int currentCombo = 0;
     private bool isAttacking = false;
     private bool isComboFinishing = false;
     private bool attackQueued = false;
+    
+    // NEW: Upward attack state
+    private bool isUpwardAttacking = false;
+    private bool canUpwardAttack = true;
+    private float upwardAttackCooldownTimer = 0f;
     
     private float comboWindowTimer = 0f;
     private float comboResetTimer = 0f;
@@ -25,8 +32,10 @@ public class KalbComboSystem : MonoBehaviour
     // Properties
     public int CurrentCombo => currentCombo;
     public bool IsAttacking => isAttacking;
+    public bool IsUpwardAttacking => isUpwardAttacking; // NEW
     public bool IsComboFinishing => isComboFinishing;
-    public bool CanAttack => !isAttacking && attackCooldownTimer <= 0 && currentCombo < settings.maxComboHits;
+    public bool CanAttack => (!isAttacking && !isUpwardAttacking && attackCooldownTimer <= 0 && currentCombo < settings.maxComboHits) || 
+                             (isUpwardAttacking && upwardAttackCooldownTimer <= 0); // NEW: Modified
     public float ComboWindowTimer => comboWindowTimer;
     public bool IsInComboWindow => comboWindowTimer > 0;
     
@@ -39,10 +48,20 @@ public class KalbComboSystem : MonoBehaviour
             return;
         }
         
-        // Create attack point if not assigned
+        // Get input handler if not assigned
+        if (inputHandler == null)
+            inputHandler = GetComponent<KalbInputHandler>();
+        
+        // Create attack points if not assigned
         if (attackPoint == null)
         {
             CreateAttackPoint();
+        }
+        
+        // NEW: Create upward attack point
+        if (upwardAttackPoint == null)
+        {
+            CreateUpwardAttackPoint();
         }
         
         if (rb == null) rb = GetComponent<Rigidbody2D>();
@@ -58,6 +77,15 @@ public class KalbComboSystem : MonoBehaviour
         UpdateAttackPointPosition();
     }
     
+    // NEW: Create separate upward attack point
+    private void CreateUpwardAttackPoint()
+    {
+        GameObject obj = new GameObject("UpwardAttackPoint");
+        obj.transform.parent = transform;
+        upwardAttackPoint = obj.transform;
+        UpdateUpwardAttackPointPosition();
+    }
+    
     private void UpdateAttackPointPosition()
     {
         if (attackPoint != null && movement != null)
@@ -65,6 +93,20 @@ public class KalbComboSystem : MonoBehaviour
             attackPoint.localPosition = new Vector3(
                 settings.attackPointOffset.x * (movement.FacingRight ? 1 : -1),
                 settings.attackPointOffset.y,
+                0
+            );
+        }
+    }
+    
+    // NEW: Update upward attack point position
+    private void UpdateUpwardAttackPointPosition()
+    {
+        if (upwardAttackPoint != null)
+        {
+            // Upward attack point is centered above player, doesn't flip with facing
+            upwardAttackPoint.localPosition = new Vector3(
+                0, // Centered horizontally
+                settings.upwardAttackPointOffset.y,
                 0
             );
         }
@@ -86,7 +128,7 @@ public class KalbComboSystem : MonoBehaviour
                 comboWindowTimer = 0;
                 
                 // If not attacking and window closed, start reset timer
-                if (!isAttacking && currentCombo > 0)
+                if (!isAttacking && !isUpwardAttacking && currentCombo > 0)
                 {
                     comboResetTimer = settings.comboResetTime;
                 }
@@ -109,6 +151,16 @@ public class KalbComboSystem : MonoBehaviour
             attackCooldownTimer -= Time.deltaTime;
         }
         
+        // NEW: Upward attack cooldown timer
+        if (upwardAttackCooldownTimer > 0)
+        {
+            upwardAttackCooldownTimer -= Time.deltaTime;
+            if (upwardAttackCooldownTimer <= 0)
+            {
+                canUpwardAttack = true;
+            }
+        }
+        
         // Attack duration timer
         if (isAttacking && attackTimer > 0)
         {
@@ -118,10 +170,49 @@ public class KalbComboSystem : MonoBehaviour
                 EndAttack();
             }
         }
+        
+        // NEW: Upward attack duration timer
+        if (isUpwardAttacking && attackTimer > 0)
+        {
+            attackTimer -= Time.deltaTime;
+            if (attackTimer <= 0)
+            {
+                EndUpwardAttack();
+            }
+        }
     }
     
+    // NEW: Check if upward attack should be performed
+    public bool ShouldPerformUpwardAttack()
+    {
+        if (!settings.enableUpwardAttack) return false;
+        if (!canUpwardAttack) return false;
+        if (inputHandler == null) return false;
+        
+        // Check if up is held
+        bool upHeld = inputHandler.IsUpHeld;
+        
+        // For air attacks, we might want a separate setting
+        bool isGrounded = movement != null && 
+                          GetComponent<KalbController>() != null && 
+                          GetComponent<KalbController>().IsEffectivelyGrounded();
+        
+        if (!isGrounded && !settings.enableUpwardAirAttack)
+            return false;
+        
+        return upHeld;
+    }
+    
+    // MODIFIED: Start attack with upward detection
     public void StartAttack()
     {
+        // NEW: Check for upward attack first
+        if (ShouldPerformUpwardAttack())
+        {
+            StartUpwardAttack();
+            return;
+        }
+        
         if (!CanAttack) return;
         
         // If currently attacking, queue next attack if within combo window
@@ -134,6 +225,9 @@ public class KalbComboSystem : MonoBehaviour
             }
             return;
         }
+        
+        // Don't start new ground combo if upward attacking
+        if (isUpwardAttacking) return;
         
         // Determine combo index (0-based)
         int comboIndex = Mathf.Clamp(currentCombo, 0, settings.maxComboHits - 1);
@@ -161,6 +255,112 @@ public class KalbComboSystem : MonoBehaviour
         UpdateComboAnimation();
     }
     
+    // NEW: Start upward attack
+    private void StartUpwardAttack()
+    {
+        if (!canUpwardAttack) return;
+        
+        // Set upward attack state
+        isUpwardAttacking = true;
+        attackTimer = settings.upwardAttackDuration;
+        upwardAttackCooldownTimer = settings.upwardAttackCooldown;
+        canUpwardAttack = false;
+        
+        // Reset ground combo (as requested)
+        ResetCombo();
+        
+        // Execute upward attack
+        ExecuteUpwardAttack();
+        
+        // Apply upward movement effect
+        ApplyUpwardAttackMovement();
+        
+        // Play upward animation
+        PlayUpwardAttackAnimation();
+    }
+    
+    // NEW: Execute upward attack hit detection
+    private void ExecuteUpwardAttack()
+    {
+        if (upwardAttackPoint == null) return;
+        
+        // Check for enemies in upward attack range
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            upwardAttackPoint.position, 
+            settings.upwardAttackRange, 
+            settings.enemyLayers
+        );
+        
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            // Apply damage
+            // Assuming enemy has a health component - you'll need to adapt this
+            // to your actual enemy system
+            /*var health = enemy.GetComponent<Health>(); // Replace with your health component
+            if (health != null)
+            {
+                health.TakeDamage((int)settings.upwardAttackDamage);
+            }*/
+            
+            // Apply knockback with upward direction
+            var rb = enemy.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                Vector2 knockback = settings.upwardAttackKnockbackDirection.normalized * 
+                                    settings.upwardAttackKnockback;
+                rb.AddForce(knockback, ForceMode2D.Impulse);
+            }
+        }
+        
+        // Spawn hit effect if available
+        if (settings.hitEffectPrefab != null && hitEnemies.Length > 0)
+        {
+            GameObject effect = Instantiate(settings.hitEffectPrefab, upwardAttackPoint.position, Quaternion.identity);
+            Destroy(effect, settings.hitEffectDuration);
+        }
+    }
+    
+    // NEW: Apply upward attack movement (slight upward boost)
+    private void ApplyUpwardAttackMovement()
+    {
+        if (rb == null) return;
+        
+        // Stop horizontal movement
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        
+        // Apply upward boost
+        if (settings.upwardAttackUpwardForce > 0)
+        {
+            rb.AddForce(Vector2.up * settings.upwardAttackUpwardForce, ForceMode2D.Impulse);
+        }
+    }
+    
+    // NEW: Play upward attack animation
+    private void PlayUpwardAttackAnimation()
+    {
+        if (animationController == null) return;
+        
+        // Choose appropriate animation based on grounded/air
+        bool isGrounded = movement != null && 
+                          GetComponent<KalbController>() != null && 
+                          GetComponent<KalbController>().IsEffectivelyGrounded();
+        
+        string animName = isGrounded ? settings.upwardAttackAnimation : settings.upwardAirAttackAnimation;
+        
+        if (!string.IsNullOrEmpty(animName))
+        {
+            animationController.PlayAnimation(animName);
+        }
+    }
+    
+    // NEW: End upward attack
+    private void EndUpwardAttack()
+    {
+        isUpwardAttacking = false;
+        
+        // Transition to appropriate state - will be handled by state machine
+    }
+    
     private void ExecuteAttack(int comboIndex)
     {
         // Ensure arrays have data
@@ -178,6 +378,27 @@ public class KalbComboSystem : MonoBehaviour
             settings.comboRange[comboIndex], 
             settings.enemyLayers
         );
+        
+        // Apply damage and knockback to enemies
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            // You'll need to implement your enemy damage system here
+            // This is a placeholder - adapt to your actual enemy system
+            /*var health = enemy.GetComponent<Health>(); // Replace with your component
+            if (health != null)
+            {
+                health.TakeDamage((int)settings.comboDamage[comboIndex]);
+            }*/
+            
+            // Apply knockback
+            var rb = enemy.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                Vector2 knockbackDirection = (enemy.transform.position - transform.position).normalized;
+                knockbackDirection.y = 0.5f; // Add some upward component
+                rb.AddForce(knockbackDirection * settings.comboKnockback[comboIndex], ForceMode2D.Impulse);
+            }
+        }
         
         // Spawn hit effect if available
         if (settings.hitEffectPrefab != null && hitEnemies.Length > 0)
@@ -249,7 +470,7 @@ public class KalbComboSystem : MonoBehaviour
             return;
         }
 
-        // NEW: If we just finished the full combo, reset immediately
+        // If we just finished the full combo, reset immediately
         if (currentCombo >= settings.maxComboHits)
         {
             ResetCombo(); // Reset immediately instead of waiting for comboResetTimer
@@ -284,11 +505,14 @@ public class KalbComboSystem : MonoBehaviour
         attackQueued = false;
         isAttacking = false;
         attackCooldownTimer = 0f;
+        // NEW: Don't reset upward attack state here
     }
     
     public void CancelCombo()
     {
         ResetCombo();
+        // NEW: Also cancel upward attack
+        isUpwardAttacking = false;
     }
     
     public void UpdateAttackPointWithFacing(bool facingRight)
@@ -301,6 +525,9 @@ public class KalbComboSystem : MonoBehaviour
                 attackPoint.localPosition.z
             );
         }
+        
+        // NEW: Upward attack point doesn't need to flip
+        UpdateUpwardAttackPointPosition();
     }
     
     public int GetCurrentCombo() => currentCombo;
@@ -308,17 +535,24 @@ public class KalbComboSystem : MonoBehaviour
     
     private void OnDrawGizmosSelected()
     {
+        // Draw normal attack range
         if (attackPoint != null && settings != null && currentCombo > 0)
         {
             int comboIndex = Mathf.Clamp(currentCombo - 1, 0, settings.maxComboHits - 1);
             
-            // Ensure combo range array has data
             if (settings.comboRange.Length > comboIndex)
             {
                 float range = settings.comboRange[comboIndex];
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(attackPoint.position, range);
             }
+        }
+        
+        // NEW: Draw upward attack range
+        if (upwardAttackPoint != null && settings != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(upwardAttackPoint.position, settings.upwardAttackRange);
         }
     }
 }
