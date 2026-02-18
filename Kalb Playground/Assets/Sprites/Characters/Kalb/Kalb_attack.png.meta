@@ -1,0 +1,1118 @@
+fileFormatVersion: 2
+guid: ec61ce33fe801457e833528cd98aab7e
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4373751618030865757
+    second: Kalb_attack_0
+  - first:
+      213: -5947507096966252409
+    second: Kalb_attack_1
+  - first:
+      213: -577087698950800026
+    second: Kalb_attack_2
+  - first:
+      213: 8972924489499819210
+    second: Kalb_attack_3
+  - first:
+      213: -4830286754321288197
+    second: Kalb_attack_4
+  - first:
+      213: -5599010227467965220
+    second: Kalb_attack_5
+  - first:
+      213: -2866451787069199172
+    second: Kalb_attack_6
+  - first:
+      213: -6524653906803157969
+    second: Kalb_attack_7
+  - first:
+      213: 1097737543626530653
+    second: Kalb_attack_8
+  - first:
+      213: -3734984054557420266
+    second: Kalb_attack_9
+  - first:
+      213: -2425986360502624295
+    second: Kalb_attack_10
+  - first:
+      213: 5859288262506130658
+    second: Kalb_attack_11
+  - first:
+      213: 9032528665362428703
+    second: Kalb_attack_12
+  - first:
+      213: -2409563135879925874
+    second: Kalb_attack_13
+  - first:
+      213: -9016973518978210928
+    second: Kalb_attack_14
+  - first:
+      213: 5827009592682646169
+    second: Kalb_attack_15
+  - first:
+      213: 6475277744722931981
+    second: Kalb_attack_16
+  - first:
+      213: -4462195476384423747
+    second: Kalb_attack_17
+  - first:
+      213: -2938234167255293503
+    second: Kalb_attack_18
+  - first:
+      213: 7817980106517543369
+    second: Kalb_attack_19
+  - first:
+      213: 8855101378157175882
+    second: Kalb_attack_20
+  - first:
+      213: 6854605687813350015
+    second: Kalb_attack_21
+  - first:
+      213: -5919912692476390432
+    second: Kalb_attack_22
+  - first:
+      213: -3336129997651060500
+    second: Kalb_attack_23
+  - first:
+      213: 5710999804411681727
+    second: Kalb_attack_24
+  - first:
+      213: 133746708720345074
+    second: Kalb_attack_25
+  - first:
+      213: -6251808932565239842
+    second: Kalb_attack_26
+  - first:
+      213: 6737899379691200624
+    second: Kalb_attack_27
+  - first:
+      213: 5259812090692577342
+    second: Kalb_attack_28
+  - first:
+      213: -4886641452855594294
+    second: Kalb_attack_29
+  - first:
+      213: -3366766329910515707
+    second: Kalb_attack_30
+  - first:
+      213: -6672024877627112174
+    second: Kalb_attack_31
+  - first:
+      213: 727707174558363987
+    second: Kalb_attack_32
+  - first:
+      213: 516025962664856387
+    second: Kalb_attack_33
+  - first:
+      213: -6588331870464619618
+    second: Kalb_attack_34
+  - first:
+      213: -414695403454825915
+    second: Kalb_attack_35
+  - first:
+      213: 8746998993670517862
+    second: Kalb_attack_36
+  - first:
+      213: -6880042231700897385
+    second: Kalb_attack_37
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Kalb_attack_0
+      rect:
+        serializedVersion: 2
+        x: 353
+        y: 5112
+        width: 107
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5d05886cefa2bc30800000000000000
+      internalID: 4373751618030865757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_1
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 4324
+        width: 216
+        height: 274
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 788363a7ec5367da0800000000000000
+      internalID: -5947507096966252409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_2
+      rect:
+        serializedVersion: 2
+        x: 1144
+        y: 4310
+        width: 112
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66d3acb9bc5cdf7f0800000000000000
+      internalID: -577087698950800026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_3
+      rect:
+        serializedVersion: 2
+        x: 1215
+        y: 4259
+        width: 157
+        height: 263
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acc3a09584b368c70800000000000000
+      internalID: 8972924489499819210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_4
+      rect:
+        serializedVersion: 2
+        x: 1929
+        y: 4257
+        width: 212
+        height: 263
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf3b765f9cf57fcb0800000000000000
+      internalID: -4830286754321288197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_5
+      rect:
+        serializedVersion: 2
+        x: 2740
+        y: 4275
+        width: 164
+        height: 226
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cdc2ef9ecd15c42b0800000000000000
+      internalID: -5599010227467965220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_6
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 3526
+        width: 198
+        height: 163
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbce4f969415838d0800000000000000
+      internalID: -2866451787069199172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_7
+      rect:
+        serializedVersion: 2
+        x: 1132
+        y: 3519
+        width: 241
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2412a247d5c375a0800000000000000
+      internalID: -6524653906803157969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_8
+      rect:
+        serializedVersion: 2
+        x: 1929
+        y: 3505
+        width: 249
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5f1878da72fb3f00800000000000000
+      internalID: 1097737543626530653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_9
+      rect:
+        serializedVersion: 2
+        x: 2735
+        y: 3505
+        width: 112
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6155b5a8acbaa2cc0800000000000000
+      internalID: -3734984054557420266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_10
+      rect:
+        serializedVersion: 2
+        x: 2822
+        y: 3549
+        width: 145
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9df5c40324a255ed0800000000000000
+      internalID: -2425986360502624295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_11
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 2602
+        width: 232
+        height: 267
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ec2b4381af505150800000000000000
+      internalID: 5859288262506130658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_12
+      rect:
+        serializedVersion: 2
+        x: 1137
+        y: 2640
+        width: 236
+        height: 263
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f13f57af6fcf95d70800000000000000
+      internalID: 9032528665362428703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_13
+      rect:
+        serializedVersion: 2
+        x: 1931
+        y: 2642
+        width: 238
+        height: 263
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8f200628138f8ed0800000000000000
+      internalID: -2409563135879925874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_14
+      rect:
+        serializedVersion: 2
+        x: 2737
+        y: 2724
+        width: 181
+        height: 186
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0932334cb564dd280800000000000000
+      internalID: -9016973518978210928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_15
+      rect:
+        serializedVersion: 2
+        x: 331
+        y: 1916
+        width: 109
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99a84aa0a52bdd050800000000000000
+      internalID: 5827009592682646169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_16
+      rect:
+        serializedVersion: 2
+        x: 1130
+        y: 1916
+        width: 202
+        height: 314
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d01f3342dceccd950800000000000000
+      internalID: 6475277744722931981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_17
+      rect:
+        serializedVersion: 2
+        x: 1873
+        y: 2028
+        width: 211
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db060cf1bd81312c0800000000000000
+      internalID: -4462195476384423747
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_18
+      rect:
+        serializedVersion: 2
+        x: 1929
+        y: 1916
+        width: 109
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c125d1a79b4937d0800000000000000
+      internalID: -2938234167255293503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_19
+      rect:
+        serializedVersion: 2
+        x: 2633
+        y: 2011
+        width: 208
+        height: 235
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c97c064c7b0f7c60800000000000000
+      internalID: 7817980106517543369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_20
+      rect:
+        serializedVersion: 2
+        x: 2728
+        y: 1916
+        width: 109
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a44612f79c3a3ea70800000000000000
+      internalID: 8855101378157175882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_21
+      rect:
+        serializedVersion: 2
+        x: 3435
+        y: 1976
+        width: 80
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f72ac794e83702f50800000000000000
+      internalID: 6854605687813350015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_22
+      rect:
+        serializedVersion: 2
+        x: 3527
+        y: 1916
+        width: 109
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e35e9f65ce38dda0800000000000000
+      internalID: -5919912692476390432
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_23
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 1089
+        width: 114
+        height: 153
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce8db75517fa3b1d0800000000000000
+      internalID: -3336129997651060500
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_24
+      rect:
+        serializedVersion: 2
+        x: 1037
+        y: 1089
+        width: 229
+        height: 277
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbb984e501c814f40800000000000000
+      internalID: 5710999804411681727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_25
+      rect:
+        serializedVersion: 2
+        x: 1834
+        y: 1084
+        width: 157
+        height: 263
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ff57274ce92bd100800000000000000
+      internalID: 133746708720345074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_26
+      rect:
+        serializedVersion: 2
+        x: 1942
+        y: 1089
+        width: 114
+        height: 153
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed7b5da36ec1d39a0800000000000000
+      internalID: -6251808932565239842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_27
+      rect:
+        serializedVersion: 2
+        x: 2616
+        y: 1083
+        width: 230
+        height: 263
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 070a1d279c3d18d50800000000000000
+      internalID: 6737899379691200624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_28
+      rect:
+        serializedVersion: 2
+        x: 3411
+        y: 1078
+        width: 125
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3829039a3b9ef840800000000000000
+      internalID: 5259812090692577342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_29
+      rect:
+        serializedVersion: 2
+        x: 3521
+        y: 1089
+        width: 114
+        height: 153
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac2f7d93d792f2cb0800000000000000
+      internalID: -4886641452855594294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_30
+      rect:
+        serializedVersion: 2
+        x: 331
+        y: 305
+        width: 122
+        height: 184
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50820ff5cd7d641d0800000000000000
+      internalID: -3366766329910515707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_31
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 257
+        width: 235
+        height: 146
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 215877449b43863a0800000000000000
+      internalID: -6672024877627112174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_32
+      rect:
+        serializedVersion: 2
+        x: 1147
+        y: 305
+        width: 122
+        height: 184
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 351fd08d1d5591a00800000000000000
+      internalID: 727707174558363987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_33
+      rect:
+        serializedVersion: 2
+        x: 1874
+        y: 239
+        width: 289
+        height: 250
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34b848701ea492700800000000000000
+      internalID: 516025962664856387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_34
+      rect:
+        serializedVersion: 2
+        x: 2640
+        y: 220
+        width: 292
+        height: 154
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9b429ef11b8194a0800000000000000
+      internalID: -6588331870464619618
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_35
+      rect:
+        serializedVersion: 2
+        x: 2754
+        y: 305
+        width: 121
+        height: 184
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54a761b4ab4be3af0800000000000000
+      internalID: -414695403454825915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_36
+      rect:
+        serializedVersion: 2
+        x: 3439
+        y: 293
+        width: 133
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6643e6cbd35936970800000000000000
+      internalID: 8746998993670517862
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_attack_37
+      rect:
+        serializedVersion: 2
+        x: 3557
+        y: 305
+        width: 122
+        height: 184
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79148c3da0e2580a0800000000000000
+      internalID: -6880042231700897385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Kalb_attack_0: 4373751618030865757
+      Kalb_attack_1: -5947507096966252409
+      Kalb_attack_10: -2425986360502624295
+      Kalb_attack_11: 5859288262506130658
+      Kalb_attack_12: 9032528665362428703
+      Kalb_attack_13: -2409563135879925874
+      Kalb_attack_14: -9016973518978210928
+      Kalb_attack_15: 5827009592682646169
+      Kalb_attack_16: 6475277744722931981
+      Kalb_attack_17: -4462195476384423747
+      Kalb_attack_18: -2938234167255293503
+      Kalb_attack_19: 7817980106517543369
+      Kalb_attack_2: -577087698950800026
+      Kalb_attack_20: 8855101378157175882
+      Kalb_attack_21: 6854605687813350015
+      Kalb_attack_22: -5919912692476390432
+      Kalb_attack_23: -3336129997651060500
+      Kalb_attack_24: 5710999804411681727
+      Kalb_attack_25: 133746708720345074
+      Kalb_attack_26: -6251808932565239842
+      Kalb_attack_27: 6737899379691200624
+      Kalb_attack_28: 5259812090692577342
+      Kalb_attack_29: -4886641452855594294
+      Kalb_attack_3: 8972924489499819210
+      Kalb_attack_30: -3366766329910515707
+      Kalb_attack_31: -6672024877627112174
+      Kalb_attack_32: 727707174558363987
+      Kalb_attack_33: 516025962664856387
+      Kalb_attack_34: -6588331870464619618
+      Kalb_attack_35: -414695403454825915
+      Kalb_attack_36: 8746998993670517862
+      Kalb_attack_37: -6880042231700897385
+      Kalb_attack_4: -4830286754321288197
+      Kalb_attack_5: -5599010227467965220
+      Kalb_attack_6: -2866451787069199172
+      Kalb_attack_7: -6524653906803157969
+      Kalb_attack_8: 1097737543626530653
+      Kalb_attack_9: -3734984054557420266
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

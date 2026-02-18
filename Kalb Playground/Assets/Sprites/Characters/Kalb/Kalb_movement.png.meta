@@ -1,0 +1,1326 @@
+fileFormatVersion: 2
+guid: 3445b1dbf3c5d425a981331eb21a70a1
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1200154173720420206
+    second: Kalb_movement_0
+  - first:
+      213: -3720724614922204993
+    second: Kalb_movement_1
+  - first:
+      213: 3621455492914218529
+    second: Kalb_movement_2
+  - first:
+      213: 364244319578654871
+    second: Kalb_movement_3
+  - first:
+      213: 3821328095450614457
+    second: Kalb_movement_4
+  - first:
+      213: -7009818925043455756
+    second: Kalb_movement_5
+  - first:
+      213: -2022026554402823538
+    second: Kalb_movement_6
+  - first:
+      213: 7738911745174876027
+    second: Kalb_movement_7
+  - first:
+      213: -2525054870933865703
+    second: Kalb_movement_8
+  - first:
+      213: 4902066992080266595
+    second: Kalb_movement_9
+  - first:
+      213: -7508371009345816775
+    second: Kalb_movement_10
+  - first:
+      213: 3495485269782077543
+    second: Kalb_movement_11
+  - first:
+      213: -7083005693927924398
+    second: Kalb_movement_12
+  - first:
+      213: 314376776006125201
+    second: Kalb_movement_13
+  - first:
+      213: 5058470826034681640
+    second: Kalb_movement_14
+  - first:
+      213: 315919883493190505
+    second: Kalb_movement_15
+  - first:
+      213: 4971642757239604372
+    second: Kalb_movement_16
+  - first:
+      213: -4678989324192127532
+    second: Kalb_movement_17
+  - first:
+      213: -6378817341441678396
+    second: Kalb_movement_18
+  - first:
+      213: 5812569029427774025
+    second: Kalb_movement_19
+  - first:
+      213: -4375285659720355973
+    second: Kalb_movement_20
+  - first:
+      213: -2632858150216665973
+    second: Kalb_movement_21
+  - first:
+      213: 8830599191449237980
+    second: Kalb_movement_22
+  - first:
+      213: -3548902362932834865
+    second: Kalb_movement_23
+  - first:
+      213: -4259139398197735721
+    second: Kalb_movement_24
+  - first:
+      213: 7627123473441189172
+    second: Kalb_movement_25
+  - first:
+      213: 2641113528560898803
+    second: Kalb_movement_26
+  - first:
+      213: 8182003395837213355
+    second: Kalb_movement_27
+  - first:
+      213: 6938995586274434163
+    second: Kalb_movement_28
+  - first:
+      213: 5104356306244253051
+    second: Kalb_movement_29
+  - first:
+      213: -5447877773619924789
+    second: Kalb_movement_30
+  - first:
+      213: -4374392815148135287
+    second: Kalb_movement_31
+  - first:
+      213: 2651882512004881890
+    second: Kalb_movement_32
+  - first:
+      213: 8852442115850877953
+    second: Kalb_movement_33
+  - first:
+      213: -3151319373465129691
+    second: Kalb_movement_34
+  - first:
+      213: -3654904878499068837
+    second: Kalb_movement_35
+  - first:
+      213: -241673058700706665
+    second: Kalb_movement_36
+  - first:
+      213: 6833434144181307680
+    second: Kalb_movement_37
+  - first:
+      213: 8255662876774982365
+    second: Kalb_movement_38
+  - first:
+      213: 6843709335461853861
+    second: Kalb_movement_39
+  - first:
+      213: 6437735022821939737
+    second: Kalb_movement_40
+  - first:
+      213: -8593979474532848378
+    second: Kalb_movement_41
+  - first:
+      213: -5946661162402241041
+    second: Kalb_movement_42
+  - first:
+      213: -4074241732443098586
+    second: Kalb_movement_43
+  - first:
+      213: 1661904019029073883
+    second: Kalb_movement_44
+  - first:
+      213: -1403788665124760949
+    second: Kalb_movement_45
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Kalb_movement_0
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 1621
+        width: 116
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29021bf3322385fe0800000000000000
+      internalID: -1200154173720420206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_1
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 1621
+        width: 116
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb8828c0da45d5cc0800000000000000
+      internalID: -3720724614922204993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_2
+      rect:
+        serializedVersion: 2
+        x: 442
+        y: 1621
+        width: 116
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1260a01659ef14230800000000000000
+      internalID: 3621455492914218529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_3
+      rect:
+        serializedVersion: 2
+        x: 642
+        y: 1621
+        width: 116
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79880ff574e0e0500800000000000000
+      internalID: 364244319578654871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_4
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 1419
+        width: 110
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9bacd8318a5180530800000000000000
+      internalID: 3821328095450614457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_5
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 1417
+        width: 110
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f869f8c3de18be90800000000000000
+      internalID: -7009818925043455756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_6
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 1421
+        width: 110
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e82a96adf8150f3e0800000000000000
+      internalID: -2022026554402823538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_7
+      rect:
+        serializedVersion: 2
+        x: 648
+        y: 1419
+        width: 110
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7f2f3fca33266b60800000000000000
+      internalID: 7738911745174876027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_8
+      rect:
+        serializedVersion: 2
+        x: 848
+        y: 1414
+        width: 110
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91bfd9329f335fcd0800000000000000
+      internalID: -2525054870933865703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_9
+      rect:
+        serializedVersion: 2
+        x: 1048
+        y: 1413
+        width: 110
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 365ac1005f3a70440800000000000000
+      internalID: 4902066992080266595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_10
+      rect:
+        serializedVersion: 2
+        x: 1248
+        y: 1419
+        width: 110
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 937f91a1958ecc790800000000000000
+      internalID: -7508371009345816775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_11
+      rect:
+        serializedVersion: 2
+        x: 1448
+        y: 1417
+        width: 110
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 760a8fe3555728030800000000000000
+      internalID: 3495485269782077543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_12
+      rect:
+        serializedVersion: 2
+        x: 1648
+        y: 1421
+        width: 110
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25d5b5749db14bd90800000000000000
+      internalID: -7083005693927924398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_13
+      rect:
+        serializedVersion: 2
+        x: 1848
+        y: 1419
+        width: 110
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1964a7b1304ec5400800000000000000
+      internalID: 314376776006125201
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_14
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 1414
+        width: 110
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82759745a6c433640800000000000000
+      internalID: 5058470826034681640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_15
+      rect:
+        serializedVersion: 2
+        x: 2248
+        y: 1413
+        width: 110
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96b2811d57f526400800000000000000
+      internalID: 315919883493190505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_16
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 1217
+        width: 115
+        height: 168
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 494096f2fb2def440800000000000000
+      internalID: 4971642757239604372
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_17
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 1217
+        width: 109
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d5eeaffff3e01fb0800000000000000
+      internalID: -4678989324192127532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_18
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 1017
+        width: 121
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c36444ac63e977a0800000000000000
+      internalID: -6378817341441678396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_19
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 1015
+        width: 111
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 942ca776cb46aa050800000000000000
+      internalID: 5812569029427774025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_20
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 1016
+        width: 113
+        height: 176
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7fe18dafdcd743c0800000000000000
+      internalID: -4375285659720355973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_21
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 1015
+        width: 111
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b84f75c3675367bd0800000000000000
+      internalID: -2632858150216665973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_22
+      rect:
+        serializedVersion: 2
+        x: 844
+        y: 1014
+        width: 116
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd9fe289d279c8a70800000000000000
+      internalID: 8830599191449237980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_23
+      rect:
+        serializedVersion: 2
+        x: 1049
+        y: 1017
+        width: 111
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcd08d29a14cfbec0800000000000000
+      internalID: -3548902362932834865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_24
+      rect:
+        serializedVersion: 2
+        x: 1249
+        y: 1016
+        width: 113
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7de8d81884f74e4c0800000000000000
+      internalID: -4259139398197735721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_25
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 804
+        width: 134
+        height: 133
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43d618c836cf8d960800000000000000
+      internalID: 7627123473441189172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_26
+      rect:
+        serializedVersion: 2
+        x: 245
+        y: 804
+        width: 145
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f2d951d2ce17a420800000000000000
+      internalID: 2641113528560898803
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_27
+      rect:
+        serializedVersion: 2
+        x: 445
+        y: 799
+        width: 152
+        height: 132
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: baabae70db05c8170800000000000000
+      internalID: 8182003395837213355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_28
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 614
+        width: 116
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37c14e9a8b34c4060800000000000000
+      internalID: 6938995586274434163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_29
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 614
+        width: 111
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b75b6b8340156d640800000000000000
+      internalID: 5104356306244253051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_30
+      rect:
+        serializedVersion: 2
+        x: 449
+        y: 614
+        width: 111
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc073ab67004564b0800000000000000
+      internalID: -5447877773619924789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_31
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 614
+        width: 111
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98c031149e80b43c0800000000000000
+      internalID: -4374392815148135287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_32
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 437
+        width: 109
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ed1f1a28116dc420800000000000000
+      internalID: 2651882512004881890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_33
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 437
+        width: 109
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10cbffdb3313ada70800000000000000
+      internalID: 8852442115850877953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_34
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 437
+        width: 109
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52dedcae9b34444d0800000000000000
+      internalID: -3151319373465129691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_35
+      rect:
+        serializedVersion: 2
+        x: 637
+        y: 437
+        width: 108
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b548835a06b274dc0800000000000000
+      internalID: -3654904878499068837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_36
+      rect:
+        serializedVersion: 2
+        x: 837
+        y: 437
+        width: 108
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79cbc5032a765acf0800000000000000
+      internalID: -241673058700706665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_37
+      rect:
+        serializedVersion: 2
+        x: 1037
+        y: 437
+        width: 108
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 029c3f7262c35de50800000000000000
+      internalID: 6833434144181307680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_38
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 237
+        width: 109
+        height: 150
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd26d8365a1029270800000000000000
+      internalID: 8255662876774982365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_39
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 237
+        width: 109
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5aa7a3e816db9fe50800000000000000
+      internalID: 6843709335461853861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_40
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 237
+        width: 109
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91a946905ed675950800000000000000
+      internalID: 6437735022821939737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_41
+      rect:
+        serializedVersion: 2
+        x: 645
+        y: 237
+        width: 108
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60da875633d0cb880800000000000000
+      internalID: -8593979474532848378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_42
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 13
+        width: 125
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe52767fd27397da0800000000000000
+      internalID: -5946661162402241041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_43
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 13
+        width: 119
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62238a80bb26577c0800000000000000
+      internalID: -4074241732443098586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_44
+      rect:
+        serializedVersion: 2
+        x: 439
+        y: 13
+        width: 127
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdf950176e4401710800000000000000
+      internalID: 1661904019029073883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Kalb_movement_45
+      rect:
+        serializedVersion: 2
+        x: 636
+        y: 13
+        width: 125
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b82d48b85adb48ce0800000000000000
+      internalID: -1403788665124760949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Kalb_movement_0: -1200154173720420206
+      Kalb_movement_1: -3720724614922204993
+      Kalb_movement_10: -7508371009345816775
+      Kalb_movement_11: 3495485269782077543
+      Kalb_movement_12: -7083005693927924398
+      Kalb_movement_13: 314376776006125201
+      Kalb_movement_14: 5058470826034681640
+      Kalb_movement_15: 315919883493190505
+      Kalb_movement_16: 4971642757239604372
+      Kalb_movement_17: -4678989324192127532
+      Kalb_movement_18: -6378817341441678396
+      Kalb_movement_19: 5812569029427774025
+      Kalb_movement_2: 3621455492914218529
+      Kalb_movement_20: -4375285659720355973
+      Kalb_movement_21: -2632858150216665973
+      Kalb_movement_22: 8830599191449237980
+      Kalb_movement_23: -3548902362932834865
+      Kalb_movement_24: -4259139398197735721
+      Kalb_movement_25: 7627123473441189172
+      Kalb_movement_26: 2641113528560898803
+      Kalb_movement_27: 8182003395837213355
+      Kalb_movement_28: 6938995586274434163
+      Kalb_movement_29: 5104356306244253051
+      Kalb_movement_3: 364244319578654871
+      Kalb_movement_30: -5447877773619924789
+      Kalb_movement_31: -4374392815148135287
+      Kalb_movement_32: 2651882512004881890
+      Kalb_movement_33: 8852442115850877953
+      Kalb_movement_34: -3151319373465129691
+      Kalb_movement_35: -3654904878499068837
+      Kalb_movement_36: -241673058700706665
+      Kalb_movement_37: 6833434144181307680
+      Kalb_movement_38: 8255662876774982365
+      Kalb_movement_39: 6843709335461853861
+      Kalb_movement_4: 3821328095450614457
+      Kalb_movement_40: 6437735022821939737
+      Kalb_movement_41: -8593979474532848378
+      Kalb_movement_42: -5946661162402241041
+      Kalb_movement_43: -4074241732443098586
+      Kalb_movement_44: 1661904019029073883
+      Kalb_movement_45: -1403788665124760949
+      Kalb_movement_5: -7009818925043455756
+      Kalb_movement_6: -2022026554402823538
+      Kalb_movement_7: 7738911745174876027
+      Kalb_movement_8: -2525054870933865703
+      Kalb_movement_9: 4902066992080266595
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
