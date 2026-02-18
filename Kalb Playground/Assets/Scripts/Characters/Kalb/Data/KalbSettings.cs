@@ -91,7 +91,7 @@ public class KalbSettings : ScriptableObject
     public Vector2 upwardAttackKnockbackDirection = new Vector2(0f, 1f); // Straight up
     public string upwardAttackAnimation = "Kalb_attack_up";
     public float upwardAttackForwardForce = 0f; // No forward movement
-    public float upwardAttackUpwardForce = 5f; // Slight upward boost
+    public float upwardAttackUpwardForce = 0f; // Slight upward boost
     public bool enableUpwardAirAttack = true;
     public float upwardAirAttackDamage = 20f;
     public float upwardAirAttackKnockback = 6f;

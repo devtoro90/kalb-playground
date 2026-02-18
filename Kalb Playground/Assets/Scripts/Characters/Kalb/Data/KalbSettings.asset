@@ -23,7 +23,6 @@ MonoBehaviour:
   airAcceleration: 12
   airDeceleration: 12
   airTurnAcceleration: 12
-  maxAirSpeed: 10
   airFriction: 5
   fallingGravityScale: 2.5
   normalGravityScale: 2
@@ -98,6 +97,39 @@ MonoBehaviour:
   hitEffectDuration: 0.3
   comboFlashColor: {r: 1, g: 1, b: 1, a: 1}
   comboFlashDuration: 0.1
+  enableUpwardAttack: 1
+  upwardAttackDamage: 25
+  upwardAttackKnockback: 8
+  upwardAttackRange: 0.7
+  upwardAttackDuration: 0.2
+  upwardAttackCooldown: 0.3
+  upwardAttackPointOffset: {x: 0, y: 0.8}
+  upwardAttackKnockbackDirection: {x: 0, y: 1}
+  upwardAttackAnimation: Kalb_attack_up
+  upwardAttackForwardForce: 0
+  upwardAttackUpwardForce: 0
+  enableUpwardAirAttack: 1
+  upwardAirAttackDamage: 20
+  upwardAirAttackKnockback: 6
+  upwardAirAttackAnimation: Kalb_attack_up
+  enableWallAttack: 1
+  wallAttackDamage: 30
+  wallAttackKnockback: 10
+  wallAttackRange: 0.8
+  wallAttackDuration: 0.25
+  wallAttackCooldown: 0.3
+  wallAttackPointOffset: {x: 0.8, y: 0}
+  wallAttackKnockbackDirection: {x: 2, y: 1}
+  wallAttackAnimation: Kalb_attack_wall
+  stayInWallLockAfterAttack: 1
+  allowWallJumpDuringAttack: 1
+  wallAttackExitDelay: 0.1
+  ledgeGrabUnlocked: 1
+  runUnlocked: 1
+  dashUnlocked: 1
+  doubleJumpUnlocked: 1
+  wallJumpUnlocked: 1
+  wallLockUnlocked: 1
   ledgeDetectionDistance: 0.5
   ledgeGrabOffsetY: 0.15
   ledgeGrabOffsetX: 0.55
@@ -108,15 +140,9 @@ MonoBehaviour:
   minLedgeHoldTime: 0.3
   ledgeReleaseForce: 5
   ledgeReleaseCooldown: 0.2
-  ledgeGrabUnlocked: 1
   maxClimbDistance: 2
   climbSurfaceCheckDistance: 1.5
   climbHorizontalBuffer: 0.3
-  runUnlocked: 1
-  dashUnlocked: 1
-  doubleJumpUnlocked: 1
-  wallJumpUnlocked: 1
-  wallLockUnlocked: 1
   runSpeed: 8
   runAcceleration: 20
   runDeceleration: 25
@@ -141,8 +167,6 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
-  wallStickForce: 5
-  wallStickTolerance: 0.1
   requireInputForWallSlide: 1
   awayInputGracePeriod: 0.3
   awayInputDisengageDistance: 0.3
@@ -153,3 +177,15 @@ MonoBehaviour:
   wallLockEnterSpeed: 0.2
   wallLockExitSpeed: 0.15
   wallLockInputThreshold: 0.3
+  wallSlideMinSpeed: -2
+  wallSlideMaxSpeed: -8
+  wallSlideAcceleration: 15
+  wallSlideDeceleration: 20
+  wallStickDuration: 0.15
+  wallStickForce: 5
+  wallStickTolerance: 0.1
+  neutralSlideMultiplier: 0.5
+  wallJumpMomentumRetention: 0.4
+  wallTapBoostAmount: 1.5
+  wallTapBoostWindow: 0.3
+  maxWallTapBoosts: 3
