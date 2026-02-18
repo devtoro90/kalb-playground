@@ -703,23 +703,23 @@ public class KalbController : MonoBehaviour
     }
 
     private bool CanPerformWallAttack()
-{
-    if (!(stateMachine.CurrentState is KalbWallLockState))
-        return false;
-    
-    if (comboSystem == null)
-        return false;
-    
-    if (!settings.enableWallAttack)
-        return false;
-    
-    if (comboSystem.IsAnyAttackActive)
-        return false;
-    
-    if (wallJump == null || !wallJump.IsTouchingWall)
-        return false;
-    
-    return comboSystem.CanPerformWallAttack;
-}
+    {
+        if (!(stateMachine.CurrentState is KalbWallLockState))
+            return false;
+        
+        if (comboSystem == null)
+            return false;
+        
+        if (!settings.enableWallAttack)
+            return false;
+        
+        if (comboSystem.IsAnyAttackActive)
+            return false;
+        
+        if (wallJump == null || !wallJump.IsTouchingWall)
+            return false;
+        
+        return comboSystem.CanPerformWallAttack;
+    }
 
 }
