@@ -186,7 +186,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -227,12 +227,12 @@ TextureImporter:
       name: Kalb_attack_0
       rect:
         serializedVersion: 2
-        x: 353
-        y: 5112
-        width: 107
-        height: 170
+        x: 0
+        y: 3001
+        width: 500
+        height: 500
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -249,12 +249,12 @@ TextureImporter:
       name: Kalb_attack_1
       rect:
         serializedVersion: 2
-        x: 322
-        y: 4324
-        width: 216
-        height: 274
+        x: 0
+        y: 2522
+        width: 456
+        height: 479
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -271,12 +271,12 @@ TextureImporter:
       name: Kalb_attack_2
       rect:
         serializedVersion: 2
-        x: 1144
-        y: 4310
-        width: 112
-        height: 164
+        x: 500
+        y: 2501
+        width: 500
+        height: 500
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -293,12 +293,12 @@ TextureImporter:
       name: Kalb_attack_3
       rect:
         serializedVersion: 2
-        x: 1215
-        y: 4259
-        width: 157
-        height: 263
+        x: 1000
+        y: 2515
+        width: 484
+        height: 486
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -315,12 +315,12 @@ TextureImporter:
       name: Kalb_attack_4
       rect:
         serializedVersion: 2
-        x: 1929
-        y: 4257
-        width: 212
-        height: 263
+        x: 1500
+        y: 2541
+        width: 500
+        height: 460
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -337,12 +337,12 @@ TextureImporter:
       name: Kalb_attack_5
       rect:
         serializedVersion: 2
-        x: 2740
-        y: 4275
-        width: 164
-        height: 226
+        x: 0
+        y: 2017
+        width: 479
+        height: 484
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -359,12 +359,12 @@ TextureImporter:
       name: Kalb_attack_6
       rect:
         serializedVersion: 2
-        x: 326
-        y: 3526
-        width: 198
-        height: 163
+        x: 500
+        y: 2013
+        width: 491
+        height: 488
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -381,12 +381,12 @@ TextureImporter:
       name: Kalb_attack_7
       rect:
         serializedVersion: 2
-        x: 1132
-        y: 3519
-        width: 241
-        height: 164
+        x: 1000
+        y: 2001
+        width: 500
+        height: 489
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -403,12 +403,12 @@ TextureImporter:
       name: Kalb_attack_8
       rect:
         serializedVersion: 2
-        x: 1929
-        y: 3505
-        width: 249
-        height: 164
+        x: 1500
+        y: 2001
+        width: 500
+        height: 483
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -425,12 +425,12 @@ TextureImporter:
       name: Kalb_attack_9
       rect:
         serializedVersion: 2
-        x: 2735
-        y: 3505
-        width: 112
-        height: 164
+        x: 0
+        y: 1501
+        width: 500
+        height: 490
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -447,12 +447,12 @@ TextureImporter:
       name: Kalb_attack_10
       rect:
         serializedVersion: 2
-        x: 2822
-        y: 3549
-        width: 145
-        height: 33
+        x: 500
+        y: 1501
+        width: 500
+        height: 500
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -469,12 +469,12 @@ TextureImporter:
       name: Kalb_attack_11
       rect:
         serializedVersion: 2
-        x: 335
-        y: 2602
-        width: 232
-        height: 267
+        x: 1000
+        y: 1501
+        width: 493
+        height: 462
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -491,12 +491,12 @@ TextureImporter:
       name: Kalb_attack_12
       rect:
         serializedVersion: 2
-        x: 1137
-        y: 2640
-        width: 236
-        height: 263
+        x: 1500
+        y: 1524
+        width: 500
+        height: 477
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -513,12 +513,12 @@ TextureImporter:
       name: Kalb_attack_13
       rect:
         serializedVersion: 2
-        x: 1931
-        y: 2642
-        width: 238
-        height: 263
+        x: 33
+        y: 997
+        width: 467
+        height: 504
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -535,12 +535,12 @@ TextureImporter:
       name: Kalb_attack_14
       rect:
         serializedVersion: 2
-        x: 2737
-        y: 2724
-        width: 181
-        height: 186
+        x: 531
+        y: 1001
+        width: 469
+        height: 500
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -557,12 +557,12 @@ TextureImporter:
       name: Kalb_attack_15
       rect:
         serializedVersion: 2
-        x: 331
-        y: 1916
-        width: 109
-        height: 167
+        x: 1035
+        y: 1013
+        width: 465
+        height: 488
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -579,12 +579,12 @@ TextureImporter:
       name: Kalb_attack_16
       rect:
         serializedVersion: 2
-        x: 1130
-        y: 1916
-        width: 202
-        height: 314
+        x: 1529
+        y: 1005
+        width: 471
+        height: 496
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -601,12 +601,12 @@ TextureImporter:
       name: Kalb_attack_17
       rect:
         serializedVersion: 2
-        x: 1873
-        y: 2028
-        width: 211
-        height: 222
+        x: 2024
+        y: 1005
+        width: 476
+        height: 496
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -623,12 +623,12 @@ TextureImporter:
       name: Kalb_attack_18
       rect:
         serializedVersion: 2
-        x: 1929
-        y: 1916
-        width: 109
-        height: 167
+        x: 43
+        y: 501
+        width: 457
+        height: 414
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -645,12 +645,12 @@ TextureImporter:
       name: Kalb_attack_19
       rect:
         serializedVersion: 2
-        x: 2633
-        y: 2011
-        width: 208
-        height: 235
+        x: 513
+        y: 501
+        width: 487
+        height: 418
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -667,12 +667,12 @@ TextureImporter:
       name: Kalb_attack_20
       rect:
         serializedVersion: 2
-        x: 2728
-        y: 1916
-        width: 109
-        height: 167
+        x: 1000
+        y: 501
+        width: 500
+        height: 418
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -689,12 +689,12 @@ TextureImporter:
       name: Kalb_attack_21
       rect:
         serializedVersion: 2
-        x: 3435
-        y: 1976
-        width: 80
-        height: 143
+        x: 1500
+        y: 501
+        width: 472
+        height: 414
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -711,12 +711,12 @@ TextureImporter:
       name: Kalb_attack_22
       rect:
         serializedVersion: 2
-        x: 3527
-        y: 1916
-        width: 109
-        height: 167
+        x: 2000
+        y: 501
+        width: 456
+        height: 415
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -733,12 +733,12 @@ TextureImporter:
       name: Kalb_attack_23
       rect:
         serializedVersion: 2
-        x: 363
-        y: 1089
-        width: 114
-        height: 153
+        x: 0
+        y: 1
+        width: 483
+        height: 500
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -755,12 +755,12 @@ TextureImporter:
       name: Kalb_attack_24
       rect:
         serializedVersion: 2
-        x: 1037
-        y: 1089
-        width: 229
-        height: 277
+        x: 511
+        y: 1
+        width: 489
+        height: 500
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -777,12 +777,12 @@ TextureImporter:
       name: Kalb_attack_25
       rect:
         serializedVersion: 2
-        x: 1834
-        y: 1084
-        width: 157
-        height: 263
+        x: 1018
+        y: 1
+        width: 482
+        height: 493
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -799,12 +799,12 @@ TextureImporter:
       name: Kalb_attack_26
       rect:
         serializedVersion: 2
-        x: 1942
-        y: 1089
-        width: 114
-        height: 153
+        x: 1527
+        y: 1
+        width: 473
+        height: 492
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -821,12 +821,12 @@ TextureImporter:
       name: Kalb_attack_27
       rect:
         serializedVersion: 2
-        x: 2616
-        y: 1083
-        width: 230
-        height: 263
+        x: 2029
+        y: 1
+        width: 471
+        height: 494
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -839,231 +839,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_28
-      rect:
-        serializedVersion: 2
-        x: 3411
-        y: 1078
-        width: 125
-        height: 103
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e3829039a3b9ef840800000000000000
-      internalID: 5259812090692577342
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_29
-      rect:
-        serializedVersion: 2
-        x: 3521
-        y: 1089
-        width: 114
-        height: 153
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ac2f7d93d792f2cb0800000000000000
-      internalID: -4886641452855594294
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_30
-      rect:
-        serializedVersion: 2
-        x: 331
-        y: 305
-        width: 122
-        height: 184
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 50820ff5cd7d641d0800000000000000
-      internalID: -3366766329910515707
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_31
-      rect:
-        serializedVersion: 2
-        x: 1104
-        y: 257
-        width: 235
-        height: 146
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 215877449b43863a0800000000000000
-      internalID: -6672024877627112174
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_32
-      rect:
-        serializedVersion: 2
-        x: 1147
-        y: 305
-        width: 122
-        height: 184
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 351fd08d1d5591a00800000000000000
-      internalID: 727707174558363987
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_33
-      rect:
-        serializedVersion: 2
-        x: 1874
-        y: 239
-        width: 289
-        height: 250
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 34b848701ea492700800000000000000
-      internalID: 516025962664856387
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_34
-      rect:
-        serializedVersion: 2
-        x: 2640
-        y: 220
-        width: 292
-        height: 154
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e9b429ef11b8194a0800000000000000
-      internalID: -6588331870464619618
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_35
-      rect:
-        serializedVersion: 2
-        x: 2754
-        y: 305
-        width: 121
-        height: 184
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 54a761b4ab4be3af0800000000000000
-      internalID: -414695403454825915
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_36
-      rect:
-        serializedVersion: 2
-        x: 3439
-        y: 293
-        width: 133
-        height: 143
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 6643e6cbd35936970800000000000000
-      internalID: 8746998993670517862
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Kalb_attack_37
-      rect:
-        serializedVersion: 2
-        x: 3557
-        y: 305
-        width: 122
-        height: 184
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 79148c3da0e2580a0800000000000000
-      internalID: -6880042231700897385
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 33cdf266b4809453e8431d8fecd5493d
     internalID: 0
     vertices: []
     indices: 
@@ -1071,7 +851,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":500.0,"y":500.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Kalb_attack_0: 4373751618030865757
       Kalb_attack_1: -5947507096966252409
@@ -1094,17 +876,7 @@ TextureImporter:
       Kalb_attack_25: 133746708720345074
       Kalb_attack_26: -6251808932565239842
       Kalb_attack_27: 6737899379691200624
-      Kalb_attack_28: 5259812090692577342
-      Kalb_attack_29: -4886641452855594294
       Kalb_attack_3: 8972924489499819210
-      Kalb_attack_30: -3366766329910515707
-      Kalb_attack_31: -6672024877627112174
-      Kalb_attack_32: 727707174558363987
-      Kalb_attack_33: 516025962664856387
-      Kalb_attack_34: -6588331870464619618
-      Kalb_attack_35: -414695403454825915
-      Kalb_attack_36: 8746998993670517862
-      Kalb_attack_37: -6880042231700897385
       Kalb_attack_4: -4830286754321288197
       Kalb_attack_5: -5599010227467965220
       Kalb_attack_6: -2866451787069199172

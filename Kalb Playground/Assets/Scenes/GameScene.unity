@@ -972,8 +972,6 @@ MonoBehaviour:
   lookHoldDelay: 0.1
   limitLookToBounds: 1
   requireIdleAndGrounded: 1
-  allowLookInAir: 0
-  allowLookWhileMoving: 0
   deadzoneRadius: 0.5
   responsiveness: 5
   cameraSmoothTime: 0.1
@@ -2519,12 +2517,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2311659948842064771, guid: a945911dc2d594a4294bd51f3adac1ac, type: 3}
+  m_Sprite: {fileID: -1200154173720420206, guid: 3445b1dbf3c5d425a981331eb21a70a1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.1600001, y: 1.5703111}
+  m_Size: {x: 5, y: 5.000083}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2804,7 +2802,11 @@ MonoBehaviour:
   rb: {fileID: 658198517}
   animationController: {fileID: 658198526}
   movement: {fileID: 658198525}
+  inputHandler: {fileID: 0}
+  wallJump: {fileID: 0}
   attackPoint: {fileID: 0}
+  upwardAttackPoint: {fileID: 0}
+  wallAttackPoint: {fileID: 0}
 --- !u!114 &658198534
 MonoBehaviour:
   m_ObjectHideFlags: 0

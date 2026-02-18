@@ -331,11 +331,8 @@ AnimatorStateMachine:
     m_State: {fileID: -1434994427606314836}
     m_Position: {x: 1060, y: 200, z: 0}
   - serializedVersion: 1
-    m_State: {fileID: 6059042319108343087}
-    m_Position: {x: 1270, y: 200, z: 0}
-  - serializedVersion: 1
     m_State: {fileID: -1290861511264649607}
-    m_Position: {x: 1480, y: 200, z: 0}
+    m_Position: {x: 1270, y: 200, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -915,32 +912,6 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 8ae6d4b5dda6642b8815b745233720a4, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
-  m_MirrorParameter: 
-  m_CycleOffsetParameter: 
-  m_TimeParameter: 
---- !u!1102 &6059042319108343087
-AnimatorState:
-  serializedVersion: 6
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Kalb_wall_attack
-  m_Speed: 1
-  m_CycleOffset: 0
-  m_Transitions: []
-  m_StateMachineBehaviours: []
-  m_Position: {x: 50, y: 50, z: 0}
-  m_IKOnFeet: 0
-  m_WriteDefaultValues: 1
-  m_Mirror: 0
-  m_SpeedParameterActive: 0
-  m_MirrorParameterActive: 0
-  m_CycleOffsetParameterActive: 0
-  m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 34f2d4409a52141538bafc684b549379, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
