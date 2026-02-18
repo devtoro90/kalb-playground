@@ -299,7 +299,9 @@ public class KalbComboSystem : MonoBehaviour
             StartUpwardAttack();
             return;
         }
-        
+
+        if(inputHandler.IsUpHeld) return;
+
         if (!CanAttack) return;
         
         // If currently attacking, queue next attack if within combo window
