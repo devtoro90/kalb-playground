@@ -19,15 +19,6 @@ public enum CameraPriority
     CustomTarget
 }
 
-[System.Serializable]
-public class CameraUpgradeData
-{
-    public string upgradeName;
-    public string description;
-    public int cost;
-    public bool unlocked = false;
-}
-
 public class MetroidvaniaCamera : MonoBehaviour
 {
     // ====================================================================
@@ -36,7 +27,7 @@ public class MetroidvaniaCamera : MonoBehaviour
     
     [Header("Core Settings")]
     public Transform player;
-    [SerializeField] private KalbController playerController; // Reference to player controller
+    [SerializeField] private KalbController playerController;
     public CameraFollowMode followMode = CameraFollowMode.Basic;
     public float cameraSpeed = 5f;
     
@@ -64,41 +55,43 @@ public class MetroidvaniaCamera : MonoBehaviour
     public bool enableImpactPause = true;
     
     // ====================================================================
-    // NEW SECTION: LOOK UP/DOWN FUNCTIONALITY
+    // NEW SECTION: FALL SPEED FOLLOWING
     // ====================================================================
     
-    [Header("Look Up/Down Settings")]
-    [SerializeField] private bool enableLookUpDown = true;
-    [SerializeField] private float lookUpOffset = 3.5f;      // How far up to look
-    [SerializeField] private float lookDownOffset = -2.5f;   // How far down to look
-    [SerializeField] private float lookSmoothTime = 0.15f;   // Smoothing for look movement
-    [SerializeField] private float returnSmoothTime = 0.2f;  // Smoothing when returning to center
-    [SerializeField] private bool invertLook = false;        // Invert up/down direction
+    [Header("Fall Speed Following")]
+    [SerializeField] private bool enableFallSpeedFollowing = true;
+    [SerializeField] private AnimationCurve fallSpeedMultiplier = AnimationCurve.Linear(0, 1, 20, 3);
+    [SerializeField] private float minFallSpeed = 5f;
+    [SerializeField] private float maxFallSpeed = 30f;
+    [SerializeField] private float minCameraMultiplier = 1f;
+    [SerializeField] private float maxCameraMultiplier = 3f;
+    [SerializeField] private float verticalLeadMultiplier = 1.5f;
+    [SerializeField] private float fallResponseTime = 0.1f;
+    [SerializeField] private float fallReturnTime = 0.3f;
     
-    [Header("Look Input Settings")]
-    [SerializeField] private bool useModifierKey = false;    // Require modifier key (Shift/Ctrl)
-    [SerializeField] private Key lookModifierKey = Key.LeftShift; // Modifier key if enabled
-    [SerializeField] private bool useSeparateLookKeys = true; // Use dedicated up/down keys
-    [SerializeField] private Key lookUpKey = Key.UpArrow;     // Key to look up
-    [SerializeField] private Key lookDownKey = Key.DownArrow; // Key to look down
-    [SerializeField] private float verticalInputThreshold = 0.5f; // Threshold for gamepad stick
+    [Header("Fall Anticipation")]
+    [SerializeField] private bool enableFallAnticipation = true;
+    [SerializeField] private float anticipationThreshold = 5f;
+    [SerializeField] private float anticipationLead = 2f;
+    [SerializeField] private AnimationCurve anticipationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     
-    [Header("Look Behavior")]
-    [SerializeField] private bool autoReturnToCenter = true;  // Auto return when not looking
-    [SerializeField] private float lookHoldDelay = 0.1f;      // Delay before starting look
-    [SerializeField] private bool limitLookToBounds = true;   // Keep look within camera bounds
+    [Header("Dynamic Vertical Deadzone")]
+    [SerializeField] private bool useDynamicDeadzone = true;
+    [SerializeField] private float baseVerticalDeadzone = 0.5f;
+    [SerializeField] private float maxVerticalDeadzone = 2f;
+    [SerializeField] private AnimationCurve deadzoneFallCurve = AnimationCurve.Linear(0, 1, 20, 3);
     
-    // NEW: Condition settings
-    [Header("Look Conditions")]
-    [SerializeField] private bool requireIdleAndGrounded = true; // Only look when idle & grounded
-    
-    // Private look variables
-    private float currentLookOffset = 0f;
-    private float targetLookOffset = 0f;
-    private float lookVelocity = 0f;
-    private bool isLooking = false;
-    private float lookHoldTimer = 0f;
-    private Vector3 baseTargetPosition;
+    // Private fall tracking variables
+    private float currentFallMultiplier = 1f;
+    private float targetFallMultiplier = 1f;
+    private float fallMultiplierVelocity = 0f;
+    private float previousPlayerY = 0f;
+    private float currentVerticalVelocity = 0f;
+    private float verticalVelocitySmooth = 0f;
+    private float lastGroundedY = 0f;
+    private bool wasGrounded = true;
+    private float anticipationTimer = 0f;
+    private float fallStartTime = 0f;
     
     // ====================================================================
     // SECTION 2: BASIC FOLLOW (Unlocked by default)
@@ -142,6 +135,42 @@ public class MetroidvaniaCamera : MonoBehaviour
     private Vector3 smoothedPosition;
     
     // ====================================================================
+    // NEW SECTION: LOOK UP/DOWN FUNCTIONALITY
+    // ====================================================================
+    
+    [Header("Look Up/Down Settings")]
+    [SerializeField] private bool enableLookUpDown = true;
+    [SerializeField] private float lookUpOffset = 3.5f;
+    [SerializeField] private float lookDownOffset = -2.5f;
+    [SerializeField] private float lookSmoothTime = 0.15f;
+    [SerializeField] private float returnSmoothTime = 0.2f;
+    [SerializeField] private bool invertLook = false;
+    
+    [Header("Look Input Settings")]
+    [SerializeField] private bool useModifierKey = false;
+    [SerializeField] private Key lookModifierKey = Key.LeftShift;
+    [SerializeField] private bool useSeparateLookKeys = true;
+    [SerializeField] private Key lookUpKey = Key.UpArrow;
+    [SerializeField] private Key lookDownKey = Key.DownArrow;
+    [SerializeField] private float verticalInputThreshold = 0.5f;
+    
+    [Header("Look Behavior")]
+    [SerializeField] private bool autoReturnToCenter = true;
+    [SerializeField] private float lookHoldDelay = 0.1f;
+    [SerializeField] private bool limitLookToBounds = true;
+    
+    [Header("Look Conditions")]
+    [SerializeField] private bool requireIdleAndGrounded = true;
+    
+    // Private look variables
+    private float currentLookOffset = 0f;
+    private float targetLookOffset = 0f;
+    private float lookVelocity = 0f;
+    private bool isLooking = false;
+    private float lookHoldTimer = 0f;
+    private Vector3 baseTargetPosition;
+    
+    // ====================================================================
     // SECTION 10: INITIALIZATION
     // ====================================================================
     
@@ -173,6 +202,8 @@ public class MetroidvaniaCamera : MonoBehaviour
             targetPosition = new Vector3(playerPos.x, playerPos.y, transform.position.z);
             transform.position = targetPosition;
             baseTargetPosition = targetPosition;
+            previousPlayerY = playerPos.y;
+            lastGroundedY = playerPos.y;
         }
 
         // Initialize shake with random offset for Perlin noise
@@ -186,58 +217,110 @@ public class MetroidvaniaCamera : MonoBehaviour
     {
         if (player == null) return;
         
-        // Update look up/down input with conditions
+        // Update vertical velocity tracking
+        UpdateVerticalVelocity();
+        
+        // Update fall speed multiplier
+        UpdateFallSpeedMultiplier();
+        
+        // Update look up/down input
         if (enableLookUpDown)
         {
             UpdateLookInput();
         }
         
-        // Update screen shake FIRST
+        // Update screen shake
         UpdateEnhancedScreenShake();
         
-        // Calculate base target position (player position)
+        // Calculate base target position with fall speed influence
         Vector3 playerPos = player.position;
         Vector3 cameraPos = transform.position;
         
-        // Calculate distance from camera center
+        // Track grounded state for fall anticipation
+        bool isGrounded = playerController != null ? playerController.IsEffectivelyGrounded() : false;
+        
+        if (isGrounded && !wasGrounded)
+        {
+            // Player just landed - trigger landing effects
+            OnPlayerLanded();
+        }
+        
+        if (isGrounded)
+        {
+            lastGroundedY = playerPos.y;
+            anticipationTimer = 0f;
+        }
+        else if (wasGrounded && !isGrounded)
+        {
+            // Player just left ground - start fall tracking
+            fallStartTime = Time.time;
+        }
+        
+        wasGrounded = isGrounded;
+        
+        // Calculate base target with fall speed influence
+        float targetY = playerPos.y;
+        
+        if (enableFallSpeedFollowing && !isGrounded && currentVerticalVelocity < -minFallSpeed)
+        {
+            // Apply fall speed multiplier to vertical camera movement
+            float fallInfluence = Mathf.Abs(currentVerticalVelocity) * currentFallMultiplier * verticalLeadMultiplier;
+            
+            // Add anticipation for fast falls
+            if (enableFallAnticipation && Mathf.Abs(currentVerticalVelocity) > anticipationThreshold)
+            {
+                float anticipationProgress = Mathf.Clamp01((Time.time - fallStartTime) / 0.5f);
+                float extraLead = anticipationLead * anticipationCurve.Evaluate(anticipationProgress);
+                fallInfluence += extraLead;
+            }
+            
+            targetY -= fallInfluence * Time.fixedDeltaTime;
+        }
+        
+        baseTargetPosition = new Vector3(playerPos.x, targetY, transform.position.z);
+        
+        // Apply dynamic deadzone if enabled
+        float currentDeadzone = deadzoneRadius;
+        if (useDynamicDeadzone && !isGrounded && currentVerticalVelocity < 0)
+        {
+            float fallRatio = Mathf.Clamp01(Mathf.Abs(currentVerticalVelocity) / maxFallSpeed);
+            float deadzoneMultiplier = deadzoneFallCurve.Evaluate(Mathf.Abs(currentVerticalVelocity));
+            currentDeadzone = Mathf.Lerp(baseVerticalDeadzone, maxVerticalDeadzone, fallRatio * deadzoneMultiplier);
+        }
+        
+        // Calculate distance from camera center with dynamic deadzone
         float distance = Vector2.Distance(
             new Vector2(playerPos.x, playerPos.y),
             new Vector2(cameraPos.x, cameraPos.y)
         );
         
-        // Base target is player position
-        baseTargetPosition = new Vector3(playerPos.x, playerPos.y, transform.position.z);
-        
         // Only move if outside deadzone
-        if (distance > deadzoneRadius)
+        if (distance > currentDeadzone)
         {
             targetPosition = baseTargetPosition;
         }
         
-        // Apply look up/down offset to target Y position
+        // Apply look up/down offset
         if (enableLookUpDown)
         {
-            // Smooth the look offset
             float smoothTimeToUse = isLooking ? lookSmoothTime : returnSmoothTime;
             currentLookOffset = Mathf.SmoothDamp(currentLookOffset, targetLookOffset, ref lookVelocity, smoothTimeToUse, Mathf.Infinity, Time.fixedDeltaTime);
-            
-            // Apply the offset to target position
             targetPosition.y += currentLookOffset;
         }
         
-        // Apply boundaries (including look offset limits)
+        // Apply boundaries
         if (useCameraBounds)
         {
             ApplyBoundaries();
         }
         
-        // Apply screen shake offset to target position
+        // Apply screen shake
         Vector3 finalTargetPosition = targetPosition + shakeOffset;
         
-        // Apply camera speed modifier for impact pauses
-        float effectiveCameraSpeed = cameraSpeed * currentCameraSpeedModifier;
+        // Apply camera speed modifier
+        float effectiveCameraSpeed = cameraSpeed * currentCameraSpeedModifier * currentFallMultiplier;
         
-        // Smooth movement using SmoothDamp with modified speed
+        // Smooth movement
         smoothedPosition = Vector3.SmoothDamp(
             transform.position, 
             finalTargetPosition, 
@@ -255,27 +338,72 @@ public class MetroidvaniaCamera : MonoBehaviour
     }
     
     // ====================================================================
+    // NEW SECTION: FALL SPEED CALCULATION
+    // ====================================================================
+    
+    private void UpdateVerticalVelocity()
+    {
+        if (player == null) return;
+        
+        // Calculate raw vertical velocity
+        float currentY = player.position.y;
+        float rawVelocity = (currentY - previousPlayerY) / Time.fixedDeltaTime;
+        previousPlayerY = currentY;
+        
+        // Smooth the velocity for more stable camera movement
+        verticalVelocitySmooth = Mathf.Lerp(verticalVelocitySmooth, rawVelocity, Time.fixedDeltaTime * 10f);
+        currentVerticalVelocity = verticalVelocitySmooth;
+    }
+    
+    private void UpdateFallSpeedMultiplier()
+    {
+        float fallSpeed = Mathf.Abs(currentVerticalVelocity);
+        
+        // Calculate target multiplier based on fall speed
+        if (fallSpeed > minFallSpeed && currentVerticalVelocity < 0) // Only when falling
+        {
+            float normalizedFallSpeed = Mathf.Clamp01((fallSpeed - minFallSpeed) / (maxFallSpeed - minFallSpeed));
+            targetFallMultiplier = Mathf.Lerp(minCameraMultiplier, maxCameraMultiplier, 
+                fallSpeedMultiplier.Evaluate(fallSpeed));
+        }
+        else
+        {
+            targetFallMultiplier = 1f;
+        }
+        
+        // Smooth the multiplier change
+        float smoothTime = (targetFallMultiplier > currentFallMultiplier) ? fallResponseTime : fallReturnTime;
+        currentFallMultiplier = Mathf.SmoothDamp(currentFallMultiplier, targetFallMultiplier, 
+            ref fallMultiplierVelocity, smoothTime);
+    }
+    
+    private void OnPlayerLanded()
+    {
+        float fallDistance = Mathf.Abs(player.position.y - lastGroundedY);
+        float fallSpeed = Mathf.Abs(currentVerticalVelocity);
+        
+        // Trigger camera shake on hard landings
+        if (fallDistance > 3f || fallSpeed > 10f)
+        {
+            TriggerHardLandingShake(fallSpeed, fallDistance);
+        }
+        
+        // Quickly reset fall multiplier on landing
+        targetFallMultiplier = 1f;
+    }
+    
+    // ====================================================================
     // NEW SECTION: LOOK UP/DOWN INPUT HANDLING
     // ====================================================================
     
     private bool CanLook()
     {
-        // If we don't have player controller, default to allowing look
         if (playerController == null) return true;
         
-        // Check if we require idle and grounded
         if (requireIdleAndGrounded)
         {
-            // Check if player is idle (not moving horizontally) and grounded
             bool isIdle = Mathf.Abs(playerController.InputHandler.MoveInput.x) < 0.1f;
             bool isGrounded = playerController.IsEffectivelyGrounded();
-            
-            // Also check if player is in idle state specifically (optional, more precise)
-            bool isInIdleState = playerController.IdleState != null && 
-                                 playerController.GetType().GetField("stateMachine")?.GetValue(playerController) is KalbStateMachine stateMachine &&
-                                 stateMachine.CurrentState is KalbIdleState;
-            
-            // For platformers, being grounded with no input is usually sufficient
             return isIdle && isGrounded;
         }
         
@@ -284,48 +412,36 @@ public class MetroidvaniaCamera : MonoBehaviour
     
     private void UpdateLookInput()
     {
-        // Skip if Keyboard.current is not available
         if (Keyboard.current == null && Gamepad.current == null) return;
         
-        // Check if we can look based on player state
         bool canLook = CanLook();
-        
         bool wantsToLookUp = false;
         bool wantsToLookDown = false;
         
-        // Only process input if we can look
         if (canLook)
         {
-            // Check keyboard input
             if (Keyboard.current != null)
             {
-                // Check modifier key if required
                 bool modifierPressed = !useModifierKey || 
                     (lookModifierKey == Key.LeftShift && Keyboard.current.leftShiftKey.isPressed) ||
-                    (lookModifierKey == Key.RightShift && Keyboard.current.rightShiftKey.isPressed) ||
-                    (lookModifierKey == Key.LeftCtrl && Keyboard.current.leftCtrlKey.isPressed) ||
-                    (lookModifierKey == Key.RightCtrl && Keyboard.current.rightCtrlKey.isPressed);
+                    (lookModifierKey == Key.RightShift && Keyboard.current.rightShiftKey.isPressed);
                 
                 if (useSeparateLookKeys)
                 {
-                    // Dedicated look keys
                     wantsToLookUp = Keyboard.current[lookUpKey].isPressed && modifierPressed;
                     wantsToLookDown = Keyboard.current[lookDownKey].isPressed && modifierPressed;
                 }
                 else
                 {
-                    // Use vertical arrows with optional modifier
                     wantsToLookUp = (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed) && modifierPressed;
                     wantsToLookDown = (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed) && modifierPressed;
                 }
             }
             
-            // Check gamepad input if available
             if (Gamepad.current != null)
             {
                 Vector2 rightStick = Gamepad.current.rightStick.ReadValue();
                 
-                // Use right stick for look (more natural for gamepad)
                 if (Mathf.Abs(rightStick.y) > verticalInputThreshold)
                 {
                     if (rightStick.y > 0)
@@ -335,7 +451,6 @@ public class MetroidvaniaCamera : MonoBehaviour
                 }
             }
             
-            // Apply inversion
             if (invertLook)
             {
                 bool temp = wantsToLookUp;
@@ -344,7 +459,6 @@ public class MetroidvaniaCamera : MonoBehaviour
             }
         }
         
-        // Update look state with hold timer
         if ((wantsToLookUp || wantsToLookDown) && canLook)
         {
             lookHoldTimer += Time.fixedDeltaTime;
@@ -365,7 +479,6 @@ public class MetroidvaniaCamera : MonoBehaviour
         }
         else
         {
-            // No input or can't look - reset look
             lookHoldTimer = 0f;
             
             if (autoReturnToCenter)
@@ -375,7 +488,6 @@ public class MetroidvaniaCamera : MonoBehaviour
             }
         }
         
-        // Ensure look offset stays within camera bounds if enabled
         if (limitLookToBounds && useCameraBounds)
         {
             float camHeight = cam.orthographicSize;
@@ -383,11 +495,9 @@ public class MetroidvaniaCamera : MonoBehaviour
             float topBound = maxBounds.y - camHeight;
             float bottomBound = minBounds.y + camHeight;
             
-            // Calculate maximum possible look offset while staying in bounds
             float maxLookUp = topBound - playerY;
             float maxLookDown = bottomBound - playerY;
             
-            // Clamp target offset
             if (targetLookOffset > 0)
             {
                 targetLookOffset = Mathf.Min(targetLookOffset, maxLookUp);
@@ -400,44 +510,23 @@ public class MetroidvaniaCamera : MonoBehaviour
     }
     
     // ====================================================================
-    // SECTION 13: BOUNDARY SYSTEM - FIXED VERSION
+    // SECTION 13: BOUNDARY SYSTEM
     // ====================================================================
     
     private void ApplyBoundaries()
     {
         if (!useCameraBounds) return;
         
-        // Calculate camera bounds in world space
         float camHeight = cam.orthographicSize;
         float camWidth = camHeight * cam.aspect;
         
-        // Calculate effective bounds (limiting camera edges, not center)
         float leftBound = minBounds.x + camWidth;
         float rightBound = maxBounds.x - camWidth;
         float bottomBound = minBounds.y + camHeight;
         float topBound = maxBounds.y - camHeight;
         
-        // Clamp target position so camera edges stay within bounds
         targetPosition.x = Mathf.Clamp(targetPosition.x, leftBound, rightBound);
         targetPosition.y = Mathf.Clamp(targetPosition.y, bottomBound, topBound);
-        
-        // Debug visualization
-        DebugDrawBounds(leftBound, rightBound, bottomBound, topBound);
-    }
-    
-    private void DebugDrawBounds(float left, float right, float bottom, float top)
-    {
-        // Draw camera center bounds
-        Debug.DrawLine(new Vector3(minBounds.x, minBounds.y, 0), new Vector3(maxBounds.x, minBounds.y, 0), Color.green);
-        Debug.DrawLine(new Vector3(maxBounds.x, minBounds.y, 0), new Vector3(maxBounds.x, maxBounds.y, 0), Color.green);
-        Debug.DrawLine(new Vector3(maxBounds.x, maxBounds.y, 0), new Vector3(minBounds.x, maxBounds.y, 0), Color.green);
-        Debug.DrawLine(new Vector3(minBounds.x, maxBounds.y, 0), new Vector3(minBounds.x, minBounds.y, 0), Color.green);
-        
-        // Draw camera edge bounds (actual limits)
-        Debug.DrawLine(new Vector3(left, bottom, 0), new Vector3(right, bottom, 0), Color.yellow);
-        Debug.DrawLine(new Vector3(right, bottom, 0), new Vector3(right, top, 0), Color.yellow);
-        Debug.DrawLine(new Vector3(right, top, 0), new Vector3(left, top, 0), Color.yellow);
-        Debug.DrawLine(new Vector3(left, top, 0), new Vector3(left, bottom, 0), Color.yellow);
     }
     
     // ====================================================================
@@ -455,24 +544,17 @@ public class MetroidvaniaCamera : MonoBehaviour
     {
         if (activeShake.timer > 0)
         {
-            // Reduce timer
             activeShake.timer -= Time.fixedDeltaTime;
             
-            // Calculate progress (0 to 1)
             float progress = 1f - (activeShake.timer / activeShake.duration);
-            
-            // Apply decay curve
             float decay = shakeDecayCurve.Evaluate(progress);
             float currentIntensity = activeShake.intensity * decay;
             
-            // Generate Perlin noise-based shake (smoother than random)
             float time = Time.time * screenShakeFrequency + shakeNoiseOffset;
             
-            // Create shake in all directions
             float shakeX = (Mathf.PerlinNoise(time, 0f) * 2f - 1f) * currentIntensity;
             float shakeY = (Mathf.PerlinNoise(0f, time) * 2f - 1f) * currentIntensity;
             
-            // Apply optional directional bias
             if (activeShake.direction != Vector3.zero)
             {
                 float directionalBias = 0.7f;
@@ -483,7 +565,6 @@ public class MetroidvaniaCamera : MonoBehaviour
             
             shakeOffset = new Vector3(shakeX, shakeY, 0);
             
-            // If shake ended, reset
             if (activeShake.timer <= 0)
             {
                 activeShake.timer = 0;
@@ -496,16 +577,10 @@ public class MetroidvaniaCamera : MonoBehaviour
         }
     }
     
-    // ====================================================================
-    // ENHANCED SCREEN SHAKE WITH IMPACT PAUSE
-    // ====================================================================
-    
     public void TriggerScreenShake(float intensity, float duration, Vector3 direction = default, bool isHardImpact = false)
     {
-        // For hard landings, we want to combine or override existing shakes
         if (activeShake.timer > 0 && !isHardImpact)
         {
-            // If new shake is stronger, override
             if (intensity > activeShake.intensity)
             {
                 activeShake.intensity = intensity;
@@ -514,7 +589,6 @@ public class MetroidvaniaCamera : MonoBehaviour
                 activeShake.direction = direction;
                 activeShake.isHardImpact = isHardImpact;
             }
-            // If similar intensity, extend duration
             else if (Mathf.Abs(intensity - activeShake.intensity) < 0.05f)
             {
                 activeShake.timer = Mathf.Max(activeShake.timer, duration);
@@ -522,7 +596,6 @@ public class MetroidvaniaCamera : MonoBehaviour
         }
         else
         {
-            // Start new shake
             activeShake = new ShakeData
             {
                 intensity = intensity,
@@ -533,42 +606,32 @@ public class MetroidvaniaCamera : MonoBehaviour
             };
         }
         
-        // If this is a hard impact and pause is enabled, trigger pause effect
         if (isHardImpact && enableImpactPause && impactPauseCoroutine == null)
         {
             impactPauseCoroutine = StartCoroutine(ImpactPauseEffect(intensity, duration));
         }
     }
     
-    // Special shake for hard landings with built-in pause
     public void TriggerHardLandingShake(float fallSpeed, float fallDistance)
     {
-        // Calculate shake intensity based on fall impact
         float normalizedFallSpeed = Mathf.Clamp01(Mathf.Abs(fallSpeed) / 30f);
         float normalizedFallDistance = Mathf.Clamp01(fallDistance / 10f);
         
-        // Combined impact factor (weighted toward speed)
         float impactFactor = (normalizedFallSpeed * 0.7f) + (normalizedFallDistance * 0.3f);
         
-        // Scale intensity and duration based on impact
         float intensity = Mathf.Lerp(0.15f, 0.35f, impactFactor);
         float duration = Mathf.Lerp(0.2f, 0.4f, impactFactor);
         
-        // Add strong upward bias for hard landings
         Vector3 direction = new Vector3(0, 0.8f, 0);
         
-        // Calculate pause strength based on impact
         float pauseStrength = Mathf.Lerp(0.3f, 0.05f, impactFactor);
         
-        // Update pause settings based on impact
         impactPauseDuration = Mathf.Lerp(0.08f, 0.15f, impactFactor);
         impactPauseStrength = pauseStrength;
         
-        // Trigger with upward bias and hard impact flag
         TriggerScreenShake(intensity, duration, direction, true);
     }
     
-    // Impact pause effect - slows down camera movement briefly
     private IEnumerator ImpactPauseEffect(float intensity, float duration)
     {
         if (!enableImpactPause) yield break;
@@ -576,20 +639,17 @@ public class MetroidvaniaCamera : MonoBehaviour
         float pauseTimer = 0f;
         float originalModifier = currentCameraSpeedModifier;
         
-        // Initial strong pause (camera almost stops)
         while (pauseTimer < impactPauseDuration)
         {
             pauseTimer += Time.fixedDeltaTime;
             float progress = pauseTimer / impactPauseDuration;
             
-            // Apply pause strength - camera moves very slowly
             currentCameraSpeedModifier = Mathf.Lerp(impactPauseStrength, 1f, 
                 pauseRecoveryCurve.Evaluate(progress));
             
             yield return new WaitForFixedUpdate();
         }
         
-        // Smooth recovery to normal speed
         float recoveryTimer = 0f;
         float recoveryDuration = 0.1f;
         
@@ -603,92 +663,44 @@ public class MetroidvaniaCamera : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
         
-        // Ensure back to normal
         currentCameraSpeedModifier = 1f;
         impactPauseCoroutine = null;
     }
     
-    // Alternative: Frame-freeze effect (more dramatic)
-    public void TriggerHardLandingWithFreeze(float fallSpeed, float fallDistance)
-    {
-        StartCoroutine(HardLandingWithFreezeCoroutine(fallSpeed, fallDistance));
-    }
-    
-    private IEnumerator HardLandingWithFreezeCoroutine(float fallSpeed, float fallDistance)
-    {
-        // Calculate impact strength
-        float impactFactor = Mathf.Clamp01((Mathf.Abs(fallSpeed) + fallDistance) / 40f);
-        
-        // 2. Camera pause (slows camera follow without affecting game time)
-        float pauseTime = Mathf.Lerp(0.1f, 0.2f, impactFactor);
-        float pauseStrength = Mathf.Lerp(0.2f, 0.05f, impactFactor);
-        
-        // Store original values
-        float originalPauseDuration = impactPauseDuration;
-        float originalPauseStrength = impactPauseStrength;
-        
-        // Set temporary values
-        impactPauseDuration = pauseTime;
-        impactPauseStrength = pauseStrength;
-        
-        // Trigger the shake with pause
-        TriggerHardLandingShake(fallSpeed, fallDistance);
-        
-        // Wait for pause to complete
-        yield return new WaitForSeconds(pauseTime + 0.1f);
-        
-        // Restore original values
-        impactPauseDuration = originalPauseDuration;
-        impactPauseStrength = originalPauseStrength;
-    }
-    
-    // Public method to stop any active pause
-    public void StopImpactPause()
-    {
-        if (impactPauseCoroutine != null)
-        {
-            StopCoroutine(impactPauseCoroutine);
-            impactPauseCoroutine = null;
-        }
-        currentCameraSpeedModifier = 1f;
-    }
-    
     // ====================================================================
-    // PUBLIC METHODS FOR LOOK UP/DOWN
+    // PUBLIC METHODS
     // ====================================================================
     
-    /// <summary>
-    /// Manually set the look offset (for scripted camera movements)
-    /// </summary>
     public void SetLookOffset(float offset)
     {
         targetLookOffset = offset;
         isLooking = (offset != 0);
     }
     
-    /// <summary>
-    /// Reset look to center
-    /// </summary>
     public void ResetLook()
     {
         targetLookOffset = 0f;
         isLooking = false;
     }
     
-    /// <summary>
-    /// Get current look offset value
-    /// </summary>
     public float GetCurrentLookOffset()
     {
         return currentLookOffset;
     }
     
-    /// <summary>
-    /// Check if camera is currently looking up/down
-    /// </summary>
     public bool IsLooking()
     {
         return isLooking;
+    }
+    
+    public float GetCurrentFallMultiplier()
+    {
+        return currentFallMultiplier;
+    }
+    
+    public float GetCurrentVerticalVelocity()
+    {
+        return currentVerticalVelocity;
     }
     
     // ====================================================================
@@ -699,7 +711,6 @@ public class MetroidvaniaCamera : MonoBehaviour
     {
         if (!Application.isPlaying)
         {
-            // In editor, approximate camera size
             Camera editorCam = GetComponent<Camera>();
             if (editorCam == null) editorCam = Camera.main;
             
@@ -708,7 +719,6 @@ public class MetroidvaniaCamera : MonoBehaviour
                 float camHeight = editorCam.orthographicSize;
                 float camWidth = camHeight * editorCam.aspect;
                 
-                // Draw camera edge bounds
                 if (useCameraBounds)
                 {
                     float leftBound = minBounds.x + camWidth;
@@ -725,7 +735,6 @@ public class MetroidvaniaCamera : MonoBehaviour
             }
         }
         
-        // Draw original bounds
         if (useCameraBounds)
         {
             Gizmos.color = Color.green;
@@ -745,19 +754,16 @@ public class MetroidvaniaCamera : MonoBehaviour
             Gizmos.color = Color.cyan;
             Vector3 playerPos = player.position;
             
-            // Draw look up range
             Gizmos.DrawLine(
                 new Vector3(playerPos.x - 0.5f, playerPos.y + lookUpOffset, 0),
                 new Vector3(playerPos.x + 0.5f, playerPos.y + lookUpOffset, 0)
             );
             
-            // Draw look down range
             Gizmos.DrawLine(
                 new Vector3(playerPos.x - 0.5f, playerPos.y + lookDownOffset, 0),
                 new Vector3(playerPos.x + 0.5f, playerPos.y + lookDownOffset, 0)
             );
             
-            // Draw current look offset
             if (Application.isPlaying)
             {
                 Gizmos.color = Color.red;
@@ -766,6 +772,19 @@ public class MetroidvaniaCamera : MonoBehaviour
                     new Vector3(playerPos.x + 0.5f, playerPos.y + currentLookOffset, 0)
                 );
             }
+        }
+        
+        // Draw fall speed multiplier debug
+        if (Application.isPlaying && player != null)
+        {
+            Gizmos.color = Color.magenta;
+            float multiplierSize = currentFallMultiplier * 0.5f;
+            Gizmos.DrawWireSphere(player.position + Vector3.up * 2f, multiplierSize);
+            
+            // Draw velocity vector
+            Gizmos.color = Color.blue;
+            Vector3 velocityEnd = player.position + new Vector3(0, currentVerticalVelocity * 0.1f, 0);
+            Gizmos.DrawLine(player.position, velocityEnd);
         }
     }
 }

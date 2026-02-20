@@ -2708,7 +2708,7 @@ public class Kalb : MonoBehaviour
         if (isHardLanding)
         {
             // Use enhanced hard landing shake with optional time freeze
-            metroidvaniaCamera.TriggerHardLandingWithFreeze(currentFallSpeed, totalFallDistance);
+            metroidvaniaCamera.TriggerHardLandingShake(currentFallSpeed, totalFallDistance);
         }
         
         // Dash camera shake

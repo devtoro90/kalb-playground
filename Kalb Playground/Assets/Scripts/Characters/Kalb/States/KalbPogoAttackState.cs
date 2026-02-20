@@ -29,13 +29,7 @@ public class KalbPogoAttackState : KalbState
     private float bouncePeakTimer = 0f;
     private float bounceAnimationTimer = 0f;
     
-    // NEW: Track if we're in full control mode during bounce
-    private bool fullControlDuringBounce = true;
-    
     // Constants
-    private const float POGO_ATTACK_DURATION = 0.15f;
-    private const float POGO_COOLDOWN = 0.2f;
-    private const float POGO_BOUNCE_BUFFER = 0.05f;
     private const float PEAK_DETECTION_DELAY = 0.05f;
     private const float BOUNCE_ANIMATION_MIN_DURATION = 0.2f;
     
