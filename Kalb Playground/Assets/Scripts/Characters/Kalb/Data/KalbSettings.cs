@@ -113,6 +113,28 @@ public class KalbSettings : ScriptableObject
     public bool allowWallJumpDuringAttack = true; // Can jump to cancel attack
     public float wallAttackExitDelay = 0.1f; // Delay before exiting wall lock
 
+    [Header("Pogo Attack Settings")]
+    public bool enablePogoAttack = true;
+    public float pogoAttackDamage = 15f;
+    public float pogoAttackKnockback = 5f;
+    public float pogoAttackRange = 0.6f;
+    public float pogoAttackDuration = 0.15f;  // Short attack window
+    public float pogoAttackCooldown = 0.2f;    // Brief cooldown
+    public float pogoBounceForce = 10f;
+    public float pogoMinBounceForce = 6f;
+    public float pogoMaxBounceForce = 14f;
+    public float pogoMomentumPreservation = 0.7f;
+    public float pogoInputControlTime = 0.1f;
+    public float pogoChainWindow = 0.25f;      // Time to chain next pogo
+    public bool pogoResetsDoubleJump = true;
+    public bool pogoResetsAirDash = true;
+    public int maxPogoChains = 5;               // Max consecutive pogos
+    public Vector2 pogoAttackPointOffset = new Vector2(0f, -0.8f);
+    public Vector2 pogoAttackKnockbackDirection = new Vector2(0f, 1f);
+    public string pogoAttackAnimation = "Kalb_pogo_attack";
+    public string pogoBounceAnimation = "Kalb_pogo_bounce"; 
+    public LayerMask pogoTargetLayers;  
+
     [Header("Ability Unlocks")]
     public bool ledgeGrabUnlocked = true;
     public bool runUnlocked = false;

@@ -84,6 +84,22 @@ public class KalbAirState : KalbState
             stateMachine.ChangeState(controller.WallSlideState);
             return;
         }
+
+        if (inputHandler.AttackPressed && inputHandler.IsDownHeld && 
+            controller.Settings.enablePogoAttack && 
+            controller.PogoAttackState != null && 
+            controller.PogoAttackState.CanPogo)
+        {
+            controller.InputBuffer.BufferAttack();
+            
+            if (controller.InputBuffer.ConsumeBufferedInput("Attack"))
+            {
+                
+                stateMachine.ChangeState(controller.PogoAttackState);
+                inputHandler.ResetAttackInput();
+                return;
+            }
+        }
         
         // Check for jump input (for coyote time or double jump)
         if (inputHandler.JumpPressed)

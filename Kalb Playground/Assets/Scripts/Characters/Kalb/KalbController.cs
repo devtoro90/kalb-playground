@@ -37,6 +37,7 @@ public class KalbController : MonoBehaviour
     private KalbLedgeClimbState ledgeClimbState;
     private KalbWallSlideState wallSlideState;
     private KalbWallLockState wallLockState;
+    private KalbPogoAttackState pogoAttackState;
     
     // Dash cooldown tracking - MOVED HERE from KalbDashState
     private float dashCooldownTimer = 0f;
@@ -90,6 +91,7 @@ public class KalbController : MonoBehaviour
     public KalbLedgeClimbState LedgeClimbState => ledgeClimbState;
     public KalbWallSlideState WallSlideState => wallSlideState;
     public KalbWallLockState WallLockState => wallLockState;
+    public KalbPogoAttackState PogoAttackState => pogoAttackState;
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     public bool IsLookingUp => animationController != null ? animationController.IsLookingUp : false;
@@ -178,6 +180,7 @@ public class KalbController : MonoBehaviour
         ledgeClimbState = new KalbLedgeClimbState(this, stateMachine); 
         wallSlideState = new KalbWallSlideState(this, stateMachine);    
         wallLockState = new KalbWallLockState(this, stateMachine);
+        pogoAttackState = new KalbPogoAttackState(this, stateMachine);
         
         // Start with idle state
         stateMachine.Initialize(idleState);
@@ -357,26 +360,68 @@ public class KalbController : MonoBehaviour
             }
         }
 
-       // Check for attack
-        //if (inputHandler.AttackPressed && comboSystem.CanAttack)
+        // Check for attack
         if (inputHandler.AttackPressed)
         {
-            if (stateMachine.CurrentState is KalbWallLockState)
+            // LOGIC ORDER (Priority):
+            // 1. Pogo Attack (air + down held)
+            // 2. Wall Attack (in wall lock)
+            // 3. Upward Attack (up held)
+            // 4. Normal Attack
+            
+            bool attackHandled = false;
+            
+            // PRIORITY 1: Pogo Attack - when in air and holding down
+            if (!IsEffectivelyGrounded() && inputHandler.IsDownHeld && 
+                settings.enablePogoAttack && pogoAttackState != null)
+            {
+                if (pogoAttackState.CanPogo)
+                {
+                    inputBuffer.BufferAttack();
+                    
+                    if (inputBuffer.ConsumeBufferedInput("Attack"))
+                    {
+                        
+                        stateMachine.ChangeState(pogoAttackState);
+                        inputHandler.ResetAttackInput();
+                        attackHandled = true;
+                    }
+                }
+            }
+            
+            // PRIORITY 2: Wall Attack
+            if (!attackHandled && stateMachine.CurrentState is KalbWallLockState)
             {
                 if (CanPerformWallAttack())
                 {
                     comboSystem.StartWallAttack();
                     inputHandler.ResetAttackInput();
+                    attackHandled = true;
                 }
             }
-            else if (CanAttackFromCurrentState())
+            
+            // PRIORITY 3: Upward Attack
+            if (!attackHandled && inputHandler.IsUpHeld && settings.enableUpwardAttack)
             {
-                inputBuffer.BufferAttack();
-
-                if(inputBuffer.ConsumeBufferedInput("Attack"))
+                // Let combo system handle upward attack
+                if (comboSystem.CanPerformUpwardAttack)
                 {
                     stateMachine.ChangeState(combatState);
                     inputHandler.ResetAttackInput();
+                    attackHandled = true;
+                }
+            }
+            
+            // PRIORITY 4: Normal Attack
+            if (!attackHandled && CanAttackFromCurrentState())
+            {
+                inputBuffer.BufferAttack();
+                
+                if (inputBuffer.ConsumeBufferedInput("Attack"))
+                {
+                    stateMachine.ChangeState(combatState);
+                    inputHandler.ResetAttackInput();
+                    attackHandled = true;
                 }
             }
         }

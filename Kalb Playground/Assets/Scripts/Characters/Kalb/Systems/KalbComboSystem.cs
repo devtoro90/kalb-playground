@@ -261,7 +261,7 @@ public class KalbComboSystem : MonoBehaviour
     }
     public bool ShouldPerformWallAttack()
     {
-        Debug.Log("ShouldPerformWallAttack");
+        
         if (!settings.enableWallAttack) return false;
         if (!canWallAttack) return false;
         
@@ -270,9 +270,9 @@ public class KalbComboSystem : MonoBehaviour
         if (controller == null) return false;
         
         bool isInWallState = controller.StateMachine.CurrentState is KalbWallLockState;
-        Debug.Log("current state: " +controller.StateMachine.CurrentState.ToString());
-        Debug.Log("isInWallState " + isInWallState);
-        Debug.Log("wallJump.IsTouchingWall " + wallJump.IsTouchingWall);
+        
+        
+        
         
         if (!isInWallState) return false;
         
@@ -281,11 +281,8 @@ public class KalbComboSystem : MonoBehaviour
         return true;
     }
     
-    
-    // MODIFIED: Start attack with upward detection
     public void StartAttack()
     {
-        Debug.Log("StartAttack");
         // Check for wall attack first (highest priority when on wall)
         if (ShouldPerformWallAttack())
         {

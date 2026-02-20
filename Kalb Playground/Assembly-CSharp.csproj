@@ -51,6 +51,7 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextEventHandler.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/EnvMapAnimator.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextSelector_A.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbPogoAttackState.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbState.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbCollisionDetector.cs" />
     <Compile Include="Assets/Scripts/Utilities/PlayerInputActions.cs" />
