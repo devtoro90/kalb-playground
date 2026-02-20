@@ -894,8 +894,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MetroidvaniaCamera
   player: {fileID: 658198519}
-  playerController: {fileID: 0}
-  followMode: 0
+  playerController: {fileID: 658198527}
+  followMode: 1
   cameraSpeed: 5
   useCameraBounds: 1
   minBounds: {x: -9, y: -5}
@@ -956,6 +956,96 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   enableImpactPause: 1
+  enableFallSpeedFollowing: 1
+  fallSpeedMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0.1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 20
+      value: 3
+      inSlope: 0.1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  minFallSpeed: 5
+  maxFallSpeed: 30
+  minCameraMultiplier: 1
+  maxCameraMultiplier: 3
+  verticalLeadMultiplier: 1.5
+  fallResponseTime: 0.1
+  fallReturnTime: 0.3
+  enableFallAnticipation: 1
+  anticipationThreshold: 5
+  anticipationLead: 2
+  anticipationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  useDynamicDeadzone: 1
+  baseVerticalDeadzone: 0.5
+  maxVerticalDeadzone: 2
+  deadzoneFallCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0.1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 20
+      value: 3
+      inSlope: 0.1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  deadzoneRadius: 0.5
+  responsiveness: 5
+  cameraSmoothTime: 0.1
+  maxCameraSpeed: 15
   enableLookUpDown: 1
   lookUpOffset: 3.5
   lookDownOffset: -2.5
@@ -972,10 +1062,6 @@ MonoBehaviour:
   lookHoldDelay: 0.1
   limitLookToBounds: 1
   requireIdleAndGrounded: 1
-  deadzoneRadius: 0.5
-  responsiveness: 5
-  cameraSmoothTime: 0.1
-  maxCameraSpeed: 15
 --- !u!1 &537544731
 GameObject:
   m_ObjectHideFlags: 0

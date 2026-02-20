@@ -124,12 +124,35 @@ MonoBehaviour:
   stayInWallLockAfterAttack: 1
   allowWallJumpDuringAttack: 1
   wallAttackExitDelay: 0.1
+  enablePogoAttack: 1
+  pogoAttackDamage: 15
+  pogoAttackKnockback: 5
+  pogoAttackRange: 0.6
+  pogoAttackDuration: 0.25
+  pogoAttackCooldown: 0.2
+  pogoBounceForce: 15
+  pogoMinBounceForce: 15
+  pogoMaxBounceForce: 15
+  pogoMomentumPreservation: 0.5
+  pogoInputControlTime: 0.1
+  pogoChainWindow: 0.3
+  pogoResetsDoubleJump: 1
+  pogoResetsAirDash: 1
+  maxPogoChains: 3
+  pogoAttackPointOffset: {x: 0, y: -0.5}
+  pogoAttackKnockbackDirection: {x: 0, y: 1}
+  pogoAttackAnimation: Kalb_pogo_attack
+  pogoBounceAnimation: Kalb_pogo_bounce
+  pogoTargetLayers:
+    serializedVersion: 2
+    m_Bits: 128
   ledgeGrabUnlocked: 1
   runUnlocked: 1
   dashUnlocked: 1
   doubleJumpUnlocked: 1
   wallJumpUnlocked: 1
   wallLockUnlocked: 1
+  floatingFallUnlocked: 1
   ledgeDetectionDistance: 0.5
   ledgeGrabOffsetY: 0.15
   ledgeGrabOffsetX: 0.55
@@ -189,3 +212,19 @@ MonoBehaviour:
   wallTapBoostAmount: 1.5
   wallTapBoostWindow: 0.3
   maxWallTapBoosts: 3
+  enableFloatingFall: 1
+  floatFallSpeed: -3
+  floatFallGravityMultiplier: 0.3
+  floatFallAcceleration: 5
+  floatFallCooldown: 0.5
+  floatFallMinHeight: 1
+  floatFallMaxDuration: 2
+  floatFallHorizontalControl: 0.8
+  floatFallResetsOnGround: 1
+  floatFallResetsOnWall: 1
+  floatFallResetsOnPogo: 1
+  floatFallResetsOnDash: 1
+  floatFallAnimation: Kalb_float_fall
+  groundCheckLayers:
+    serializedVersion: 2
+    m_Bits: 64

@@ -131,7 +131,7 @@ public class KalbAirState : KalbState
             // Only enter if we're not already in float state
             if (!(stateMachine.CurrentState is KalbFloatFallState))
             {
-                Debug.Log("[AirState] Transitioning to FloatFallState");
+                
                 stateMachine.ChangeState(controller.FloatFallState);
                 return;
             }

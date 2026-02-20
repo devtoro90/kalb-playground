@@ -60,11 +60,11 @@ public class KalbFloatFallState : KalbState
     
     public override void Enter()
     {
-        Debug.Log("[KalbFloatFallState] ENTER");
+        
         
         if (!CanFloat || !ShouldFloat())
         {
-            Debug.Log("[KalbFloatFallState] Cannot float, exiting to AirState");
+            
             stateMachine.ChangeState(controller.AirState);
             return;
         }
@@ -78,7 +78,7 @@ public class KalbFloatFallState : KalbState
     
     public override void Exit()
     {
-        Debug.Log("[KalbFloatFallState] EXIT");
+        
         
         if (isFloating)
         {
@@ -105,48 +105,41 @@ public class KalbFloatFallState : KalbState
         {
             // Check if we should stop floating (jump released or other conditions)
             bool shouldStopFloating = false;
-            string stopReason = "";
             
             // Release jump button - exit float but stay in air state
             if (!inputHandler.JumpHeld)
             {
                 shouldStopFloating = true;
-                stopReason = "Jump released";
             }
             // Hit ground
             else if (settings.floatFallResetsOnGround && controller.IsEffectivelyGrounded())
             {
                 shouldStopFloating = true;
-                stopReason = "Grounded";
             }
             // Hit wall
             else if (settings.floatFallResetsOnWall && controller.WallJump != null && controller.WallJump.IsTouchingWall)
             {
                 shouldStopFloating = true;
-                stopReason = "Touching wall";
             }
             // Pogo attack
             else if (settings.floatFallResetsOnPogo && pogoState != null && pogoState.IsPogoAttacking)
             {
                 shouldStopFloating = true;
-                stopReason = "Pogo attack";
             }
             // Max duration reached
             else if (floatTimer >= settings.floatFallMaxDuration)
             {
                 shouldStopFloating = true;
-                stopReason = "Max duration";
             }
             // Swimming
             else if (swimming.IsSwimming)
             {
                 shouldStopFloating = true;
-                stopReason = "Swimming";
             }
             
             if (shouldStopFloating)
             {
-                Debug.Log($"[Float] Stopping float: {stopReason}");
+                
                 StopFloating();
                 return;
             }
@@ -159,7 +152,7 @@ public class KalbFloatFallState : KalbState
             // MODIFIED: If not floating but jump is held and we're falling, try to enter float
             if (inputHandler.JumpHeld && rb.linearVelocity.y < -1f && CanFloat && ShouldFloat())
             {
-                Debug.Log("[Float] Jump held while falling, entering float");
+                
                 StartFloating();
             }
         }
@@ -196,7 +189,7 @@ public class KalbFloatFallState : KalbState
         {
             if (controller.AbilitySystem.CanDash() && controller.CanDashFromCurrentState() && controller.DashCooldownTimer <= 0)
             {
-                Debug.Log("[Float] Dash pressed, transitioning to DashState");
+                
                 stateMachine.ChangeState(controller.DashState);
                 inputHandler.ResetDashInput();
                 return;
@@ -209,7 +202,7 @@ public class KalbFloatFallState : KalbState
             // Check for pogo (down + attack)
             if (inputHandler.IsDownHeld && pogoState != null && pogoState.CanPogo)
             {
-                Debug.Log("[Float] Pogo input, transitioning to PogoAttackState");
+                
                 stateMachine.ChangeState(controller.PogoAttackState);
                 inputHandler.ResetAttackInput();
                 return;
@@ -217,7 +210,7 @@ public class KalbFloatFallState : KalbState
             // Regular attack
             else if (controller.CanAttackFromCurrentState())
             {
-                Debug.Log("[Float] Attack pressed, transitioning to CombatState");
+                
                 stateMachine.ChangeState(controller.CombatState);
                 inputHandler.ResetAttackInput();
                 return;
@@ -227,7 +220,7 @@ public class KalbFloatFallState : KalbState
         // MODIFIED: Jump press during float will exit float and jump
         if (inputHandler.JumpPressed)
         {
-            Debug.Log("[Float] Jump pressed, transitioning to JumpState");
+            
             
             // First stop floating
             StopFloating();
@@ -287,7 +280,7 @@ public class KalbFloatFallState : KalbState
         // If we're too low, stop floating
         if (!IsHighEnoughToFloat())
         {
-            Debug.Log("[Float] Too close to ground, stopping float");
+            
             StopFloating();
         }
     }
@@ -313,7 +306,7 @@ public class KalbFloatFallState : KalbState
             animController.PlayAnimation(settings.floatFallAnimation);
         }
         
-        Debug.Log($"[Float] Started - Gravity: {floatGravity}, Speed: {settings.floatFallSpeed}");
+        
     }
     
     private void ApplyFloatPhysics()

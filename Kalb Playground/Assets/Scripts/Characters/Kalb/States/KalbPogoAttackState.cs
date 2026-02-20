@@ -75,11 +75,11 @@ public class KalbPogoAttackState : KalbState
     
     public override void Enter()
     {
-        Debug.Log($"[KalbPogoAttackState] ENTER - CanPogo: {CanPogo}, CurrentChain: {currentPogoChain}");
+        
         
         if (!CanPogo)
         {
-            Debug.Log("[KalbPogoAttackState] Cannot pogo, exiting to AirState");
+            
             stateMachine.ChangeState(controller.AirState);
             return;
         }
@@ -125,7 +125,7 @@ public class KalbPogoAttackState : KalbState
     
     public override void Exit()
     {
-        Debug.Log($"[KalbPogoAttackState] EXIT - Chain: {currentPogoChain}, ChainTimer: {pogoChainTimer}");
+        
         
         isPogoAttacking = false;
         pogoHitRegistered = false;
@@ -151,7 +151,7 @@ public class KalbPogoAttackState : KalbState
             if (pogoCooldownTimer <= 0)
             {
                 canPogo = true;
-                Debug.Log("[Pogo] Cooldown finished, can pogo again");
+                
             }
         }
         
@@ -166,7 +166,7 @@ public class KalbPogoAttackState : KalbState
             pogoChainTimer -= Time.deltaTime;
             if (pogoChainTimer <= 0)
             {
-                Debug.Log($"[Pogo] Chain timer expired, resetting chain from {currentPogoChain} to 0");
+                
                 currentPogoChain = 0;
             }
         }
@@ -183,7 +183,7 @@ public class KalbPogoAttackState : KalbState
             // Detect if we've started falling
             if (rb.linearVelocity.y < -0.5f) // Moving down significantly
             {
-                Debug.Log($"[Pogo] Detected falling after bounce! Velocity Y: {rb.linearVelocity.y:F2}");
+                
                 hasReachedBouncePeak = true;
                 
                 // Small delay before transitioning to ensure smooth animation
@@ -195,7 +195,7 @@ public class KalbPogoAttackState : KalbState
                 // Check if we're below the bounce start position (falling)
                 if (controller.transform.position.y < bounceStartY - 0.1f)
                 {
-                    Debug.Log($"[Pogo] Detected falling by position! Current Y: {controller.transform.position.y:F2}, Bounce Start: {bounceStartY:F2}");
+                    
                     hasReachedBouncePeak = true;
                     bouncePeakTimer = PEAK_DETECTION_DELAY;
                 }
@@ -211,7 +211,7 @@ public class KalbPogoAttackState : KalbState
                 // Only transition if bounce animation has played for minimum duration
                 if (!bounceAnimationPlaying || bounceAnimationTimer <= 0)
                 {
-                    Debug.Log("[Pogo] Transitioning to AirState (falling)");
+                    
                     stateMachine.ChangeState(controller.AirState);
                     return;
                 }
@@ -227,7 +227,7 @@ public class KalbPogoAttackState : KalbState
         // Check if attack animation finished
         if (isPogoAttacking && pogoAttackTimer <= 0 && !isInBounce)
         {
-            Debug.Log("[Pogo] Attack finished, waiting for bounce");
+            
             isPogoAttacking = false;
         }
         
@@ -235,7 +235,7 @@ public class KalbPogoAttackState : KalbState
         if (!isInBounce && !isPogoAttacking && !hasReachedBouncePeak)
         {
             // No hit registered, just fall
-            Debug.Log("[Pogo] No hit, transitioning to AirState");
+            
             stateMachine.ChangeState(controller.AirState);
             return;
         }
@@ -308,12 +308,12 @@ public class KalbPogoAttackState : KalbState
         // IMPORTANT: This is for CHAINING pogos (hitting attack again during bounce)
         if (inputHandler.AttackPressed && pogoChainTimer > 0 && currentPogoChain < settings.maxPogoChains)
         {
-            Debug.Log($"[Pogo] Chain input detected! Current chain: {currentPogoChain}, Timer: {pogoChainTimer}");
+            
             
             // Check if we can pogo again
             if (CanPogo)
             {
-                Debug.Log($"[Pogo] EXECUTING CHAIN POGO #{currentPogoChain + 1}");
+                
                 
                 // Reset attack state but keep chain info
                 isPogoAttacking = true;
@@ -348,7 +348,7 @@ public class KalbPogoAttackState : KalbState
             }
             else
             {
-                Debug.Log($"[Pogo] Cannot chain - CanPogo: {CanPogo}, Cooldown: {pogoCooldownTimer}");
+                
             }
         }
         
@@ -359,7 +359,7 @@ public class KalbPogoAttackState : KalbState
             
             if (controller.InputBuffer?.ConsumeBufferedInput("Jump") == true)
             {
-                Debug.Log("[Pogo] Jump pressed, transitioning to JumpState");
+                
                 stateMachine.ChangeState(controller.JumpState);
                 inputHandler.ResetJumpInput();
             }
@@ -374,7 +374,7 @@ public class KalbPogoAttackState : KalbState
                 
                 if (controller.InputBuffer.ConsumeBufferedInput("Dash"))
                 {
-                    Debug.Log("[Pogo] Dash pressed during bounce, transitioning to DashState");
+                    
                     stateMachine.ChangeState(controller.DashState);
                     inputHandler.ResetDashInput();
                 }
@@ -395,7 +395,7 @@ public class KalbPogoAttackState : KalbState
         
         if (hitTargets.Length > 0)
         {
-            Debug.Log($"[Pogo] HIT! Targets: {hitTargets.Length}");
+            
             RegisterPogoHit(hitTargets);
             pogoHitRegistered = true;
         }
@@ -415,12 +415,12 @@ public class KalbPogoAttackState : KalbState
         // Increment chain
         currentPogoChain++;
         pogoChainTimer = settings.pogoChainWindow;
-        Debug.Log($"[Pogo] Chain increased to {currentPogoChain}, chain timer set to {pogoChainTimer}");
+        
         
         // Set cooldown
         canPogo = false;
         pogoCooldownTimer = settings.pogoAttackCooldown;
-        Debug.Log($"[Pogo] Cooldown set to {pogoCooldownTimer}");
+        
         
         // Reset air abilities
         ResetAirAbilities();
@@ -463,7 +463,7 @@ public class KalbPogoAttackState : KalbState
         float normalizedFallSpeed = Mathf.Clamp01(fallSpeed / Mathf.Abs(settings.maxFallSpeed));
         float bounceForce = Mathf.Lerp(settings.pogoMinBounceForce, settings.pogoMaxBounceForce, normalizedFallSpeed);
         
-        Debug.Log($"[Pogo] Bounce - FallSpeed: {fallSpeed:F2}, Normalized: {normalizedFallSpeed:F2}, Force: {bounceForce:F2}");
+        
         
         // Apply bounce with some horizontal preservation
         rb.linearVelocity = new Vector2(
@@ -479,7 +479,7 @@ public class KalbPogoAttackState : KalbState
     {
         if (animController != null && !string.IsNullOrEmpty(settings.pogoBounceAnimation))
         {
-            Debug.Log("[Pogo] Playing bounce animation");
+            
             animController.PlayAnimation(settings.pogoBounceAnimation);
             bounceAnimationPlaying = true;
             bounceAnimationTimer = BOUNCE_ANIMATION_MIN_DURATION;
@@ -493,21 +493,21 @@ public class KalbPogoAttackState : KalbState
         {
             physics.ResetDoubleJump();
             physics.SetCanDoubleJump(true);
-            Debug.Log("[Pogo] Reset double jump");
+            
         }
         
         // Reset air dash
         if (settings.pogoResetsAirDash && dashState != null)
         {
             dashState.ResetAirDash();
-            Debug.Log("[Pogo] Reset air dash");
+            
         }
 
 
         if (controller.FloatFallState != null)
         {
             controller.FloatFallState.ResetFloat();
-            Debug.Log("[Pogo] Reset float ability");
+            
         }
     }
     
@@ -522,14 +522,14 @@ public class KalbPogoAttackState : KalbState
     
     private void EndPogoAttack()
     {
-        Debug.Log($"[Pogo] EndPogoAttack - Chain: {currentPogoChain}, ChainTimer: {pogoChainTimer}");
+        
         
         isPogoAttacking = false;
         
         // If we can still chain, stay in this state but ready for next input
         if (pogoChainTimer > 0 && currentPogoChain < settings.maxPogoChains)
         {
-            Debug.Log($"[Pogo] Waiting for chain input... {pogoChainTimer:F2}s remaining");
+            
             // Stay in state, waiting for next attack input
             return;
         }
@@ -537,14 +537,14 @@ public class KalbPogoAttackState : KalbState
         // If we're in bounce phase, let the falling detection handle transition
         if (isInBounce)
         {
-            Debug.Log("[Pogo] In bounce phase, will transition when falling");
+            
             return;
         }
         
         // Exit to appropriate state
         if (controller.IsEffectivelyGrounded())
         {
-            Debug.Log("[Pogo] Grounded, exiting to ground state");
+            
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
             {
                 stateMachine.ChangeState(controller.WalkState);
@@ -556,14 +556,14 @@ public class KalbPogoAttackState : KalbState
         }
         else
         {
-            Debug.Log("[Pogo] In air, exiting to AirState");
+            
             stateMachine.ChangeState(controller.AirState);
         }
     }
     
     public void ForceReset()
     {
-        Debug.Log("[Pogo] Force reset");
+        
         isPogoAttacking = false;
         pogoHitRegistered = false;
         isInBounce = false;

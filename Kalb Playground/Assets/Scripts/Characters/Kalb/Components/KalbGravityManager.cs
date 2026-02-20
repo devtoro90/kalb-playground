@@ -67,7 +67,7 @@ public class KalbGravityManager : MonoBehaviour
         
         if (showGravityDebug)
         {
-            Debug.Log($"[GravityManager] Override set to {gravityScale} by {source}");
+            
         }
     }
     
