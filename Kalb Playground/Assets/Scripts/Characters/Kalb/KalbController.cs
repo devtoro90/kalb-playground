@@ -446,17 +446,22 @@ public class KalbController : MonoBehaviour
     {
         bool currentlyGrounded = collisionDetector.IsGrounded;
         
-        // If we were grounded and now we're not, start the stick timer
         if (wasGroundedLastFrame && !currentlyGrounded)
         {
             groundStickTimer = GROUND_STICK_THRESHOLD;
         }
-        // If we're grounded, reset the timer
         else if (currentlyGrounded)
         {
             groundStickTimer = 0f;
+            
+            // NEW: Force state transition when grounded
+            // This helps catch any states that might be stuck
+            if (stateMachine.CurrentState is KalbFloatFallState)
+            {
+                Debug.Log("[Controller] Grounded while in FloatState - forcing transition");
+                stateMachine.ChangeState(idleState);
+            }
         }
-        // If timer is active, count down
         else if (groundStickTimer > 0)
         {
             groundStickTimer -= Time.deltaTime;

@@ -20,11 +20,11 @@ public class KalbFloatFallState : KalbState
     private bool canFloat = true;
     private float heightCheckTimer = 0f;
     private const float HEIGHT_CHECK_INTERVAL = 0.1f;
+    private bool wasGroundedLastFrame = false; // NEW: Track ground state
     
     // Properties
     public bool IsFloating => isFloating;
     
-    // MODIFIED: CanFloat now just checks basic requirements - no usage limits
     public bool CanFloat 
     { 
         get 
@@ -32,15 +32,12 @@ public class KalbFloatFallState : KalbState
             if (!settings.enableFloatingFall) return false;
             if (!controller.AbilitySystem.CanFloatingFall()) return false;
             if (swimming.IsSwimming) return false;
-            if (controller.IsEffectivelyGrounded()) return false;
+            if (controller.IsEffectivelyGrounded()) return false; // CRITICAL: Can't float if grounded
             if (!canFloat) return false;
             
             return true;
         }
     }
-    
-    public float FloatTimer => floatTimer;
-    public float FloatPercentage => Mathf.Clamp01(floatTimer / settings.floatFallMaxDuration);
     
     public KalbFloatFallState(KalbController controller, KalbStateMachine stateMachine) 
         : base(controller, stateMachine)
@@ -60,16 +57,17 @@ public class KalbFloatFallState : KalbState
     
     public override void Enter()
     {
-        
+        Debug.Log("[KalbFloatFallState] ENTER");
         
         if (!CanFloat || !ShouldFloat())
         {
-            
-            stateMachine.ChangeState(controller.AirState);
+            Debug.Log("[KalbFloatFallState] Cannot float, exiting to appropriate state");
+            ExitToAppropriateState();
             return;
         }
         
         StartFloating();
+        wasGroundedLastFrame = false;
         
         controller.InputBuffer?.ClearBufferedInput("Jump");
         controller.InputBuffer?.ClearBufferedInput("Dash");
@@ -78,7 +76,7 @@ public class KalbFloatFallState : KalbState
     
     public override void Exit()
     {
-        
+        Debug.Log("[KalbFloatFallState] EXIT");
         
         if (isFloating)
         {
@@ -90,57 +88,81 @@ public class KalbFloatFallState : KalbState
     
     public override void Update()
     {
-        UpdateTimers();
-        
-        // Periodic height check
-        heightCheckTimer -= Time.deltaTime;
-        if (heightCheckTimer <= 0)
+        // CRITICAL: Ground check FIRST - highest priority
+        if (controller.IsEffectivelyGrounded())
         {
-            heightCheckTimer = HEIGHT_CHECK_INTERVAL;
-            CheckHeightAboveGround();
+            // Only log once when we first become grounded
+            if (!wasGroundedLastFrame)
+            {
+                Debug.Log("[Float] Ground detected! Exiting float state");
+                wasGroundedLastFrame = true;
+                
+                // Immediately exit to appropriate grounded state
+                StopFloating();
+                ExitToGroundedState();
+                return;
+            }
+        }
+        else
+        {
+            wasGroundedLastFrame = false;
         }
         
-        // MODIFIED: Dynamic float toggling based on jump button
+        // If we're still floating, continue normal update
         if (isFloating)
         {
+            UpdateTimers();
+            
+            // Periodic height check
+            heightCheckTimer -= Time.deltaTime;
+            if (heightCheckTimer <= 0)
+            {
+                heightCheckTimer = HEIGHT_CHECK_INTERVAL;
+                CheckHeightAboveGround();
+            }
+            
             // Check if we should stop floating (jump released or other conditions)
             bool shouldStopFloating = false;
+            string stopReason = "";
             
             // Release jump button - exit float but stay in air state
             if (!inputHandler.JumpHeld)
             {
                 shouldStopFloating = true;
-            }
-            // Hit ground
-            else if (settings.floatFallResetsOnGround && controller.IsEffectivelyGrounded())
-            {
-                shouldStopFloating = true;
+                stopReason = "Jump released";
             }
             // Hit wall
             else if (settings.floatFallResetsOnWall && controller.WallJump != null && controller.WallJump.IsTouchingWall)
             {
                 shouldStopFloating = true;
+                stopReason = "Touching wall";
             }
             // Pogo attack
             else if (settings.floatFallResetsOnPogo && pogoState != null && pogoState.IsPogoAttacking)
             {
                 shouldStopFloating = true;
+                stopReason = "Pogo attack";
             }
             // Max duration reached
             else if (floatTimer >= settings.floatFallMaxDuration)
             {
                 shouldStopFloating = true;
+                stopReason = "Max duration";
             }
             // Swimming
             else if (swimming.IsSwimming)
             {
                 shouldStopFloating = true;
+                stopReason = "Swimming";
             }
             
             if (shouldStopFloating)
             {
-                
+                Debug.Log($"[Float] Stopping float: {stopReason}");
                 StopFloating();
+                
+                // Exit to appropriate state after stopping
+                ExitToAppropriateState();
                 return;
             }
             
@@ -149,20 +171,15 @@ public class KalbFloatFallState : KalbState
         }
         else
         {
-            // MODIFIED: If not floating but jump is held and we're falling, try to enter float
+            // If not floating but jump is held and we're falling, try to enter float
             if (inputHandler.JumpHeld && rb.linearVelocity.y < -1f && CanFloat && ShouldFloat())
             {
-                
+                Debug.Log("[Float] Jump held while falling, entering float");
                 StartFloating();
             }
-        }
-        
-        // Check for transitions out of float state
-        if (!isFloating)
-        {
-            // Go back to air state if we're in air
-            if (!controller.IsEffectivelyGrounded())
+            else if (!controller.IsEffectivelyGrounded())
             {
+                // If we're not floating and not grounded, make sure we're in air state
                 stateMachine.ChangeState(controller.AirState);
                 return;
             }
@@ -172,6 +189,19 @@ public class KalbFloatFallState : KalbState
     public override void FixedUpdate()
     {
         if (!isFloating) return;
+        
+        // Double-check ground in FixedUpdate too (for safety)
+        if (controller.IsEffectivelyGrounded())
+        {
+            if (!wasGroundedLastFrame)
+            {
+                Debug.Log("[Float] Ground detected in FixedUpdate! Exiting float state");
+                wasGroundedLastFrame = true;
+                StopFloating();
+                ExitToGroundedState();
+                return;
+            }
+        }
         
         // Apply floating physics
         ApplyFloatPhysics();
@@ -189,7 +219,8 @@ public class KalbFloatFallState : KalbState
         {
             if (controller.AbilitySystem.CanDash() && controller.CanDashFromCurrentState() && controller.DashCooldownTimer <= 0)
             {
-                
+                Debug.Log("[Float] Dash pressed, transitioning to DashState");
+                StopFloating();
                 stateMachine.ChangeState(controller.DashState);
                 inputHandler.ResetDashInput();
                 return;
@@ -202,7 +233,8 @@ public class KalbFloatFallState : KalbState
             // Check for pogo (down + attack)
             if (inputHandler.IsDownHeld && pogoState != null && pogoState.CanPogo)
             {
-                
+                Debug.Log("[Float] Pogo input, transitioning to PogoAttackState");
+                StopFloating();
                 stateMachine.ChangeState(controller.PogoAttackState);
                 inputHandler.ResetAttackInput();
                 return;
@@ -210,17 +242,18 @@ public class KalbFloatFallState : KalbState
             // Regular attack
             else if (controller.CanAttackFromCurrentState())
             {
-                
+                Debug.Log("[Float] Attack pressed, transitioning to CombatState");
+                StopFloating();
                 stateMachine.ChangeState(controller.CombatState);
                 inputHandler.ResetAttackInput();
                 return;
             }
         }
         
-        // MODIFIED: Jump press during float will exit float and jump
+        // Jump press during float will exit float and jump
         if (inputHandler.JumpPressed)
         {
-            
+            Debug.Log("[Float] Jump pressed, transitioning to JumpState");
             
             // First stop floating
             StopFloating();
@@ -236,6 +269,9 @@ public class KalbFloatFallState : KalbState
     
     private bool ShouldFloat()
     {
+        // CRITICAL: Can't float if grounded
+        if (controller.IsEffectivelyGrounded()) return false;
+        
         // Must be falling (negative vertical velocity)
         if (rb.linearVelocity.y >= 0) return false;
         
@@ -280,7 +316,7 @@ public class KalbFloatFallState : KalbState
         // If we're too low, stop floating
         if (!IsHighEnoughToFloat())
         {
-            
+            Debug.Log("[Float] Too close to ground, stopping float");
             StopFloating();
         }
     }
@@ -306,7 +342,7 @@ public class KalbFloatFallState : KalbState
             animController.PlayAnimation(settings.floatFallAnimation);
         }
         
-        
+        Debug.Log($"[Float] Started - Gravity: {floatGravity}, Speed: {settings.floatFallSpeed}");
     }
     
     private void ApplyFloatPhysics()
@@ -314,7 +350,6 @@ public class KalbFloatFallState : KalbState
         // Ensure we maintain float speed
         if (rb.linearVelocity.y < settings.floatFallSpeed)
         {
-            // Gradually slow descent to float speed
             float newYVelocity = Mathf.MoveTowards(
                 rb.linearVelocity.y, 
                 settings.floatFallSpeed, 
@@ -326,27 +361,22 @@ public class KalbFloatFallState : KalbState
         else if (rb.linearVelocity.y > 0)
         {
             // If moving up (bounce from pogo), don't interfere
-            // Let the upward motion happen naturally
         }
     }
     
     private void ApplyFloatMovement()
     {
-        // Apply horizontal movement with reduced control
         float moveInput = inputHandler.MoveInput.x;
         
         if (Mathf.Abs(moveInput) > 0.1f)
         {
-            // Calculate target speed (can use run speed if ability unlocked)
             float targetSpeed = moveInput * settings.moveSpeed * settings.floatFallHorizontalControl;
             
-            // If run is held and unlocked, use run speed
             if (inputHandler.DashHeld && controller.AbilitySystem.CanRun())
             {
                 targetSpeed = moveInput * settings.runSpeed * settings.floatFallHorizontalControl;
             }
             
-            // Smoothly move toward target speed
             float currentSpeed = rb.linearVelocity.x;
             float newSpeed = Mathf.MoveTowards(
                 currentSpeed, 
@@ -356,7 +386,6 @@ public class KalbFloatFallState : KalbState
             
             rb.linearVelocity = new Vector2(newSpeed, rb.linearVelocity.y);
             
-            // Flip sprite based on movement
             bool shouldFaceRight = moveInput > 0;
             if (shouldFaceRight != movement.FacingRight)
             {
@@ -365,7 +394,6 @@ public class KalbFloatFallState : KalbState
         }
         else
         {
-            // No input - apply air friction
             if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
             {
                 float frictionForce = -Mathf.Sign(rb.linearVelocity.x) * settings.airFriction * 0.5f;
@@ -382,26 +410,71 @@ public class KalbFloatFallState : KalbState
         
         // Clear gravity override
         gravityManager.ClearOverride("FloatingFall");
-        
-        // Don't set cooldown - allow immediate re-float if conditions met
     }
     
     private void EndFloating()
     {
-        // Clear gravity override
         gravityManager.ClearOverride("FloatingFall");
     }
     
     private void UpdateTimers()
     {
-        // No cooldown timer needed for unlimited toggling
-        // Keep canFloat always true
-        canFloat = true;
+        canFloat = true; // Always can float when conditions met
+    }
+    
+    // NEW: Helper method to exit to grounded state
+    private void ExitToGroundedState()
+    {
+        Debug.Log("[Float] Exiting to grounded state");
+        
+        // Clear any remaining float effects
+        if (isFloating)
+        {
+            StopFloating();
+        }
+        
+        // Check movement input to decide between idle and walk
+        if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
+        {
+            // Check if should run
+            if (inputHandler.DashHeld && controller.AbilitySystem.CanRun())
+            {
+                stateMachine.ChangeState(controller.RunState);
+            }
+            else
+            {
+                stateMachine.ChangeState(controller.WalkState);
+            }
+        }
+        else
+        {
+            stateMachine.ChangeState(controller.IdleState);
+        }
+    }
+    
+    // NEW: Helper method to exit to appropriate state based on current conditions
+    private void ExitToAppropriateState()
+    {
+        // First check ground
+        if (controller.IsEffectivelyGrounded())
+        {
+            ExitToGroundedState();
+            return;
+        }
+        
+        // Then check other states
+        if (swimming != null && swimming.IsInWater)
+        {
+            stateMachine.ChangeState(controller.SwimState);
+            return;
+        }
+        
+        // Default to air state
+        stateMachine.ChangeState(controller.AirState);
     }
     
     public void ResetFloat()
     {
-        // Nothing to reset for unlimited toggling
         canFloat = true;
     }
 }

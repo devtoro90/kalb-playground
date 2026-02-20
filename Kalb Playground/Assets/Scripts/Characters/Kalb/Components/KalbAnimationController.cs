@@ -215,7 +215,6 @@ public class KalbAnimationController : MonoBehaviour
     
     public void PlayAnimation(string animationName)
     {
-        Debug.Log("Animation: " + animationName);
         if (animator != null)
         {
             animator.Play(animationName);
