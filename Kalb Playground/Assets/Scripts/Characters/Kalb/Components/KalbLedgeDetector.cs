@@ -66,6 +66,13 @@ public class KalbLedgeDetector : MonoBehaviour
             ledgeDetected = false;
             return false;
         }
+
+        // FIXED: Don't check for ledge if in water exit grace period
+        if (controller.Swimming.IsInWaterExitGracePeriod)
+        {
+            ledgeDetected = false;
+            return false;
+        }
         
         // Don't check if on cooldown
         if (isOnCooldown)
@@ -90,7 +97,7 @@ public class KalbLedgeDetector : MonoBehaviour
         
         // Don't check during certain states
         if (controller.DashState.IsDashing || controller.ComboSystem.IsAttacking || 
-            controller.Swimming.IsSwimming)
+            controller.Swimming.IsSwimming || controller.Swimming.IsInWaterExitGracePeriod)
         {
             ledgeDetected = false;
             return false;

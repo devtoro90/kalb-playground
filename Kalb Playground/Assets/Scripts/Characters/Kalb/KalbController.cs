@@ -227,22 +227,25 @@ public class KalbController : MonoBehaviour
         
         UpdateGroundStickTimer();
         
+        // FIXED: Skip certain state checks if in water exit grace period
+        bool inWaterGracePeriod = swimming != null && swimming.IsInWaterExitGracePeriod;
+
         // CRITICAL: Check for wall lock first (highest priority when pushing toward wall)
-        if (ShouldEnterWallLockState())
+        if (!inWaterGracePeriod && ShouldEnterWallLockState())
         {
             stateMachine.ChangeState(wallLockState);
             return;
         }
         
         // Then check for wall slide
-        if (ShouldEnterWallSlideState() && !(stateMachine.CurrentState is KalbWallSlideState))
+        if (!inWaterGracePeriod && ShouldEnterWallSlideState() && !(stateMachine.CurrentState is KalbWallSlideState))
         {
             stateMachine.ChangeState(wallSlideState);
             return;
         }
 
         // Check for ledge grab
-        if (abilitySystem.CanLedgeGrab() && !IsInLedgeState() && ledgeDetector != null && 
+        if (!inWaterGracePeriod && abilitySystem.CanLedgeGrab() && !IsInLedgeState() && ledgeDetector != null && 
             rb.linearVelocity.y < 0 && !IsEffectivelyGrounded())
         {
             if (!ledgeDetector.IsOnCooldown)

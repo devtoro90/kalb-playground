@@ -41,6 +41,9 @@ public class KalbSwimming : MonoBehaviour
     public bool IsSwimDashing => isSwimDashing;
     public bool IsInWater => isInWater;
     public bool IsJumpingFromWater => isJumpingFromWater;
+    public bool IsInWaterExitGracePeriod { get; private set; } = false;
+    private float waterExitGraceTimer = 0f;
+    private const float WATER_EXIT_GRACE_DURATION = 0.3f; 
     
     private void Start()
     {
@@ -71,6 +74,16 @@ public class KalbSwimming : MonoBehaviour
         if (waterJumpCooldown > 0)
         {
             waterJumpCooldown -= Time.deltaTime;
+        }
+
+        // NEW: Update water exit grace timer
+        if (waterExitGraceTimer > 0)
+        {
+            waterExitGraceTimer -= Time.deltaTime;
+            if (waterExitGraceTimer <= 0)
+            {
+                IsInWaterExitGracePeriod = false;
+            }
         }
         
         // Reset jump flag after cooldown
@@ -411,10 +424,14 @@ public class KalbSwimming : MonoBehaviour
     {
         if (!isSwimming || isSwimDashing || rb == null || physics == null) return;
 
-// Set jumping flag to prevent immediate re-entry
+        // Set jumping flag to prevent immediate re-entry
         isJumpingFromWater = true;
         waterJumpCooldown = 0.5f; // Half second cooldown
         
+        // NEW: Set water exit grace period
+        IsInWaterExitGracePeriod = true;
+        waterExitGraceTimer = WATER_EXIT_GRACE_DURATION;
+
         // 1. Immediately exit swimming state
         isSwimming = false;
         
@@ -450,6 +467,19 @@ public class KalbSwimming : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         settings.jumpForce = originalForce;
+    }
+
+    // NEW: Method to manually end grace period (if needed)
+    public void EndWaterExitGracePeriod()
+    {
+        IsInWaterExitGracePeriod = false;
+        waterExitGraceTimer = 0f;
+    }
+    
+    // NEW: Check if we're in water-related state
+    public bool IsInWaterState()
+    {
+        return isSwimming || isJumpingFromWater || IsInWaterExitGracePeriod;
     }
     
     private void OnDrawGizmosSelected()

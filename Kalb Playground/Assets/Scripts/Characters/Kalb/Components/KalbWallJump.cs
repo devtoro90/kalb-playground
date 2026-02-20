@@ -102,6 +102,14 @@ public class KalbWallJump : MonoBehaviour
             return;
         }
         
+
+        // FIXED: Don't check for walls if swimming OR in water exit grace period
+        if (controller.Swimming.IsSwimming || controller.Swimming.IsInWaterExitGracePeriod)
+        {
+            ClearWallStates();
+            return;
+        }
+
         // Don't check during dash or attacking
         if (controller.DashState.IsDashing || controller.ComboSystem.IsAttacking)
         {
@@ -351,6 +359,13 @@ public class KalbWallJump : MonoBehaviour
 
     private void UpdateWallSlideEngagement()
     {
+        // FIXED: Don't engage if in water exit grace period
+        if (controller.Swimming.IsInWaterExitGracePeriod)
+        {
+            isWallSliding = false;
+            return;
+        }
+
         // If on cooldown (from ledge release), don't engage wall slide
         if (wallSlideCooldownTimer > 0)
         {
@@ -583,6 +598,7 @@ public class KalbWallJump : MonoBehaviour
                isTouchingWall &&
                !controller.IsEffectivelyGrounded() && 
                !controller.Swimming.IsSwimming &&
+               !controller.Swimming.IsInWaterExitGracePeriod &&
                !controller.DashState.IsDashing &&
                wallJumpHorizontalLockTimer <= 0;
     }
