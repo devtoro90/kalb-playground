@@ -54,6 +54,11 @@ public class KalbJumpState : KalbState
     public override void Exit()
     {
         physics.SetJumpButtonState(false);
+
+        if (controller.FloatFallState != null)
+        {
+            controller.FloatFallState.ResetFloat();
+        }
     }
     
     public override void Update()

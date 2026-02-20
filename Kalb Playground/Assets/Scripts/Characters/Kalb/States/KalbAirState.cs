@@ -125,6 +125,18 @@ public class KalbAirState : KalbState
             controller.Physics.ApplyJumpCut();
         }
 
+        if (inputHandler.JumpHeld && controller.Rb.linearVelocity.y < -1f &&
+        controller.FloatFallState != null && controller.FloatFallState.CanFloat)
+        {
+            // Only enter if we're not already in float state
+            if (!(stateMachine.CurrentState is KalbFloatFallState))
+            {
+                Debug.Log("[AirState] Transitioning to FloatFallState");
+                stateMachine.ChangeState(controller.FloatFallState);
+                return;
+            }
+        }
+
         // Check for attack input in air state
         if (inputHandler.AttackPressed && comboSystem != null && comboSystem.CanAttack)
         {

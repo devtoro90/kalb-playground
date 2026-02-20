@@ -4,13 +4,14 @@ public class KalbAbilitySystem : MonoBehaviour
 {
     [SerializeField] private KalbSettings settings;
     
-    // Events for ability unlocks (optional, for future use)
+    // Events for ability unlocks
     public System.Action<bool> OnLedgeGrabUnlocked;
     public System.Action<bool> OnRunUnlocked;
     public System.Action<bool> OnDashUnlocked;
     public System.Action<bool> OnDoubleJumpUnlocked;
     public System.Action<bool> OnWallJumpUnlocked;
     public System.Action<bool> OnWallLockUnlocked;
+    public System.Action<bool> OnFloatingFallUnlocked; 
     
     // Public methods to unlock abilities
     public void UnlockLedgeGrab()
@@ -18,6 +19,7 @@ public class KalbAbilitySystem : MonoBehaviour
         settings.ledgeGrabUnlocked = true;
         OnLedgeGrabUnlocked?.Invoke(true);
     }
+    
     public void UnlockRun()
     {
         settings.runUnlocked = true;
@@ -41,10 +43,17 @@ public class KalbAbilitySystem : MonoBehaviour
         settings.wallJumpUnlocked = true;
         OnWallJumpUnlocked?.Invoke(true);
     }
+    
     public void UnlockWallLock()
     {
         settings.wallLockUnlocked = true;
         OnWallLockUnlocked?.Invoke(true);
+    }
+    
+    public void UnlockFloatingFall()
+    {
+        settings.floatingFallUnlocked = true;
+        OnFloatingFallUnlocked?.Invoke(true);
     }
     
     public void UnlockAllAbilities()
@@ -55,6 +64,7 @@ public class KalbAbilitySystem : MonoBehaviour
         UnlockDoubleJump();
         UnlockWallJump();
         UnlockWallLock();
+        UnlockFloatingFall(); 
     }
 
     public void ResetAbilities()
@@ -65,6 +75,7 @@ public class KalbAbilitySystem : MonoBehaviour
         settings.doubleJumpUnlocked = false;
         settings.wallJumpUnlocked = false;
         settings.wallLockUnlocked = false;
+        settings.floatingFallUnlocked = false; 
     }
     
     // Helper methods to check abilities
@@ -74,4 +85,5 @@ public class KalbAbilitySystem : MonoBehaviour
     public bool CanDoubleJump() => settings.doubleJumpUnlocked;
     public bool CanWallJump() => settings.wallJumpUnlocked;
     public bool CanWallLock() => settings.wallLockUnlocked;
+    public bool CanFloatingFall() => settings.floatingFallUnlocked;
 }

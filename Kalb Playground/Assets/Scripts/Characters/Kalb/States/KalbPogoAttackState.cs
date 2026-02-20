@@ -508,6 +508,13 @@ public class KalbPogoAttackState : KalbState
             dashState.ResetAirDash();
             Debug.Log("[Pogo] Reset air dash");
         }
+
+
+        if (controller.FloatFallState != null)
+        {
+            controller.FloatFallState.ResetFloat();
+            Debug.Log("[Pogo] Reset float ability");
+        }
     }
     
     private void SpawnHitEffect()

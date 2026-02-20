@@ -309,6 +309,11 @@ public class KalbDashState : KalbState
         {
             EndDash();
         }
+
+        if (controller.FloatFallState != null)
+        {
+            controller.FloatFallState.ResetFloat();
+        }
         
         // NEW: Check for wall slide immediately after dash
         if (controller.WallJump != null && controller.WallJump.IsWallSliding &&

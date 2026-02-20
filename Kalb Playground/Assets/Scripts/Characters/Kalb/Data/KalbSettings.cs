@@ -142,6 +142,7 @@ public class KalbSettings : ScriptableObject
     public bool doubleJumpUnlocked = false;
     public bool wallJumpUnlocked = false;
     public bool wallLockUnlocked = false;
+    public bool floatingFallUnlocked = false;
 
     [Header("Ledge Settings")]
     public float ledgeDetectionDistance = 0.5f;
@@ -230,4 +231,19 @@ public class KalbSettings : ScriptableObject
     public float wallTapBoostWindow = 0.3f;      // Time to register consecutive taps
     [Tooltip("Maximum number of tap boosts")]
     public int maxWallTapBoosts = 3;              // Max speed boosts from tapping
+    [Header("Floating Fall Settings")]
+    public bool enableFloatingFall = true;
+    public float floatFallSpeed = -3f; // Slowed descent speed
+    public float floatFallGravityMultiplier = 0.3f; // Reduced gravity while floating
+    public float floatFallAcceleration = 5f; // How quickly float activates
+    public float floatFallCooldown = 0.5f; // Cooldown after floating
+    public float floatFallMinHeight = 1f; // Minimum height above ground
+    public float floatFallMaxDuration = 2f; // Maximum float time
+    public float floatFallHorizontalControl = 0.8f; // Horizontal control while floating (0-1)
+    public bool floatFallResetsOnGround = true;
+    public bool floatFallResetsOnWall = true;
+    public bool floatFallResetsOnPogo = true;
+    public bool floatFallResetsOnDash = true;
+    public string floatFallAnimation = "Kalb_float_fall";
+    public LayerMask groundCheckLayers; // For height check
 }

@@ -65,29 +65,39 @@ public class KalbPhysics : MonoBehaviour
     {
         if (settings == null || rb == null) return;
         
-        // If we're swimming, swimming system handles buoyancy - skip gravity
+        // If we're swimming, swimming system handles buoyancy
         if (swimming != null && swimming.IsSwimming)
         {
-            // Only apply minimal gravity when swimming (if needed for fall through water)
-            // The buoyancy system in KalbSwimming handles vertical movement
             return;
         }
         
         // Let gravity manager handle gravity scaling
-        // We just handle jump physics logic here
+        // The gravity manager will have the float override if active
         
-        // FALLING: Apply increased falling gravity
+        // FALLING: Apply increased falling gravity (if not floating)
         if (rb.linearVelocity.y < 0)
         {
-            gravityManager?.SetFallingGravity();
-            
-            // Clamp to maximum fall speed (terminal velocity)
-            if (rb.linearVelocity.y < settings.maxFallSpeed)
+            // Check if we're in float state - gravity manager handles this
+            if (gravityManager != null && gravityManager.OverrideSource != "FloatingFall")
             {
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, settings.maxFallSpeed);
+                gravityManager?.SetFallingGravity();
+            }
+            
+            // Clamp to maximum fall speed (but respect float speed if floating)
+            float maxFall = settings.maxFallSpeed;
+            
+            // If floating, use float fall speed as limit
+            if (gravityManager != null && gravityManager.OverrideSource == "FloatingFall")
+            {
+                maxFall = settings.floatFallSpeed;
+            }
+            
+            if (rb.linearVelocity.y < maxFall)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxFall);
             }
         }
-        // ASCENDING (JUMP RELEASED): Apply quick fall gravity for faster descent
+        // ASCENDING (JUMP RELEASED): Apply quick fall gravity
         else if (rb.linearVelocity.y > 0 && !isJumpButtonHeld)
         {
             gravityManager?.SetQuickFallGravity();
@@ -137,13 +147,13 @@ public class KalbPhysics : MonoBehaviour
         // Don't even read rb.linearVelocity.x here - just set Y
         Vector2 currentVelocity = rb.linearVelocity;
 
-rb.linearVelocity = new Vector2(currentVelocity.x, jumpForce);
+        rb.linearVelocity = new Vector2(currentVelocity.x, jumpForce);
 
-coyoteTimeCounter = 0f;
+        coyoteTimeCounter = 0f;
         jumpBufferCounter = 0f;
     }
     
-    public void SetCoyoteTime()
+    public void SetCoyoteTime() 
     {
         if (settings == null) return;
         coyoteTimeCounter = settings.coyoteTime;

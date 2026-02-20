@@ -38,6 +38,7 @@ public class KalbController : MonoBehaviour
     private KalbWallSlideState wallSlideState;
     private KalbWallLockState wallLockState;
     private KalbPogoAttackState pogoAttackState;
+    private KalbFloatFallState floatFallState;
     
     // Dash cooldown tracking - MOVED HERE from KalbDashState
     private float dashCooldownTimer = 0f;
@@ -92,6 +93,7 @@ public class KalbController : MonoBehaviour
     public KalbWallSlideState WallSlideState => wallSlideState;
     public KalbWallLockState WallLockState => wallLockState;
     public KalbPogoAttackState PogoAttackState => pogoAttackState;
+    public KalbFloatFallState FloatFallState => floatFallState;
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     public bool IsLookingUp => animationController != null ? animationController.IsLookingUp : false;
@@ -181,6 +183,7 @@ public class KalbController : MonoBehaviour
         wallSlideState = new KalbWallSlideState(this, stateMachine);    
         wallLockState = new KalbWallLockState(this, stateMachine);
         pogoAttackState = new KalbPogoAttackState(this, stateMachine);
+        floatFallState = new KalbFloatFallState(this,stateMachine);
         
         // Start with idle state
         stateMachine.Initialize(idleState);
