@@ -57,11 +57,11 @@ public class KalbFloatFallState : KalbState
     
     public override void Enter()
     {
-        Debug.Log("[KalbFloatFallState] ENTER");
+        
         
         if (!CanFloat || !ShouldFloat())
         {
-            Debug.Log("[KalbFloatFallState] Cannot float, exiting to appropriate state");
+            
             ExitToAppropriateState();
             return;
         }
@@ -76,7 +76,7 @@ public class KalbFloatFallState : KalbState
     
     public override void Exit()
     {
-        Debug.Log("[KalbFloatFallState] EXIT");
+        
         
         if (isFloating)
         {
@@ -94,7 +94,7 @@ public class KalbFloatFallState : KalbState
             // Only log once when we first become grounded
             if (!wasGroundedLastFrame)
             {
-                Debug.Log("[Float] Ground detected! Exiting float state");
+                
                 wasGroundedLastFrame = true;
                 
                 // Immediately exit to appropriate grounded state
@@ -123,42 +123,36 @@ public class KalbFloatFallState : KalbState
             
             // Check if we should stop floating (jump released or other conditions)
             bool shouldStopFloating = false;
-            string stopReason = "";
             
             // Release jump button - exit float but stay in air state
             if (!inputHandler.JumpHeld)
             {
                 shouldStopFloating = true;
-                stopReason = "Jump released";
             }
             // Hit wall
             else if (settings.floatFallResetsOnWall && controller.WallJump != null && controller.WallJump.IsTouchingWall)
             {
                 shouldStopFloating = true;
-                stopReason = "Touching wall";
             }
             // Pogo attack
             else if (settings.floatFallResetsOnPogo && pogoState != null && pogoState.IsPogoAttacking)
             {
                 shouldStopFloating = true;
-                stopReason = "Pogo attack";
             }
             // Max duration reached
             else if (floatTimer >= settings.floatFallMaxDuration)
             {
                 shouldStopFloating = true;
-                stopReason = "Max duration";
             }
             // Swimming
             else if (swimming.IsSwimming)
             {
                 shouldStopFloating = true;
-                stopReason = "Swimming";
             }
             
             if (shouldStopFloating)
             {
-                Debug.Log($"[Float] Stopping float: {stopReason}");
+                
                 StopFloating();
                 
                 // Exit to appropriate state after stopping
@@ -174,7 +168,7 @@ public class KalbFloatFallState : KalbState
             // If not floating but jump is held and we're falling, try to enter float
             if (inputHandler.JumpHeld && rb.linearVelocity.y < -1f && CanFloat && ShouldFloat())
             {
-                Debug.Log("[Float] Jump held while falling, entering float");
+                
                 StartFloating();
             }
             else if (!controller.IsEffectivelyGrounded())
@@ -195,7 +189,7 @@ public class KalbFloatFallState : KalbState
         {
             if (!wasGroundedLastFrame)
             {
-                Debug.Log("[Float] Ground detected in FixedUpdate! Exiting float state");
+                
                 wasGroundedLastFrame = true;
                 StopFloating();
                 ExitToGroundedState();
@@ -219,7 +213,7 @@ public class KalbFloatFallState : KalbState
         {
             if (controller.AbilitySystem.CanDash() && controller.CanDashFromCurrentState() && controller.DashCooldownTimer <= 0)
             {
-                Debug.Log("[Float] Dash pressed, transitioning to DashState");
+                
                 StopFloating();
                 stateMachine.ChangeState(controller.DashState);
                 inputHandler.ResetDashInput();
@@ -233,7 +227,7 @@ public class KalbFloatFallState : KalbState
             // Check for pogo (down + attack)
             if (inputHandler.IsDownHeld && pogoState != null && pogoState.CanPogo)
             {
-                Debug.Log("[Float] Pogo input, transitioning to PogoAttackState");
+                
                 StopFloating();
                 stateMachine.ChangeState(controller.PogoAttackState);
                 inputHandler.ResetAttackInput();
@@ -242,7 +236,7 @@ public class KalbFloatFallState : KalbState
             // Regular attack
             else if (controller.CanAttackFromCurrentState())
             {
-                Debug.Log("[Float] Attack pressed, transitioning to CombatState");
+                
                 StopFloating();
                 stateMachine.ChangeState(controller.CombatState);
                 inputHandler.ResetAttackInput();
@@ -253,7 +247,7 @@ public class KalbFloatFallState : KalbState
         // Jump press during float will exit float and jump
         if (inputHandler.JumpPressed)
         {
-            Debug.Log("[Float] Jump pressed, transitioning to JumpState");
+            
             
             // First stop floating
             StopFloating();
@@ -316,7 +310,7 @@ public class KalbFloatFallState : KalbState
         // If we're too low, stop floating
         if (!IsHighEnoughToFloat())
         {
-            Debug.Log("[Float] Too close to ground, stopping float");
+            
             StopFloating();
         }
     }
@@ -342,7 +336,7 @@ public class KalbFloatFallState : KalbState
             animController.PlayAnimation(settings.floatFallAnimation);
         }
         
-        Debug.Log($"[Float] Started - Gravity: {floatGravity}, Speed: {settings.floatFallSpeed}");
+        
     }
     
     private void ApplyFloatPhysics()
@@ -425,7 +419,7 @@ public class KalbFloatFallState : KalbState
     // NEW: Helper method to exit to grounded state
     private void ExitToGroundedState()
     {
-        Debug.Log("[Float] Exiting to grounded state");
+        
         
         // Clear any remaining float effects
         if (isFloating)

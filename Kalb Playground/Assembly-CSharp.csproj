@@ -56,6 +56,7 @@
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbCollisionDetector.cs" />
     <Compile Include="Assets/Scripts/Utilities/PlayerInputActions.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/KalbController.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbHardLandState.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark02.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbMovement.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbWallSlideState.cs" />

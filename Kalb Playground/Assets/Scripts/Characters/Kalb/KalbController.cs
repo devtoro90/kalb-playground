@@ -39,6 +39,7 @@ public class KalbController : MonoBehaviour
     private KalbWallLockState wallLockState;
     private KalbPogoAttackState pogoAttackState;
     private KalbFloatFallState floatFallState;
+    private KalbHardLandState hardLandState;
     
     // Dash cooldown tracking - MOVED HERE from KalbDashState
     private float dashCooldownTimer = 0f;
@@ -94,6 +95,7 @@ public class KalbController : MonoBehaviour
     public KalbWallLockState WallLockState => wallLockState;
     public KalbPogoAttackState PogoAttackState => pogoAttackState;
     public KalbFloatFallState FloatFallState => floatFallState;
+    public KalbHardLandState HardLandState => hardLandState;
     
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     public bool IsLookingUp => animationController != null ? animationController.IsLookingUp : false;
@@ -184,6 +186,7 @@ public class KalbController : MonoBehaviour
         wallLockState = new KalbWallLockState(this, stateMachine);
         pogoAttackState = new KalbPogoAttackState(this, stateMachine);
         floatFallState = new KalbFloatFallState(this,stateMachine);
+        hardLandState = new KalbHardLandState(this, stateMachine);
         
         // Start with idle state
         stateMachine.Initialize(idleState);
@@ -461,7 +464,7 @@ public class KalbController : MonoBehaviour
             // This helps catch any states that might be stuck
             if (stateMachine.CurrentState is KalbFloatFallState)
             {
-                Debug.Log("[Controller] Grounded while in FloatState - forcing transition");
+                
                 stateMachine.ChangeState(idleState);
             }
         }

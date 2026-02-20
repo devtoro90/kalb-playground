@@ -135,6 +135,14 @@ public class KalbSettings : ScriptableObject
     public string pogoBounceAnimation = "Kalb_pogo_bounce"; 
     public LayerMask pogoTargetLayers;  
 
+    [Header("Hard Landing Settings")]
+    public bool enableHardLanding = true;
+    public float hardLandingFallThreshold = 10f;           // Minimum fall distance to trigger hard landing
+    public float hardLandingRecoveryTime = 1f;          // How long player is locked in recovery
+    public float hardLandingMinVelocityThreshold = 8f;    // Minimum fall speed to trigger (optional fallback)
+    public AnimationCurve hardLandingShakeIntensity = AnimationCurve.Linear(0, 0.1f, 10, 0.4f); // Maps fall distance to shake intensity
+    public string hardLandingAnimation = "Kalb_hard_land";
+
     [Header("Ability Unlocks")]
     public bool ledgeGrabUnlocked = true;
     public bool runUnlocked = false;

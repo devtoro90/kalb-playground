@@ -25,8 +25,8 @@ public class TestDamageTrigger : MonoBehaviour
             spriteRenderer.color = triggerColor;
         }
         
-        if (showDebug)
-            Debug.Log($"TestDamageTrigger ready. Damage: {damageAmount}, Knockback: {knockbackForce}");
+        //if (showDebug)
+            //Debug.Log($"TestDamageTrigger ready. Damage: {damageAmount}, Knockback: {knockbackForce}");
     }
     
     void OnTriggerEnter2D(Collider2D other)

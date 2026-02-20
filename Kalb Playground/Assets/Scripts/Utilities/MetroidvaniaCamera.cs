@@ -92,6 +92,9 @@ public class MetroidvaniaCamera : MonoBehaviour
     private bool wasGrounded = true;
     private float anticipationTimer = 0f;
     private float fallStartTime = 0f;
+    private float temporarySpeedMultiplier = 1f;
+    private float temporarySpeedTimer = 0f;
+    private Coroutine temporarySpeedCoroutine;
     
     // ====================================================================
     // SECTION 2: BASIC FOLLOW (Unlocked by default)
@@ -318,7 +321,7 @@ public class MetroidvaniaCamera : MonoBehaviour
         Vector3 finalTargetPosition = targetPosition + shakeOffset;
         
         // Apply camera speed modifier
-        float effectiveCameraSpeed = cameraSpeed * currentCameraSpeedModifier * currentFallMultiplier;
+        float effectiveCameraSpeed = cameraSpeed * currentCameraSpeedModifier * currentFallMultiplier * temporarySpeedMultiplier;
         
         // Smooth movement
         smoothedPosition = Vector3.SmoothDamp(
@@ -701,6 +704,29 @@ public class MetroidvaniaCamera : MonoBehaviour
     public float GetCurrentVerticalVelocity()
     {
         return currentVerticalVelocity;
+    }
+
+    public void SetTemporaryFollowSpeed(float multiplier, float duration)
+    {
+        if (temporarySpeedCoroutine != null)
+            StopCoroutine(temporarySpeedCoroutine);
+        
+        temporarySpeedCoroutine = StartCoroutine(TemporaryFollowSpeedRoutine(multiplier, duration));
+    }
+
+    private IEnumerator TemporaryFollowSpeedRoutine(float multiplier, float duration)
+    {
+        temporarySpeedMultiplier = multiplier;
+        temporarySpeedTimer = duration;
+        
+        while (temporarySpeedTimer > 0)
+        {
+            temporarySpeedTimer -= Time.deltaTime;
+            yield return null;
+        }
+        
+        temporarySpeedMultiplier = 1f;
+        temporarySpeedCoroutine = null;
     }
     
     // ====================================================================

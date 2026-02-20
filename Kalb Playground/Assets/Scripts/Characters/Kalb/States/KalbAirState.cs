@@ -7,6 +7,13 @@ public class KalbAirState : KalbState
     private KalbMovement movement;
     private KalbSwimming swimming;
     private KalbComboSystem comboSystem;
+    private KalbSettings settings;
+    
+    // Fall tracking
+    private float fallStartY = 0f;
+    private float maxFallDistance = 0f;
+    private bool hasStartedFalling = false;
+    private bool wasFalling = false;
     
     public KalbAirState(KalbController controller, KalbStateMachine stateMachine) 
         : base(controller, stateMachine)
@@ -16,10 +23,19 @@ public class KalbAirState : KalbState
         movement = controller.Movement;
         swimming = controller.Swimming;
         comboSystem = controller.ComboSystem;
+        settings = controller.Settings;
     }
     
     public override void Enter()
     {
+        Debug.Log("[AirState] ENTER");
+        
+        // Initialize fall tracking
+        fallStartY = controller.transform.position.y;
+        maxFallDistance = 0f;
+        hasStartedFalling = false;
+        wasFalling = false;
+        
         UpdateAnimation();
         controller.GravityManager.SetNormalGravity();
         controller.InputBuffer?.ClearBufferedInput("Jump");
@@ -29,16 +45,46 @@ public class KalbAirState : KalbState
     
     public override void Update()
     {
+        // Track fall distance
+        float currentY = controller.transform.position.y;
+        float verticalVelocity = controller.Rb.linearVelocity.y;
+        
+        // If we're moving downward, track the maximum fall distance
+        if (verticalVelocity < -0.5f)
+        {
+            if (!hasStartedFalling)
+            {
+                // Just started falling
+                fallStartY = currentY;
+                hasStartedFalling = true;
+                wasFalling = true;
+                Debug.Log($"[AirState] Started falling from Y: {fallStartY}");
+            }
+            
+            // Update maximum fall distance
+            float currentFallDistance = fallStartY - currentY;
+            if (currentFallDistance > maxFallDistance)
+            {
+                maxFallDistance = currentFallDistance;
+            }
+        }
+        else if (verticalVelocity >= 0 && wasFalling)
+        {
+            // We're moving up again (like after a bounce) - reset fall tracking
+            wasFalling = false;
+            hasStartedFalling = false;
+        }
+        
         // Check for ledge state
-        if (controller.AbilitySystem.CanLedgeGrab() && controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() && // CHANGED
+        if (controller.AbilitySystem.CanLedgeGrab() && controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() &&
             controller.Rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
         {
-            // Check if we should auto-grab
             float playerBottom = controller.GetComponent<Collider2D>().bounds.min.y;
             float ledgeTop = controller.LedgeDetector.LedgePosition.y;
             
             if (playerBottom < ledgeTop && playerBottom > ledgeTop - 1.0f)
             {
+                Debug.Log("[AirState] Transition to LedgeState");
                 stateMachine.ChangeState(controller.LedgeState);
                 return;
             }
@@ -47,14 +93,34 @@ public class KalbAirState : KalbState
         // Check for swimming transition
         if (swimming != null && swimming.IsInWater)
         {
-            // Cancel combo when entering swim state
-            comboSystem?.CancelCombo(); 
+            comboSystem?.CancelCombo();
+            Debug.Log("[AirState] Transition to SwimState");
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
         
-        if (controller.IsEffectivelyGrounded()) // CHANGED
+        // CRITICAL: When landing, check if we should trigger hard landing
+        if (controller.IsEffectivelyGrounded())
         {
+            Debug.Log($"[AirState] Landed! Max fall distance: {maxFallDistance}, Threshold: {settings.hardLandingFallThreshold}");
+            
+            // Check if this qualifies as a hard landing
+            if (settings.enableHardLanding && 
+                maxFallDistance >= settings.hardLandingFallThreshold)
+            {
+                Debug.Log($"[AirState] HARD LANDING triggered! Distance: {maxFallDistance}");
+                
+                // Pass the fall distance to hard landing state and transition
+                if (controller.HardLandState != null)
+                {
+                    controller.HardLandState.SetFallDistance(maxFallDistance);
+                    stateMachine.ChangeState(controller.HardLandState);
+                    return;
+                }
+            }
+            
+            // Normal landing
+            Debug.Log("[AirState] Normal landing");
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
             {
                 stateMachine.ChangeState(controller.WalkState);
@@ -71,20 +137,21 @@ public class KalbAirState : KalbState
     
     public override void FixedUpdate()
     {
-        // Apply air control - this will handle flipping if enabled
+        // Apply air control
         movement.ApplyAirControl(inputHandler.MoveInput.x);
     }
     
     public override void HandleInput()
     {
-        // Check for wall slide state (ADD THIS at the beginning)
+        // Check for wall slide state
         if (!controller.Swimming.IsInWaterExitGracePeriod && controller.WallJump != null && controller.WallJump.IsWallSliding &&
-        controller.AbilitySystem != null && controller.AbilitySystem.CanWallJump())
+            controller.AbilitySystem != null && controller.AbilitySystem.CanWallJump())
         {
             stateMachine.ChangeState(controller.WallSlideState);
             return;
         }
 
+        // Check for pogo attack
         if (inputHandler.AttackPressed && inputHandler.IsDownHeld && 
             controller.Settings.enablePogoAttack && 
             controller.PogoAttackState != null && 
@@ -94,7 +161,6 @@ public class KalbAirState : KalbState
             
             if (controller.InputBuffer.ConsumeBufferedInput("Attack"))
             {
-                
                 stateMachine.ChangeState(controller.PogoAttackState);
                 inputHandler.ResetAttackInput();
                 return;
@@ -104,67 +170,53 @@ public class KalbAirState : KalbState
         // Check for jump input (for coyote time or double jump)
         if (inputHandler.JumpPressed)
         {
-            
             controller.Physics.SetJumpBuffer();
             
             // Check for double jump
-            if (!controller.IsEffectivelyGrounded() && // CHANGED
+            if (!controller.IsEffectivelyGrounded() &&
                 controller.Physics.CanDoubleJump &&
                 controller.AbilitySystem != null && 
                 controller.AbilitySystem.CanDoubleJump())
             {
-                
-                // Execute double jump
                 ExecuteDoubleJump();
             }
         }
         
         if (inputHandler.JumpReleased)
         {
-            
             controller.Physics.ApplyJumpCut();
         }
 
+        // Check for float fall
         if (inputHandler.JumpHeld && controller.Rb.linearVelocity.y < -1f &&
-        controller.FloatFallState != null && controller.FloatFallState.CanFloat)
+            controller.FloatFallState != null && controller.FloatFallState.CanFloat)
         {
-            // Only enter if we're not already in float state
             if (!(stateMachine.CurrentState is KalbFloatFallState))
             {
-                
                 stateMachine.ChangeState(controller.FloatFallState);
                 return;
             }
         }
 
-        // Check for attack input in air state
+        // Check for attack input
         if (inputHandler.AttackPressed && comboSystem != null && comboSystem.CanAttack)
         {
-            // Don't check swimming state here - let controller handle it
-            // This allows attacks in air after water jumps
+            // Will be handled by controller
         }
     }
 
     private void ExecuteDoubleJump()
     {
-        // Mark as double jumped
         controller.Physics.ResetDoubleJump();
         
-        // Get current velocity and preserve momentum
         float currentXVelocity = controller.Rb.linearVelocity.x;
         float jumpForce = controller.Settings.doubleJumpForce;
         
-        // Hollow Knight-style double jump: preserves momentum but allows redirection
         if (controller.Settings.doubleJumpMaintainsMomentum)
         {
-            // Current speed ratio (0-1)
             float speedRatio = Mathf.Clamp01(Mathf.Abs(currentXVelocity) / controller.Settings.moveSpeed);
-            
-            // Preserve 70-100% of horizontal momentum based on speed
             float momentumPreservation = Mathf.Lerp(0.7f, 1.0f, speedRatio);
             float preservedXVelocity = currentXVelocity * momentumPreservation;
-            
-            // Allow player to add up to 30% new direction
             float playerControl = inputHandler.MoveInput.x * controller.Settings.moveSpeed * 0.3f;
             
             controller.Rb.linearVelocity = new Vector2(
@@ -174,24 +226,18 @@ public class KalbAirState : KalbState
         }
         else
         {
-            // Standard double jump with full player control
             float targetXVelocity = inputHandler.MoveInput.x * controller.Settings.moveSpeed * 0.7f;
             controller.Rb.linearVelocity = new Vector2(targetXVelocity, jumpForce);
         }
         
         controller.Physics.SetJumpButtonState(true);
-        
-        // Play double jump animation
         controller.AnimationController.PlayAnimation("Kalb_jump");
-        
-        // Reset jump buffer
         controller.Physics.SetJumpBuffer();
         inputHandler.ResetJumpInput();
     }
     
     private void UpdateAnimation()
     {
-        // Update animation based on vertical velocity
         if (controller.Rb.linearVelocity.y > 0)
         {
             controller.AnimationController.PlayAnimation("Kalb_jump");
