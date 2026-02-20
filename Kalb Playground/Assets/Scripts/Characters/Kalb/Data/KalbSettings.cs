@@ -120,9 +120,9 @@ public class KalbSettings : ScriptableObject
     public float pogoAttackRange = 0.6f;
     public float pogoAttackDuration = 0.15f;  // Short attack window
     public float pogoAttackCooldown = 0.2f;    // Brief cooldown
-    public float pogoBounceForce = 10f;
-    public float pogoMinBounceForce = 6f;
-    public float pogoMaxBounceForce = 14f;
+    public float pogoBounceForce = 15f;
+    public float pogoMinBounceForce = 15f;
+    public float pogoMaxBounceForce = 15f;
     public float pogoMomentumPreservation = 0.7f;
     public float pogoInputControlTime = 0.1f;
     public float pogoChainWindow = 0.25f;      // Time to chain next pogo

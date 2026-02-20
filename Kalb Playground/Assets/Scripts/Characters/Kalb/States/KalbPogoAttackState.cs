@@ -22,19 +22,22 @@ public class KalbPogoAttackState : KalbState
     private bool pogoHitRegistered = false;
     private bool isInBounce = false;
     private bool hasReachedBouncePeak = false;
-    private bool bounceAnimationPlaying = false; // NEW: Track if bounce animation is playing
+    private bool bounceAnimationPlaying = false;
     private Vector2 prePogoVelocity;
     private Transform pogoAttackPoint;
     private float bounceStartY = 0f;
     private float bouncePeakTimer = 0f;
-    private float bounceAnimationTimer = 0f; // NEW: Timer for bounce animation
+    private float bounceAnimationTimer = 0f;
+    
+    // NEW: Track if we're in full control mode during bounce
+    private bool fullControlDuringBounce = true;
     
     // Constants
     private const float POGO_ATTACK_DURATION = 0.15f;
     private const float POGO_COOLDOWN = 0.2f;
     private const float POGO_BOUNCE_BUFFER = 0.05f;
     private const float PEAK_DETECTION_DELAY = 0.05f;
-    private const float BOUNCE_ANIMATION_MIN_DURATION = 0.2f; // NEW: Minimum time to show bounce animation
+    private const float BOUNCE_ANIMATION_MIN_DURATION = 0.2f;
     
     // Properties
     public bool IsPogoAttacking => isPogoAttacking;
@@ -174,7 +177,7 @@ public class KalbPogoAttackState : KalbState
             }
         }
         
-        // NEW: Update bounce animation timer
+        // Update bounce animation timer
         if (bounceAnimationTimer > 0)
         {
             bounceAnimationTimer -= Time.deltaTime;
@@ -211,7 +214,7 @@ public class KalbPogoAttackState : KalbState
             bouncePeakTimer -= Time.deltaTime;
             if (bouncePeakTimer <= 0)
             {
-                // NEW: Only transition if bounce animation has played for minimum duration
+                // Only transition if bounce animation has played for minimum duration
                 if (!bounceAnimationPlaying || bounceAnimationTimer <= 0)
                 {
                     Debug.Log("[Pogo] Transitioning to AirState (falling)");
@@ -255,24 +258,51 @@ public class KalbPogoAttackState : KalbState
     {
         if (isPogoAttacking)
         {
+            // During attack phase, limited control
             if (inputLockTimer > 0)
             {
-                // During input lock, preserve some horizontal momentum
+                // During initial input lock, preserve some horizontal momentum
                 float preservedSpeed = prePogoVelocity.x * settings.pogoMomentumPreservation;
                 rb.linearVelocity = new Vector2(preservedSpeed, rb.linearVelocity.y);
             }
             else
             {
-                // After input lock, allow limited air control
+                // After initial lock, allow limited air control during attack
                 float moveInput = inputHandler.MoveInput.x * 0.3f;
                 movement.ApplyAirControl(moveInput);
             }
         }
         else if (isInBounce && !hasReachedBouncePeak)
         {
-            // During bounce phase, allow normal air control
-            float moveInput = inputHandler.MoveInput.x * 0.5f;
-            movement.ApplyAirControl(moveInput);
+            // MODIFIED: FULL AIR CONTROL DURING BOUNCE PHASE
+            // Use the same air control as in AirState/JumpState
+            
+            // Get current max air speed (run/walk based on dash held)
+            float maxAirSpeed = movement.GetCurrentMaxAirSpeed();
+            
+            // Apply full air control with standard acceleration
+            float moveInput = inputHandler.MoveInput.x;
+            float currentXVelocity = rb.linearVelocity.x;
+            float targetXVelocity = moveInput * maxAirSpeed;
+            
+            // Use the same air acceleration as in AirState
+            float acceleration = settings.airAcceleration;
+            
+            // Smoothly move toward target velocity
+            float newXVelocity = Mathf.MoveTowards(currentXVelocity, targetXVelocity, 
+                acceleration * Time.fixedDeltaTime * 50f); // Scale for FixedUpdate
+            
+            rb.linearVelocity = new Vector2(newXVelocity, rb.linearVelocity.y);
+            
+            // Flip sprite based on input if needed
+            if (Mathf.Abs(moveInput) > 0.1f)
+            {
+                bool shouldFaceRight = moveInput > 0;
+                if (shouldFaceRight != movement.FacingRight)
+                {
+                    movement.ForceFlip(shouldFaceRight);
+                }
+            }
         }
         
         // Ensure normal gravity
@@ -328,7 +358,7 @@ public class KalbPogoAttackState : KalbState
             }
         }
         
-        // Allow jump during pogo
+        // Allow jump during pogo (with full control)
         if (inputHandler.JumpPressed)
         {
             physics.SetJumpBuffer();
@@ -338,6 +368,22 @@ public class KalbPogoAttackState : KalbState
                 Debug.Log("[Pogo] Jump pressed, transitioning to JumpState");
                 stateMachine.ChangeState(controller.JumpState);
                 inputHandler.ResetJumpInput();
+            }
+        }
+        
+        // MODIFIED: Allow dash during bounce phase
+        if (inputHandler.DashPressed && isInBounce && !hasReachedBouncePeak)
+        {
+            if (controller.AbilitySystem.CanDash() && controller.CanDashFromCurrentState() && controller.DashCooldownTimer <= 0)
+            {
+                controller.InputBuffer.BufferDash();
+                
+                if (controller.InputBuffer.ConsumeBufferedInput("Dash"))
+                {
+                    Debug.Log("[Pogo] Dash pressed during bounce, transitioning to DashState");
+                    stateMachine.ChangeState(controller.DashState);
+                    inputHandler.ResetDashInput();
+                }
             }
         }
     }
@@ -388,7 +434,7 @@ public class KalbPogoAttackState : KalbState
         // Spawn hit effect
         SpawnHitEffect();
         
-        // NEW: Play bounce animation
+        // Play bounce animation
         PlayBounceAnimation();
     }
     
@@ -435,7 +481,6 @@ public class KalbPogoAttackState : KalbState
         inputLockTimer = settings.pogoInputControlTime * 0.5f;
     }
     
-    // NEW: Play bounce animation
     private void PlayBounceAnimation()
     {
         if (animController != null && !string.IsNullOrEmpty(settings.pogoBounceAnimation))
