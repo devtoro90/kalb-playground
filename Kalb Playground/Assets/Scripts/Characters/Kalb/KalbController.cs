@@ -5,6 +5,10 @@ public class KalbController : MonoBehaviour
     [Header("Component References")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private KalbSettings settings;
+
+    [Header("Effects")]
+    [SerializeField] private KalbEffectSettings effectSettings;
+    private KalbEffectController effectController;
     
     // Core Components
     private KalbInputHandler inputHandler;
@@ -95,6 +99,10 @@ public class KalbController : MonoBehaviour
     public bool IsLookingUp => animationController != null ? animationController.IsLookingUp : false;
 
     public KalbStateMachine StateMachine => stateMachine;
+
+    public System.Action OnStateChanged;
+    public System.Action OnLanded;
+    public System.Action OnWallSlideStarted;
     
     private void Awake()
     {
@@ -148,12 +156,16 @@ public class KalbController : MonoBehaviour
 
         wallJump = GetComponent<KalbWallJump>();
         if (wallJump == null) wallJump = gameObject.AddComponent<KalbWallJump>();
+
+        effectController = GetComponent<KalbEffectController>();
+        if (effectController == null) effectController = gameObject.AddComponent<KalbEffectController>();
         
         // Create default settings if none provided
         if (settings == null)
         {
             settings = ScriptableObject.CreateInstance<KalbSettings>();
         }
+
     }
     
     private void InitializeStateMachine()
@@ -414,8 +426,15 @@ public class KalbController : MonoBehaviour
     
     public bool IsEffectivelyGrounded()
     {
+        bool wasGrounded = collisionDetector.IsGrounded || groundStickTimer > 0;
         bool result = collisionDetector.IsGrounded || groundStickTimer > 0;
         
+        if (result && !wasGroundedLastFrame)
+        {
+            OnLanded?.Invoke();
+        }
+        
+        wasGroundedLastFrame = result;
         return result;
     }
     
@@ -686,6 +705,7 @@ public class KalbController : MonoBehaviour
     public void ForceStateChange(KalbState newState)
     {
         stateMachine.ChangeState(newState);
+        OnStateChanged?.Invoke();
     }
 
     public bool CanLookUp()
@@ -721,5 +741,7 @@ public class KalbController : MonoBehaviour
         
         return comboSystem.CanPerformWallAttack;
     }
+
+    
 
 }
