@@ -146,6 +146,35 @@ MonoBehaviour:
   pogoTargetLayers:
     serializedVersion: 2
     m_Bits: 128
+  enableHardLanding: 1
+  hardLandingFallThreshold: 10
+  hardLandingRecoveryTime: 1
+  hardLandingMinVelocityThreshold: 8
+  hardLandingShakeIntensity:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.08333206
+      value: 0.4007202
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 10.25
+      value: 0.39928666
+      inSlope: -0.009750773
+      outSlope: -0.009750773
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.44672123
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hardLandingAnimation: Kalb_hard_land
   ledgeGrabUnlocked: 1
   runUnlocked: 1
   dashUnlocked: 1
