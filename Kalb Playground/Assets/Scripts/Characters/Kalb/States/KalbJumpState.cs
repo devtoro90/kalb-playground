@@ -13,7 +13,6 @@ public class KalbJumpState : KalbState
     private float fallStartY = 0f;
     private float maxFallDistance = 0f;
     private bool hasStartedFalling = false;
-    private bool wasFalling = false;
     
     public KalbJumpState(KalbController controller, KalbStateMachine stateMachine) 
         : base(controller, stateMachine)
@@ -34,7 +33,6 @@ public class KalbJumpState : KalbState
         fallStartY = controller.transform.position.y;
         maxFallDistance = 0f;
         hasStartedFalling = false;
-        wasFalling = false;
         
         // Ensure gravity is properly set
         if (controller.Rb.gravityScale != controller.Settings.normalGravityScale)
@@ -85,7 +83,6 @@ public class KalbJumpState : KalbState
                 // Just started falling
                 fallStartY = currentY;
                 hasStartedFalling = true;
-                wasFalling = true;
                 
             }
             

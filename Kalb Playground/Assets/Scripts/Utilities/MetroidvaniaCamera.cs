@@ -90,7 +90,6 @@ public class MetroidvaniaCamera : MonoBehaviour
     private float verticalVelocitySmooth = 0f;
     private float lastGroundedY = 0f;
     private bool wasGrounded = true;
-    private float anticipationTimer = 0f;
     private float fallStartTime = 0f;
     private float temporarySpeedMultiplier = 1f;
     private float temporarySpeedTimer = 0f;
@@ -251,7 +250,6 @@ public class MetroidvaniaCamera : MonoBehaviour
         if (isGrounded)
         {
             lastGroundedY = playerPos.y;
-            anticipationTimer = 0f;
         }
         else if (wasGrounded && !isGrounded)
         {

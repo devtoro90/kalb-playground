@@ -188,7 +188,15 @@ public class KalbPogoAttackState : KalbState
         if (isPogoAttacking && pogoAttackTimer <= 0 && !isInBounce)
         {
             
-            EnterBouncePhase();
+            canPogo = true; // Allow pogo again immediately
+            pogoCooldownTimer = 0f;
+            currentPogoChain = 0;
+            pogoChainTimer = 0f;
+            inputLockTimer = 0f;
+            pogoHitRegistered = false;
+            
+            // Go straight to air state
+            stateMachine.ChangeState(controller.AirState);
         }
         
         // Check if we're in bounce phase and should transition to falling
@@ -478,17 +486,20 @@ public class KalbPogoAttackState : KalbState
         bounceStartY = controller.transform.position.y;
         bounceStartTime = Time.time;
         
+        Debug.Log("[PogoState] ENTERING BOUNCE PHASE");
         
-        
-        // If no hit was registered, still apply a small bounce
+        // If no hit was registered, apply a smaller but still consistent bounce
         if (!pogoHitRegistered)
         {
+            Debug.Log("[PogoState] No hit registered, small bounce");
             
+            // Smaller but still constant bounce for missed pogos
+            // 6f is about half the normal bounce - adjust as needed
+            float bounceForce = 6f;
             
-            // Apply a small bounce even without hit
             rb.linearVelocity = new Vector2(
                 rb.linearVelocity.x * settings.pogoMomentumPreservation,
-                5f // Small bounce force
+                bounceForce
             );
         }
         
@@ -534,12 +545,11 @@ public class KalbPogoAttackState : KalbState
         bounceStartY = controller.transform.position.y;
         bounceStartTime = Time.time;
         
-        // Calculate bounce force based on fall speed
-        float fallSpeed = Mathf.Abs(Mathf.Min(prePogoVelocity.y, 0));
-        float normalizedFallSpeed = Mathf.Clamp01(fallSpeed / Mathf.Abs(settings.maxFallSpeed));
-        float bounceForce = Mathf.Lerp(settings.pogoMinBounceForce, settings.pogoMaxBounceForce, normalizedFallSpeed);
+        // CONSTANT bounce force - same every time regardless of fall speed
+        // 12f is a good middle ground - adjust this value to your liking
+        float bounceForce = settings.pogoMaxBounceForce;
         
-        
+        Debug.Log($"[PogoState] Bounce! Force: {bounceForce}");
         
         // Apply bounce with some horizontal preservation
         rb.linearVelocity = new Vector2(
