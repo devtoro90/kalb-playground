@@ -33,16 +33,16 @@ public class KalbHardLandState : KalbState
     public void SetFallDistance(float distance)
     {
         fallDistance = distance;
-        Debug.Log($"[HardLand] Setting fall distance: {distance}");
+        
     }
     
     public override void Enter()
     {
-        Debug.Log($"[HardLand] ENTER - Fall distance: {fallDistance}, Threshold: {settings.hardLandingFallThreshold}");
+        
         
         if (!settings.enableHardLanding || fallDistance < settings.hardLandingFallThreshold)
         {
-            Debug.Log("[HardLand] Conditions not met, exiting immediately");
+            
             ExitToAppropriateState();
             return;
         }
@@ -58,7 +58,7 @@ public class KalbHardLandState : KalbState
         // Play hard landing animation
         if (animController != null && !string.IsNullOrEmpty(settings.hardLandingAnimation))
         {
-            Debug.Log($"[HardLand] Playing animation: {settings.hardLandingAnimation}");
+            
             animController.PlayAnimation(settings.hardLandingAnimation);
         }
         
@@ -94,7 +94,7 @@ public class KalbHardLandState : KalbState
     {
         if (hasExited) return;
         
-        Debug.Log("[HardLand] EXIT");
+        
         isRecovering = false;
         hasExited = true;
     }
@@ -107,11 +107,11 @@ public class KalbHardLandState : KalbState
         if (recoveryTimer > 0)
         {
             recoveryTimer -= Time.deltaTime;
-            Debug.Log($"[HardLand] Recovery timer: {recoveryTimer}");
+            
             
             if (recoveryTimer <= 0)
             {
-                Debug.Log("[HardLand] Recovery complete, transitioning");
+                
                 ExitToAppropriateState();
             }
         }
@@ -147,7 +147,7 @@ public class KalbHardLandState : KalbState
         // Direction: mostly vertical with slight random horizontal
         Vector3 shakeDirection = new Vector3(Random.Range(-0.3f, 0.3f), 1f, 0f);
         
-        Debug.Log($"[HardLand] Triggering camera shake - Intensity: {intensity}, Duration: {duration}");
+        
         gameCamera.TriggerScreenShake(intensity, duration, shakeDirection, true);
     }
     
@@ -155,12 +155,12 @@ public class KalbHardLandState : KalbState
     {
         if (hasExited) return;
         
-        Debug.Log("[HardLand] Exiting to appropriate state");
+        
         
         // Double-check we're still grounded
         if (!controller.IsEffectivelyGrounded())
         {
-            Debug.Log("[HardLand] Not grounded, going to AirState");
+            
             stateMachine.ChangeState(controller.AirState);
             return;
         }
@@ -171,18 +171,18 @@ public class KalbHardLandState : KalbState
             // Check for run
             if (inputHandler.DashHeld && controller.AbilitySystem.CanRun())
             {
-                Debug.Log("[HardLand] Moving with run input, going to RunState");
+                
                 stateMachine.ChangeState(controller.RunState);
             }
             else
             {
-                Debug.Log("[HardLand] Moving, going to WalkState");
+                
                 stateMachine.ChangeState(controller.WalkState);
             }
         }
         else
         {
-            Debug.Log("[HardLand] No movement, going to IdleState");
+            
             stateMachine.ChangeState(controller.IdleState);
         }
     }

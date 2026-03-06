@@ -28,10 +28,16 @@ public class KalbPogoAttackState : KalbState
     private float bounceStartY = 0f;
     private float bouncePeakTimer = 0f;
     private float bounceAnimationTimer = 0f;
+    private float bounceStartTime = 0f;
+    
+    // Debug
+    private float lastDebugTime = 0f;
+    private const float DEBUG_INTERVAL = 0.1f;
     
     // Constants
     private const float PEAK_DETECTION_DELAY = 0.05f;
     private const float BOUNCE_ANIMATION_MIN_DURATION = 0.2f;
+    private const float MIN_BOUNCE_CONTROL_TIME = 0.15f;
     
     // Properties
     public bool IsPogoAttacking => isPogoAttacking;
@@ -93,6 +99,7 @@ public class KalbPogoAttackState : KalbState
         pogoHitRegistered = false;
         bouncePeakTimer = 0f;
         bounceAnimationTimer = 0f;
+        bounceStartTime = 0f;
         
         // Store pre-pogo velocity for momentum preservation
         prePogoVelocity = rb.linearVelocity;
@@ -177,11 +184,21 @@ public class KalbPogoAttackState : KalbState
             bounceAnimationTimer -= Time.deltaTime;
         }
         
+        // When attack timer expires, enter bounce phase even without hit
+        if (isPogoAttacking && pogoAttackTimer <= 0 && !isInBounce)
+        {
+            
+            EnterBouncePhase();
+        }
+        
         // Check if we're in bounce phase and should transition to falling
         if (isInBounce && !hasReachedBouncePeak)
         {
-            // Detect if we've started falling
-            if (rb.linearVelocity.y < -0.5f) // Moving down significantly
+            // Check if we've been in bounce long enough
+            bool hasHadControlTime = (Time.time - bounceStartTime) > MIN_BOUNCE_CONTROL_TIME;
+            
+            // Detect if we've started falling AND we've had minimum control time
+            if (rb.linearVelocity.y < -0.5f && hasHadControlTime)
             {
                 
                 hasReachedBouncePeak = true;
@@ -189,8 +206,8 @@ public class KalbPogoAttackState : KalbState
                 // Small delay before transitioning to ensure smooth animation
                 bouncePeakTimer = PEAK_DETECTION_DELAY;
             }
-            // Also detect if we've reached the peak (velocity near zero and then negative)
-            else if (rb.linearVelocity.y <= 0.1f && bounceStartY > 0f)
+            // Also detect if we've reached the peak (velocity near zero) AND had control time
+            else if (rb.linearVelocity.y <= 0.1f && bounceStartY > 0f && hasHadControlTime)
             {
                 // Check if we're below the bounce start position (falling)
                 if (controller.transform.position.y < bounceStartY - 0.1f)
@@ -224,22 +241,6 @@ public class KalbPogoAttackState : KalbState
             CheckPogoHit();
         }
         
-        // Check if attack animation finished
-        if (isPogoAttacking && pogoAttackTimer <= 0 && !isInBounce)
-        {
-            
-            isPogoAttacking = false;
-        }
-        
-        // If not in bounce and not attacking, check if we should transition
-        if (!isInBounce && !isPogoAttacking && !hasReachedBouncePeak)
-        {
-            // No hit registered, just fall
-            
-            stateMachine.ChangeState(controller.AirState);
-            return;
-        }
-        
         // Check for swimming
         if (swimming != null && swimming.IsInWater)
         {
@@ -250,43 +251,48 @@ public class KalbPogoAttackState : KalbState
     
     public override void FixedUpdate()
     {
-        if (isPogoAttacking)
+        // CRITICAL: Log every FixedUpdate to confirm we're here
+        
+        
+        // BOUNCE PHASE HAS HIGHEST PRIORITY - Check this FIRST
+        if (isInBounce && !hasReachedBouncePeak)
         {
-            // During attack phase, limited control
-            if (inputLockTimer > 0)
+            // FORCE HORIZONTAL CONTROL DURING BOUNCE
+            
+            float moveInput = inputHandler.MoveInput.x;
+           
+            
+            // Get current velocity before change
+            float beforeVelocityX = rb.linearVelocity.x;
+            
+            // Determine max speed based on run input
+            float maxSpeed = settings.moveSpeed;
+            if (inputHandler.DashHeld && controller.AbilitySystem.CanRun())
             {
-                // During initial input lock, preserve some horizontal momentum
-                float preservedSpeed = prePogoVelocity.x * settings.pogoMomentumPreservation;
-                rb.linearVelocity = new Vector2(preservedSpeed, rb.linearVelocity.y);
+                maxSpeed = settings.runSpeed;
+                
+            }
+            
+            // Calculate target velocity
+            float targetXVelocity = moveInput * maxSpeed;
+            
+            // FORCE DIRECT VELOCITY SET
+            if (Mathf.Abs(moveInput) > 0.1f)
+            {
+                // Set velocity directly
+                rb.linearVelocity = new Vector2(targetXVelocity, rb.linearVelocity.y);
+                
+                // Log the change
+                
             }
             else
             {
-                // After initial lock, allow limited air control during attack
-                float moveInput = inputHandler.MoveInput.x * 0.3f;
-                movement.ApplyAirControl(moveInput);
+                // No input - slow down with friction
+                float newXVelocity = Mathf.MoveTowards(rb.linearVelocity.x, 0, 
+                    settings.airFriction * Time.fixedDeltaTime * 20f);
+                rb.linearVelocity = new Vector2(newXVelocity, rb.linearVelocity.y);
+                
             }
-        }
-        else if (isInBounce && !hasReachedBouncePeak)
-        {
-            // MODIFIED: FULL AIR CONTROL DURING BOUNCE PHASE
-            // Use the same air control as in AirState/JumpState
-            
-            // Get current max air speed (run/walk based on dash held)
-            float maxAirSpeed = movement.GetCurrentMaxAirSpeed();
-            
-            // Apply full air control with standard acceleration
-            float moveInput = inputHandler.MoveInput.x;
-            float currentXVelocity = rb.linearVelocity.x;
-            float targetXVelocity = moveInput * maxAirSpeed;
-            
-            // Use the same air acceleration as in AirState
-            float acceleration = settings.airAcceleration;
-            
-            // Smoothly move toward target velocity
-            float newXVelocity = Mathf.MoveTowards(currentXVelocity, targetXVelocity, 
-                acceleration * Time.fixedDeltaTime * 50f); // Scale for FixedUpdate
-            
-            rb.linearVelocity = new Vector2(newXVelocity, rb.linearVelocity.y);
             
             // Flip sprite based on input if needed
             if (Mathf.Abs(moveInput) > 0.1f)
@@ -295,7 +301,39 @@ public class KalbPogoAttackState : KalbState
                 if (shouldFaceRight != movement.FacingRight)
                 {
                     movement.ForceFlip(shouldFaceRight);
+                    
                 }
+            }
+            
+            // Log final velocity periodically
+            if (Time.time - lastDebugTime > DEBUG_INTERVAL)
+            {
+                
+                lastDebugTime = Time.time;
+            }
+        }
+        else if (isPogoAttacking)
+        {
+            // During attack phase, limited control
+            if (inputLockTimer > 0)
+            {
+                // During initial input lock, preserve some horizontal momentum
+                float preservedSpeed = prePogoVelocity.x * settings.pogoMomentumPreservation;
+                rb.linearVelocity = new Vector2(preservedSpeed, rb.linearVelocity.y);
+                
+            }
+            else
+            {
+                // After initial lock, allow limited air control during attack
+                float moveInput = inputHandler.MoveInput.x * 0.3f;
+                
+                // DIRECT VELOCITY CONTROL
+                float targetSpeed = moveInput * settings.moveSpeed;
+                float currentSpeed = rb.linearVelocity.x;
+                float newSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, 
+                    settings.airAcceleration * Time.fixedDeltaTime * 20f);
+                rb.linearVelocity = new Vector2(newSpeed, rb.linearVelocity.y);
+                
             }
         }
         
@@ -365,7 +403,7 @@ public class KalbPogoAttackState : KalbState
             }
         }
         
-        // MODIFIED: Allow dash during bounce phase
+        // Allow dash during bounce phase
         if (inputHandler.DashPressed && isInBounce && !hasReachedBouncePeak)
         {
             if (controller.AbilitySystem.CanDash() && controller.CanDashFromCurrentState() && controller.DashCooldownTimer <= 0)
@@ -432,6 +470,43 @@ public class KalbPogoAttackState : KalbState
         PlayBounceAnimation();
     }
     
+    private void EnterBouncePhase()
+    {
+        isPogoAttacking = false;
+        isInBounce = true;
+        hasReachedBouncePeak = false;
+        bounceStartY = controller.transform.position.y;
+        bounceStartTime = Time.time;
+        
+        
+        
+        // If no hit was registered, still apply a small bounce
+        if (!pogoHitRegistered)
+        {
+            
+            
+            // Apply a small bounce even without hit
+            rb.linearVelocity = new Vector2(
+                rb.linearVelocity.x * settings.pogoMomentumPreservation,
+                5f // Small bounce force
+            );
+        }
+        
+        // Set cooldown
+        canPogo = false;
+        pogoCooldownTimer = settings.pogoAttackCooldown;
+        
+        // Increment chain even without hit to prevent infinite pogos
+        currentPogoChain++;
+        pogoChainTimer = settings.pogoChainWindow;
+        
+        // Reset air abilities even without hit
+        ResetAirAbilities();
+        
+        // Play bounce animation if available
+        PlayBounceAnimation();
+    }
+    
     private void ApplyPogoEffects(Collider2D target)
     {
         // Apply damage - adapt to your enemy system
@@ -457,6 +532,7 @@ public class KalbPogoAttackState : KalbState
         isInBounce = true;
         hasReachedBouncePeak = false;
         bounceStartY = controller.transform.position.y;
+        bounceStartTime = Time.time;
         
         // Calculate bounce force based on fall speed
         float fallSpeed = Mathf.Abs(Mathf.Min(prePogoVelocity.y, 0));
@@ -503,7 +579,6 @@ public class KalbPogoAttackState : KalbState
             
         }
 
-
         if (controller.FloatFallState != null)
         {
             controller.FloatFallState.ResetFloat();
@@ -520,49 +595,9 @@ public class KalbPogoAttackState : KalbState
         }
     }
     
-    private void EndPogoAttack()
-    {
-        
-        
-        isPogoAttacking = false;
-        
-        // If we can still chain, stay in this state but ready for next input
-        if (pogoChainTimer > 0 && currentPogoChain < settings.maxPogoChains)
-        {
-            
-            // Stay in state, waiting for next attack input
-            return;
-        }
-        
-        // If we're in bounce phase, let the falling detection handle transition
-        if (isInBounce)
-        {
-            
-            return;
-        }
-        
-        // Exit to appropriate state
-        if (controller.IsEffectivelyGrounded())
-        {
-            
-            if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
-            {
-                stateMachine.ChangeState(controller.WalkState);
-            }
-            else
-            {
-                stateMachine.ChangeState(controller.IdleState);
-            }
-        }
-        else
-        {
-            
-            stateMachine.ChangeState(controller.AirState);
-        }
-    }
-    
     public void ForceReset()
     {
+        
         
         isPogoAttacking = false;
         pogoHitRegistered = false;

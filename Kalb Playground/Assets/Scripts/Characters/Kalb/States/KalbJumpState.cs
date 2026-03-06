@@ -28,7 +28,7 @@ public class KalbJumpState : KalbState
     
     public override void Enter()
     {
-        Debug.Log("[JumpState] ENTER");
+        
         
         // Initialize fall tracking
         fallStartY = controller.transform.position.y;
@@ -86,7 +86,7 @@ public class KalbJumpState : KalbState
                 fallStartY = currentY;
                 hasStartedFalling = true;
                 wasFalling = true;
-                Debug.Log($"[JumpState] Started falling from Y: {fallStartY}");
+                
             }
             
             // Update maximum fall distance
@@ -106,7 +106,7 @@ public class KalbJumpState : KalbState
             
             if (playerBottom < ledgeTop && playerBottom > ledgeTop - 1.0f)
             {
-                Debug.Log("[JumpState] Transition to LedgeState");
+                
                 stateMachine.ChangeState(controller.LedgeState);
                 return;
             }
@@ -116,7 +116,7 @@ public class KalbJumpState : KalbState
         if (controller.WallJump != null && controller.WallJump.IsWallSliding &&
             controller.AbilitySystem != null && controller.AbilitySystem.CanWallJump())
         {
-            Debug.Log("[JumpState] Transition to WallSlideState");
+            
             stateMachine.ChangeState(controller.WallSlideState);
             return;
         }
@@ -124,7 +124,7 @@ public class KalbJumpState : KalbState
         // Check for swimming transition
         if (swimming != null && swimming.IsInWater)
         {
-            Debug.Log("[JumpState] Transition to SwimState");
+            
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
@@ -132,13 +132,13 @@ public class KalbJumpState : KalbState
         // CRITICAL: When landing, check if we should trigger hard landing
         if (controller.IsEffectivelyGrounded())
         {
-            Debug.Log($"[JumpState] Landed! Max fall distance: {maxFallDistance}, Threshold: {settings.hardLandingFallThreshold}");
+            
             
             // Check if this qualifies as a hard landing
             if (settings.enableHardLanding && 
                 maxFallDistance >= settings.hardLandingFallThreshold)
             {
-                Debug.Log($"[JumpState] HARD LANDING triggered! Distance: {maxFallDistance}");
+                
                 
                 // Pass the fall distance to hard landing state and transition
                 if (controller.HardLandState != null)
@@ -150,7 +150,7 @@ public class KalbJumpState : KalbState
             }
             
             // Normal landing
-            Debug.Log("[JumpState] Normal landing");
+            
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
             {
                 stateMachine.ChangeState(controller.WalkState);

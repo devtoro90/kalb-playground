@@ -28,7 +28,7 @@ public class KalbAirState : KalbState
     
     public override void Enter()
     {
-        Debug.Log("[AirState] ENTER");
+        
         
         // Initialize fall tracking
         fallStartY = controller.transform.position.y;
@@ -58,7 +58,7 @@ public class KalbAirState : KalbState
                 fallStartY = currentY;
                 hasStartedFalling = true;
                 wasFalling = true;
-                Debug.Log($"[AirState] Started falling from Y: {fallStartY}");
+                
             }
             
             // Update maximum fall distance
@@ -84,7 +84,7 @@ public class KalbAirState : KalbState
             
             if (playerBottom < ledgeTop && playerBottom > ledgeTop - 1.0f)
             {
-                Debug.Log("[AirState] Transition to LedgeState");
+                
                 stateMachine.ChangeState(controller.LedgeState);
                 return;
             }
@@ -94,7 +94,7 @@ public class KalbAirState : KalbState
         if (swimming != null && swimming.IsInWater)
         {
             comboSystem?.CancelCombo();
-            Debug.Log("[AirState] Transition to SwimState");
+            
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
@@ -102,13 +102,13 @@ public class KalbAirState : KalbState
         // CRITICAL: When landing, check if we should trigger hard landing
         if (controller.IsEffectivelyGrounded())
         {
-            Debug.Log($"[AirState] Landed! Max fall distance: {maxFallDistance}, Threshold: {settings.hardLandingFallThreshold}");
+            
             
             // Check if this qualifies as a hard landing
             if (settings.enableHardLanding && 
                 maxFallDistance >= settings.hardLandingFallThreshold)
             {
-                Debug.Log($"[AirState] HARD LANDING triggered! Distance: {maxFallDistance}");
+                
                 
                 // Pass the fall distance to hard landing state and transition
                 if (controller.HardLandState != null)
@@ -120,7 +120,7 @@ public class KalbAirState : KalbState
             }
             
             // Normal landing
-            Debug.Log("[AirState] Normal landing");
+            
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
             {
                 stateMachine.ChangeState(controller.WalkState);
