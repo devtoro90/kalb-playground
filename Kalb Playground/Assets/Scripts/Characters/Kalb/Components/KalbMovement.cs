@@ -9,6 +9,7 @@ public class KalbMovement : MonoBehaviour
     [SerializeField] private KalbSettings settings;
     [SerializeField] private KalbSwimming swimming;
     [SerializeField] private KalbComboSystem comboSystem;
+    [SerializeField] private KalbParticleController particleController;
     
     [Header("Movement Settings")]
     [SerializeField] private bool instantStop = true;
@@ -33,6 +34,7 @@ public class KalbMovement : MonoBehaviour
         if (collisionDetector == null) collisionDetector = GetComponent<KalbCollisionDetector>();
         if (swimming == null) swimming = GetComponent<KalbSwimming>();
         if (comboSystem == null) comboSystem = GetComponent<KalbComboSystem>();
+        if (particleController == null) particleController = GetComponent<KalbParticleController>();
     }
     
     private void Update()
@@ -243,6 +245,9 @@ public class KalbMovement : MonoBehaviour
                 comboSystem.UpdateAttackPointWithFacing(facingRight);
             }
         }
+
+        if (particleController != null)
+        particleController.UpdateFacingDirection(facingRight);
     }
     
     public void StopHorizontalMovement()

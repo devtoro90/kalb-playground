@@ -2445,7 +2445,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000
+  m_ApplyToSortingLayers: 00000000d727747291726a53
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -2520,6 +2520,8 @@ GameObject:
   - component: {fileID: 658198532}
   - component: {fileID: 658198533}
   - component: {fileID: 658198537}
+  - component: {fileID: 658198539}
+  - component: {fileID: 658198538}
   m_Layer: 0
   m_Name: Kalb
   m_TagString: Player
@@ -2599,8 +2601,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1920214999
+  m_SortingLayer: -2
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -1200154173720420206, guid: 3445b1dbf3c5d425a981331eb21a70a1, type: 3}
@@ -2752,12 +2754,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1324d21db18734384bc608ca592db4e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KalbMovement
-  controller: {fileID: 0}
+  controller: {fileID: 658198527}
   rb: {fileID: 658198517}
   collisionDetector: {fileID: 658198524}
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
   swimming: {fileID: 658198531}
   comboSystem: {fileID: 658198533}
+  particleController: {fileID: 658198539}
   instantStop: 1
   flipInAir: 1
 --- !u!114 &658198526
@@ -2968,6 +2971,61 @@ MonoBehaviour:
   wallCheckMiddle: {fileID: 1525144135}
   settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
   abilitySystem: {fileID: 658198532}
+--- !u!114 &658198538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658198515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ef112c0250254e978194a627a5b382c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KalbParticlePool
+  pools:
+  - poolName: RunningDust
+    prefab: {fileID: 5456183292686689010, guid: c5942330b9f7540059c159c203c0baf5, type: 3}
+    initialSize: 5
+  - poolName: JumpDust
+    prefab: {fileID: 2558936121325687988, guid: 29149b2b9a8a44371aeed73929c23a00, type: 3}
+    initialSize: 5
+  - poolName: WallSlideDust
+    prefab: {fileID: 4723287658809229725, guid: 90709651f5a374f4cbfd134aecf203b8, type: 3}
+    initialSize: 5
+  - poolName: LandingDust
+    prefab: {fileID: 5270201300035095990, guid: b00516cbb90dd43848d50f986c937f7c, type: 3}
+    initialSize: 5
+--- !u!114 &658198539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658198515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ea34acd281074cd5988ab91894558a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KalbParticleController
+  controller: {fileID: 658198527}
+  settings: {fileID: 11400000, guid: 3009c21d8f20b40ab9ef16a7ed9c5ab5, type: 2}
+  runningDustSystem: {fileID: 5456183292686689010, guid: c5942330b9f7540059c159c203c0baf5, type: 3}
+  jumpDustSystem: {fileID: 2558936121325687988, guid: 29149b2b9a8a44371aeed73929c23a00, type: 3}
+  wallSlideDustSystem: {fileID: 4723287658809229725, guid: 90709651f5a374f4cbfd134aecf203b8, type: 3}
+  landingDustSystem: {fileID: 5270201300035095990, guid: b00516cbb90dd43848d50f986c937f7c, type: 3}
+  minEmissionRate: 5
+  maxEmissionRate: 30
+  minSpeedThreshold: 5
+  dustSpawnOffset: 0.5
+  wallSlideEmissionRate: 20
+  wallSlideDustOffset: 0.4
+  wallSlideVerticalOffset: 0.2
+  particlePool: {fileID: 658198538}
+  runningDustPoolName: RunningDust
+  jumpDustPoolName: JumpDust
+  wallSlideDustPoolName: WallSlideDust
+  landingDustPoolName: LandingDust
 --- !u!1 &690632030
 GameObject:
   m_ObjectHideFlags: 0

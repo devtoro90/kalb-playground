@@ -42,6 +42,10 @@ public class KalbJumpState : KalbState
 
         controller.GravityManager.SetNormalGravity();
         controller.AnimationController.PlayAnimation("Kalb_jump");
+        if (controller.ParticleController != null)
+        {
+            controller.ParticleController.PlayJumpDust();
+        }
         controller.ComboSystem?.CancelCombo();
         
         // Apply jump

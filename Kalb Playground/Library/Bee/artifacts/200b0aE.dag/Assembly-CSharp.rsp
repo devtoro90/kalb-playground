@@ -478,6 +478,8 @@
 "Assets/Scripts/Characters/Kalb/Components/KalbInputHandler.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbLedgeDetector.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbMovement.cs"
+"Assets/Scripts/Characters/Kalb/Components/KalbParticleController.cs"
+"Assets/Scripts/Characters/Kalb/Components/KalbParticlePool.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbPhysics.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbStateMachine.cs"
 "Assets/Scripts/Characters/Kalb/Components/KalbSwimming.cs"

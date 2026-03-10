@@ -93,6 +93,12 @@ public class KalbRunState : KalbState
         
         UpdateRunSpeed();
         UpdateAnimation();
+        // Update running dust
+        if (controller.ParticleController != null)
+        {
+            float currentSpeed = Mathf.Abs(controller.Rb.linearVelocity.x);
+            controller.ParticleController.UpdateRunningDust(currentSpeed, controller.IsEffectivelyGrounded());
+        }
     }
     
     public override void FixedUpdate()

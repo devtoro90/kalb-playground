@@ -9,8 +9,8 @@ public class KalbWallSlideState : KalbState
     private KalbPhysics physics;
     private KalbCollisionDetector collisionDetector;
     private KalbSwimming swimming;
-    
-    public KalbWallSlideState(KalbController controller, KalbStateMachine stateMachine) 
+
+    public KalbWallSlideState(KalbController controller, KalbStateMachine stateMachine)
         : base(controller, stateMachine)
     {
         inputHandler = controller.InputHandler;
@@ -21,15 +21,15 @@ public class KalbWallSlideState : KalbState
         collisionDetector = controller.CollisionDetector;
         swimming = controller.Swimming;
     }
-    
+
     public override void Enter()
     {
         // Play wall slide animation
         controller.AnimationController.PlayAnimation("Kalb_wallslide");
-        
+
         // Stop horizontal movement when starting wall slide
         movement.StopHorizontalMovement();
-        
+
         // Set gravity for wall slide
         controller.GravityManager.SetNormalGravity();
 
@@ -39,30 +39,35 @@ public class KalbWallSlideState : KalbState
             Vector2 wallPush = new Vector2(wallJump.WallSide * 2f, 0);
             rb.AddForce(wallPush, ForceMode2D.Impulse);
         }
-        
+
         // Reset input buffer
         controller.InputBuffer?.ClearBufferedInput("Jump");
         controller.InputBuffer?.ClearBufferedInput("Dash");
         controller.InputBuffer?.ClearBufferedInput("Attack");
     }
-    
+
     public override void Exit()
     {
         // Reset any wall slide specific state if needed
+        // Turn off dust when exiting wall slide
+        if (controller.ParticleController != null)
+        {
+            controller.ParticleController.UpdateWallSlideDust(false, 0, 0);
+        }
     }
-    
+
     public override void Update()
     {
         // Check if we should transition to wall lock
-        if (controller.AbilitySystem.CanWallLock() && 
+        if (controller.AbilitySystem.CanWallLock() &&
             controller.WallLockCooldownTimer <= 0 &&
-            IsPushingTowardWall() && 
+            IsPushingTowardWall() &&
             !(stateMachine.CurrentState is KalbWallLockState))
         {
             stateMachine.ChangeState(controller.WallLockState);
             return;
         }
-        
+
         // Check if we should exit wall slide
         if (!ShouldContinueWallSliding())
         {
@@ -73,59 +78,71 @@ public class KalbWallSlideState : KalbState
                 return;
             }
         }
-        
+
         // Check for ledge (higher priority than wall slide)
         if (controller.LedgeDetector.LedgeDetected && !controller.IsEffectivelyGrounded() &&
             rb.linearVelocity.y < 0 && controller.Settings.ledgeGrabUnlocked)
         {
             float playerBottom = controller.GetComponent<Collider2D>().bounds.min.y;
             float ledgeTop = controller.LedgeDetector.LedgePosition.y;
-            
+
             if (playerBottom < ledgeTop && playerBottom > ledgeTop - 1.0f)
             {
                 stateMachine.ChangeState(controller.LedgeState);
                 return;
             }
         }
-        
+
         // Check for swimming
         if (swimming != null && swimming.IsInWater)
         {
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
-        
+
         // Update animation with slide speed parameter
         UpdateAnimation();
+
+        Debug.Log($"Wall Slide State: Distance to Wall = {wallJump.GetDistanceToWall():F2}, Slide Speed Ratio = {wallJump.SlideSpeedRatio:F2}");
+        // Update wall slide dust
+        if (controller.ParticleController != null && controller.WallJump != null)
+        {
+            Debug.Log($"Updating wall slide dust: IsWallSliding={controller.WallJump.IsWallSliding}, WallSide={controller.WallJump.WallSide}, SlideSpeed={controller.WallJump.CurrentSlideSpeed}");
+            controller.ParticleController.UpdateWallSlideDust(
+                controller.WallJump.IsWallSliding,
+                controller.WallJump.WallSide,
+                controller.WallJump.CurrentSlideSpeed
+            );
+        }
     }
-    
+
     public override void FixedUpdate()
     {
         // Wall sliding physics is handled by KalbWallJump component
         // This state just ensures we're in the right state for animation
     }
-    
+
     public override void HandleInput()
     {
         // Check for wall jump input
         if (inputHandler.JumpPressed && wallJump != null && wallJump.CanWallJump())
         {
             controller.Physics.SetJumpBuffer();
-            
+
             if (controller.InputBuffer?.ConsumeBufferedInput("Jump") == true)
             {
                 ExecuteWallJump();
                 return;
             }
         }
-        
+
         // Check for dash input (only if ability unlocked)
         if (inputHandler.DashPressed && controller.AbilitySystem.CanDash())
         {
             if (controller.CanDashFromCurrentState() && controller.DashCooldownTimer <= 0)
             {
                 controller.InputBuffer.BufferDash();
-                
+
                 if (controller.InputBuffer.ConsumeBufferedInput("Dash"))
                 {
                     stateMachine.ChangeState(controller.DashState);
@@ -133,14 +150,14 @@ public class KalbWallSlideState : KalbState
                 }
             }
         }
-        
+
         // Check for attack input
         if (inputHandler.AttackPressed && controller.ComboSystem.CanAttack)
         {
             if (controller.CanAttackFromCurrentState())
             {
                 controller.InputBuffer.BufferAttack();
-                
+
                 if (controller.InputBuffer.ConsumeBufferedInput("Attack"))
                 {
                     stateMachine.ChangeState(controller.CombatState);
@@ -149,7 +166,7 @@ public class KalbWallSlideState : KalbState
             }
         }
     }
-    
+
     private bool ShouldContinueWallSliding()
     {
         if (!wallJump.IsTouchingWall) return false;
@@ -158,22 +175,22 @@ public class KalbWallSlideState : KalbState
         if (swimming != null && swimming.IsSwimming) return false;
         if (controller.DashState.IsDashing) return false;
         if (controller.AbilitySystem != null && !controller.AbilitySystem.CanWallJump()) return false;
-        
+
         return true;
     }
-    
+
     private bool IsPushingTowardWall()
     {
         if (!wallJump.IsTouchingWall)
             return false;
-        
+
         float inputDirection = Mathf.Sign(inputHandler.MoveInput.x);
         float wallSide = wallJump.WallSide;
-        
-        return Mathf.Abs(inputHandler.MoveInput.x) > controller.Settings.wallLockInputThreshold && 
+
+        return Mathf.Abs(inputHandler.MoveInput.x) > controller.Settings.wallLockInputThreshold &&
             Mathf.Approximately(inputDirection, wallSide);
     }
-    
+
     private void ExitToAppropriateState()
     {
         if (controller.IsEffectivelyGrounded())
@@ -188,36 +205,40 @@ public class KalbWallSlideState : KalbState
             }
             return;
         }
-        
+
         if (swimming != null && swimming.IsInWater)
         {
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
-        
+
         stateMachine.ChangeState(controller.AirState);
     }
-    
+
     private void ExecuteWallJump()
     {
         if (wallJump == null) return;
-        
+
         wallJump.ExecuteWallJump();
         controller.AnimationController.PlayAnimation("Kalb_jump");
+        if (controller.ParticleController != null)
+        {
+            controller.ParticleController.PlayJumpDust();
+        }
         controller.Physics.SetJumpBuffer();
         inputHandler.ResetJumpInput();
         stateMachine.ChangeState(controller.AirState);
     }
-    
+
     private void UpdateAnimation()
     {
         // Get slide speed ratio for animation blending
         float speedRatio = wallJump.SlideSpeedRatio;
-        
+
         // You can use this to blend between different wall slide animations
         // or to control the speed of the slide animation
         controller.AnimationController.PlayAnimation("Kalb_wallslide");
-        
+
         // Optional: Set animator parameter for slide speed
         // animator.SetFloat("SlideSpeed", speedRatio);
     }

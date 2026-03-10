@@ -20,6 +20,7 @@ public class KalbController : MonoBehaviour
     private KalbGravityManager gravityManager;
     private KalbInputBuffer inputBuffer;
     private KalbWallJump wallJump;
+    private KalbParticleController particleController;
     
     // State Machine
     private KalbStateMachine stateMachine;
@@ -67,6 +68,8 @@ public class KalbController : MonoBehaviour
     public KalbGravityManager GravityManager => gravityManager;
     public KalbInputBuffer InputBuffer => inputBuffer;
     public KalbWallJump WallJump => wallJump;
+    public KalbParticleController ParticleController => particleController;
+
     public float WallLockCooldownTimer
     {
         get => wallLockCooldownTimer;
@@ -158,6 +161,9 @@ public class KalbController : MonoBehaviour
 
         wallJump = GetComponent<KalbWallJump>();
         if (wallJump == null) wallJump = gameObject.AddComponent<KalbWallJump>();
+        
+        particleController = GetComponent<KalbParticleController>();
+        if (particleController == null) particleController = gameObject.AddComponent<KalbParticleController>();
         
         // Create default settings if none provided
         if (settings == null)

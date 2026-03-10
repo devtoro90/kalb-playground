@@ -38,6 +38,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Player
+    uniqueID: 1920214999
+    locked: 0
+  - name: Effects
+    uniqueID: 1399485073
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
