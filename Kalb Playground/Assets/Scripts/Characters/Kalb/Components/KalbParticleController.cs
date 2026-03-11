@@ -11,6 +11,7 @@ public class KalbParticleController : MonoBehaviour
     [SerializeField] private ParticleSystem jumpDustSystem;
     [SerializeField] private ParticleSystem wallSlideDustSystem;
     [SerializeField] private ParticleSystem landingDustSystem;
+    [SerializeField] private ParticleSystem dashTrailSystem;
 
     [Header("Running Dust Settings")]
     [SerializeField] private float minEmissionRate = 5f;    // At minimum speed
@@ -23,12 +24,18 @@ public class KalbParticleController : MonoBehaviour
     [SerializeField] private float wallSlideDustOffset = 0.4f; // Distance from center to wall
     [SerializeField] private float wallSlideVerticalOffset = 0.2f;
 
+    [Header("Dash Trail Particles")]
+    [SerializeField] private float dashTrailEmissionRate = 30f;
+
+
     [Header("Pooling")]
     [SerializeField] private KalbParticlePool particlePool;
     [SerializeField] private string runningDustPoolName = "RunningDust";
     [SerializeField] private string jumpDustPoolName = "JumpDust";
     [SerializeField] private string wallSlideDustPoolName = "WallSlideDust";
     [SerializeField] private string landingDustPoolName = "LandingDust";
+    [SerializeField] private string dashTrailPoolName = "DashTrail";
+    [SerializeField] private string dashLinePoolName = "DashLineTrail";
 
     // Cache the emission module for performance
     private ParticleSystem.EmissionModule runningEmission;
@@ -248,6 +255,63 @@ public class KalbParticleController : MonoBehaviour
         }
     }
 
+
+    public void StartDashTrailParticles(Vector2 dashDirection)
+    {
+        if (dashTrailSystem == null) return;
+
+        // Position trail system behind player
+        PositionDashTrailSystem(dashDirection);
+
+        // Set emission rate
+        var emission = dashTrailSystem.emission;
+        emission.rateOverTime = dashTrailEmissionRate;
+
+        if (!dashTrailSystem.isPlaying)
+        {
+            dashTrailSystem.Play();
+        }
+
+        Debug.Log("[Dash Particles] Trail started");
+    }
+
+    public void StopDashTrailParticles()
+    {
+        if (dashTrailSystem == null) return;
+
+        var emission = dashTrailSystem.emission;
+        emission.rateOverTime = 0;
+
+        Debug.Log("[Dash Particles] Trail stopped");
+    }
+
+    private void PositionDashTrailSystem(Vector2 dashDirection)
+    {
+        if (dashTrailSystem == null) return;
+
+        // Position trail system behind player relative to dash direction
+        Collider2D playerCollider = GetComponent<Collider2D>();
+        if (playerCollider != null)
+        {
+            Vector3 playerCenter = playerCollider.bounds.center;
+
+            // Place trail slightly behind the dash direction
+            Vector3 offset = -dashDirection.normalized * 0.3f;
+            Vector3 trailPosition = playerCenter + offset;
+
+            dashTrailSystem.transform.position = trailPosition;
+
+            // Rotate trail to emit backward relative to dash direction
+            float angle = GetAngleFromDirection(-dashDirection);
+            dashTrailSystem.transform.rotation = Quaternion.Euler(0, 0, angle);
+        }
+    }
+
+    private float GetAngleFromDirection(Vector2 direction)
+    {
+        return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    }
+
     Vector3 GetFootPosition()
     {
         Collider2D col = GetComponent<Collider2D>();
@@ -283,6 +347,12 @@ public class KalbParticleController : MonoBehaviour
         if (wallSlideDustSystem != null && controller.WallJump != null && controller.WallJump.IsWallSliding)
         {
             PositionWallSlideDust();
+        }
+
+        // Also update dash trail orientation if active
+        if (dashTrailSystem != null && dashTrailSystem.isPlaying && controller.DashState != null)
+        {
+            PositionDashTrailSystem(controller.DashState.DashDirection);
         }
     }
 

@@ -2408,6 +2408,37 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!1 &557174106
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 557174107}
+  m_Layer: 0
+  m_Name: TrailContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &557174107
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 557174106}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 658198519}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -2522,6 +2553,7 @@ GameObject:
   - component: {fileID: 658198537}
   - component: {fileID: 658198539}
   - component: {fileID: 658198538}
+  - component: {fileID: 658198540}
   m_Layer: 0
   m_Name: Kalb
   m_TagString: Player
@@ -2632,6 +2664,7 @@ Transform:
   - {fileID: 1525144135}
   - {fileID: 313741843}
   - {fileID: 698528782}
+  - {fileID: 557174107}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &658198521
@@ -2996,6 +3029,12 @@ MonoBehaviour:
   - poolName: LandingDust
     prefab: {fileID: 5270201300035095990, guid: b00516cbb90dd43848d50f986c937f7c, type: 3}
     initialSize: 5
+  - poolName: DashTrail
+    prefab: {fileID: 6391684589021278559, guid: a85f2c3ab53b94a8b974aab71f0970f4, type: 3}
+    initialSize: 5
+  - poolName: DashLineTrail
+    prefab: {fileID: 8033887819656788733, guid: 23d77e22f5cb84637bc93ede37dc3848, type: 3}
+    initialSize: 5
 --- !u!114 &658198539
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3014,6 +3053,7 @@ MonoBehaviour:
   jumpDustSystem: {fileID: 2558936121325687988, guid: 29149b2b9a8a44371aeed73929c23a00, type: 3}
   wallSlideDustSystem: {fileID: 4723287658809229725, guid: 90709651f5a374f4cbfd134aecf203b8, type: 3}
   landingDustSystem: {fileID: 5270201300035095990, guid: b00516cbb90dd43848d50f986c937f7c, type: 3}
+  dashTrailSystem: {fileID: 6391684589021278559, guid: a85f2c3ab53b94a8b974aab71f0970f4, type: 3}
   minEmissionRate: 5
   maxEmissionRate: 30
   minSpeedThreshold: 5
@@ -3021,11 +3061,54 @@ MonoBehaviour:
   wallSlideEmissionRate: 20
   wallSlideDustOffset: 0.4
   wallSlideVerticalOffset: 0.2
+  dashTrailEmissionRate: 30
+  lineCount: 10
+  lineSpread: 1
+  lineLength: 2
+  lineStartColor: {r: 0, g: 1, b: 1, a: 1}
+  lineEndColor: {r: 0, g: 0.5, b: 1, a: 0}
+  lineLifetime: 0.3
+  linesFollowDashDirection: 0
+  lineTrailSpeed: 0
   particlePool: {fileID: 658198538}
   runningDustPoolName: RunningDust
   jumpDustPoolName: JumpDust
   wallSlideDustPoolName: WallSlideDust
   landingDustPoolName: LandingDust
+  dashTrailPoolName: DashTrail
+  dashLinePoolName: DashLineTrail
+--- !u!114 &658198540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658198515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd7f9a9ab61634d13a45afb2614ee2bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KalbDashTrail
+  controller: {fileID: 658198527}
+  playerSprite: {fileID: 658198518}
+  trailContainer: {fileID: 557174107}
+  useWorldSpace: 1
+  maxTrailCount: 10
+  trailSpawnInterval: 0.03
+  trailLifetime: 0.3
+  trailMaterial: {fileID: 2100000, guid: 20443ecda436a4957a20c99f64d4a92f, type: 2}
+  trailStartColor: {r: 1, g: 1, b: 1, a: 0.8}
+  trailEndColor: {r: 1, g: 1, b: 1, a: 0}
+  trailScale: 1
+  fadeOut: 1
+  rotateTrailsToDirection: 1
+  rotationSmoothness: 5
+  useObjectPooling: 1
+  prewarmCount: 10
+  useDirectionColors: 1
+  horizontalDashColor: {r: 1, g: 1, b: 1, a: 1}
+  verticalDashColor: {r: 0, g: 1, b: 1, a: 1}
+  diagonalDashColor: {r: 0.8, g: 0.8, b: 1, a: 1}
 --- !u!1 &690632030
 GameObject:
   m_ObjectHideFlags: 0
