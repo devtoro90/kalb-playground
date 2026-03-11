@@ -54,7 +54,7 @@ public class KalbDashLineTrail : MonoBehaviour
             CreateLineRenderer();
         }
 
-        Debug.Log("[DashLineTrail] Initialized with " + linePool.Count + " lines in pool");
+
     }
 
     private LineRenderer CreateLineRenderer()
@@ -102,7 +102,7 @@ public class KalbDashLineTrail : MonoBehaviour
 
     public void StartDashLines(Vector2 direction, float duration)
     {
-        Debug.Log("[DashLineTrail] StartDashLines called");
+
 
         isDashing = true;
         dashDirection = direction.normalized;
@@ -114,7 +114,7 @@ public class KalbDashLineTrail : MonoBehaviour
 
     public void StopDashLines()
     {
-        Debug.Log("[DashLineTrail] StopDashLines called");
+
         isDashing = false;
     }
 
