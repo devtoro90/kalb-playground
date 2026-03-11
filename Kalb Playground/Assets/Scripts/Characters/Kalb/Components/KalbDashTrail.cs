@@ -17,7 +17,6 @@ public class KalbDashTrail : MonoBehaviour
     [SerializeField] private int maxTrailCount = 10;
     [SerializeField] private float trailSpawnInterval = 0.03f;
     [SerializeField] private float trailLifetime = 0.3f;
-    [SerializeField] private Material trailMaterial;
 
     [Header("Trail Appearance")]
     [SerializeField] private Color trailStartColor = new Color(1f, 1f, 1f, 0.8f);
@@ -114,11 +113,6 @@ public class KalbDashTrail : MonoBehaviour
         renderer.enabled = true;
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
-
-        if (trailMaterial != null)
-        {
-            renderer.material = trailMaterial;
-        }
 
         // Add a temporary visibility helper (optional)
 #if UNITY_EDITOR

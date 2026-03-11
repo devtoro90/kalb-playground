@@ -2432,12 +2432,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 557174106}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -6.96, y: -2.18, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 658198519}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &619394800
 GameObject:
@@ -2664,7 +2664,6 @@ Transform:
   - {fileID: 1525144135}
   - {fileID: 313741843}
   - {fileID: 698528782}
-  - {fileID: 557174107}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &658198521
@@ -3029,12 +3028,6 @@ MonoBehaviour:
   - poolName: LandingDust
     prefab: {fileID: 5270201300035095990, guid: b00516cbb90dd43848d50f986c937f7c, type: 3}
     initialSize: 5
-  - poolName: DashTrail
-    prefab: {fileID: 6391684589021278559, guid: a85f2c3ab53b94a8b974aab71f0970f4, type: 3}
-    initialSize: 5
-  - poolName: DashLineTrail
-    prefab: {fileID: 8033887819656788733, guid: 23d77e22f5cb84637bc93ede37dc3848, type: 3}
-    initialSize: 5
 --- !u!114 &658198539
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3062,14 +3055,6 @@ MonoBehaviour:
   wallSlideDustOffset: 0.4
   wallSlideVerticalOffset: 0.2
   dashTrailEmissionRate: 30
-  lineCount: 10
-  lineSpread: 1
-  lineLength: 2
-  lineStartColor: {r: 0, g: 1, b: 1, a: 1}
-  lineEndColor: {r: 0, g: 0.5, b: 1, a: 0}
-  lineLifetime: 0.3
-  linesFollowDashDirection: 0
-  lineTrailSpeed: 0
   particlePool: {fileID: 658198538}
   runningDustPoolName: RunningDust
   jumpDustPoolName: JumpDust
@@ -3096,7 +3081,7 @@ MonoBehaviour:
   maxTrailCount: 10
   trailSpawnInterval: 0.03
   trailLifetime: 0.3
-  trailMaterial: {fileID: 2100000, guid: 20443ecda436a4957a20c99f64d4a92f, type: 2}
+  trailMaterial: {fileID: 0}
   trailStartColor: {r: 1, g: 1, b: 1, a: 0.8}
   trailEndColor: {r: 1, g: 1, b: 1, a: 0}
   trailScale: 1
@@ -3635,5 +3620,6 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 658198519}
+  - {fileID: 557174107}
   - {fileID: 2102329492}
   - {fileID: 16984153}
