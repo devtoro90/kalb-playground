@@ -221,10 +221,30 @@ public class KalbDashState : KalbState
         // Use input
         if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f || Mathf.Abs(inputHandler.MoveInput.y) > 0.1f)
         {
-            dashDirection = new Vector2(inputHandler.MoveInput.x, inputHandler.MoveInput.y).normalized;
+            Vector2 rawInput = new Vector2(inputHandler.MoveInput.x, inputHandler.MoveInput.y);
+
+            // FIX 1: If grounded, ignore downward input and treat as forward/horizontal
+            if (controller.IsEffectivelyGrounded() && rawInput.y < -0.1f)
+            {
+                // Grounded + down pressed = dash forward only
+                dashDirection = new Vector2(rawInput.x, 0).normalized;
+
+                // If no horizontal input, default to facing direction
+                if (Mathf.Abs(dashDirection.x) < 0.1f)
+                {
+                    dashDirection = movement.FacingRight ? Vector2.right : Vector2.left;
+                }
+            }
+            else
+            {
+                // Normal dash direction for all other cases
+                dashDirection = rawInput.normalized;
+            }
 
             // Apply diagonal multiplier if not pure horizontal/vertical
-            if (settings.canDashDiagonal && Mathf.Abs(inputHandler.MoveInput.x) > 0.1f && Mathf.Abs(inputHandler.MoveInput.y) > 0.1f)
+            if (settings.canDashDiagonal &&
+                Mathf.Abs(inputHandler.MoveInput.x) > 0.1f &&
+                Mathf.Abs(inputHandler.MoveInput.y) > 0.1f)
             {
                 dashDirection *= settings.diagonalDashMultiplier;
             }
@@ -236,6 +256,13 @@ public class KalbDashState : KalbState
         float horizontalInput = Mathf.Abs(inputHandler.MoveInput.x);
         float verticalInput = Mathf.Abs(inputHandler.MoveInput.y);
         float inputThreshold = 0.1f;
+
+        // FIX 1: If grounded and trying to dash down, force forward dash
+        if (controller.IsEffectivelyGrounded() && inputHandler.MoveInput.y < -0.1f)
+        {
+            currentDashDirectionType = DashDirectionType.Forward;
+            return;
+        }
 
         // If no directional input, use forward dash
         if (horizontalInput < inputThreshold && verticalInput < inputThreshold)
