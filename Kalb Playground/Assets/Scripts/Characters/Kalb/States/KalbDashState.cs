@@ -337,14 +337,33 @@ public class KalbDashState : KalbState
 
         controller.GravityManager.ClearOverride("Dash");
 
+        // FIX 2: Handle upward dash momentum differently
+        bool wasUpwardDash = currentDashDirectionType == DashDirectionType.Up ||
+                            currentDashDirectionType == DashDirectionType.UpDiagonal;
+
+        // Store current velocity before restoring gravity
+        Vector2 endVelocity = controller.Rb.linearVelocity;
+
         // Restore gravity
         controller.Rb.gravityScale = preDashGravityScale;
 
-        // Slow down
-        controller.Rb.linearVelocity = new Vector2(
-            controller.Rb.linearVelocity.x * settings.dashEndSlowdown,
-            controller.Rb.linearVelocity.y * settings.dashEndSlowdown
-        );
+        if (wasUpwardDash)
+        {
+            // FIX 2: For upward dashes, kill upward momentum and let gravity take over
+            // This prevents the floaty jump after upward dash
+            controller.Rb.linearVelocity = new Vector2(
+                endVelocity.x * settings.dashEndSlowdown,
+                Mathf.Min(endVelocity.y * 0.2f, 2f) // Reduce upward momentum significantly
+            );
+        }
+        else
+        {
+            // Normal dash slowdown for other directions
+            controller.Rb.linearVelocity = new Vector2(
+                endVelocity.x * settings.dashEndSlowdown,
+                endVelocity.y * settings.dashEndSlowdown
+            );
+        }
 
         controller.DashCooldownTimer = settings.dashCooldown;
     }
@@ -370,7 +389,7 @@ public class KalbDashState : KalbState
             controller.FloatFallState.ResetFloat();
         }
 
-        // NEW: Check for wall slide immediately after dash
+        // Check for wall slide immediately after dash
         if (controller.WallJump != null && controller.WallJump.IsWallSliding &&
             controller.AbilitySystem != null && controller.AbilitySystem.CanWallJump())
         {
@@ -385,9 +404,14 @@ public class KalbDashState : KalbState
             return;
         }
 
+        // FIX 2: For upward dashes, ALWAYS go to falling state
+        bool wasUpwardDash = currentDashDirectionType == DashDirectionType.Up ||
+                            currentDashDirectionType == DashDirectionType.UpDiagonal;
+
         // Check grounded
         if (!controller.IsEffectivelyGrounded())
         {
+            // For upward dashes, force air state (which will show falling animation)
             stateMachine.ChangeState(controller.AirState);
             return;
         }
