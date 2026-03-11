@@ -244,12 +244,12 @@ public class KalbDashTrail : MonoBehaviour
         }
         activeTrails.Clear();
 
-        Debug.Log($"[DashTrail] Force cleaned up {activeTrails.Count} trails");
+
     }
 
     private void Update()
     {
-        Debug.Log($"[DashTrail] Update - isTrailActive: {isTrailActive}, ActiveTrails: {activeTrails.Count}");
+
 
         // Safety cleanup - if dash is no longer active but trails remain
         if (!isTrailActive && activeTrails.Count > 0)
@@ -257,7 +257,7 @@ public class KalbDashTrail : MonoBehaviour
             // Check if controller's dash state is still active
             if (controller != null && controller.DashState != null && !controller.DashState.IsDashing)
             {
-                Debug.Log("[DashTrail] Dash ended, cleaning up trails");
+
                 ForceCleanupTrails();
             }
         }
@@ -272,7 +272,7 @@ public class KalbDashTrail : MonoBehaviour
         // Spawn new trail instances
         if (Time.time >= lastSpawnTime + trailSpawnInterval)
         {
-            Debug.Log("[DashTrail] Spawning new trail instance");
+
             SpawnTrailInstance();
             lastSpawnTime = Time.time;
         }
@@ -300,7 +300,7 @@ public class KalbDashTrail : MonoBehaviour
             if (lifeRatio >= 1f)
             {
                 // Trail expired
-                Debug.Log($"[DashTrail] Trail expired, returning to pool");
+
                 ReturnTrailObject(trail.gameObject);
                 activeTrails.RemoveAt(i);
                 continue;

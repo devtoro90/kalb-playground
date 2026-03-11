@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class KalbDashState : KalbState
 {
+    [Header("Dash Line Trail")]
+    private KalbDashLineTrail dashLineTrail;
+    private bool useLineTrailEffect = true;
     private KalbInputHandler inputHandler;
     private KalbCollisionDetector collisionDetector;
     private KalbMovement movement;
@@ -66,8 +69,20 @@ public class KalbDashState : KalbState
             dashTrail = controller.GetComponent<KalbDashTrail>();
         }
 
+        // Get line trail reference
+        if (dashLineTrail == null)
+        {
+            dashLineTrail = controller.GetComponent<KalbDashLineTrail>();
+            if (dashLineTrail == null && useLineTrailEffect)
+            {
+                dashLineTrail = controller.gameObject.AddComponent<KalbDashLineTrail>();
+            }
+        }
+
+
         // Start dash effects
         StartDashEffects();
+
 
     }
 
@@ -404,24 +419,30 @@ public class KalbDashState : KalbState
 
     private void StartDashEffects()
     {
-        Debug.Log($"[DashState] Starting dash effects. DashDirection: {dashDirection}");
+
 
         // Get references if needed
         if (dashTrail == null)
         {
             dashTrail = controller.GetComponent<KalbDashTrail>();
-            Debug.Log($"[DashState] dashTrail reference: {dashTrail != null}");
+
         }
 
         // Start ghost trail
         if (dashTrail != null)
         {
-            Debug.Log("[DashState] Calling dashTrail.StartDashTrail()");
+
             dashTrail.StartDashTrail();
         }
         else
         {
             Debug.LogError("[DashState] dashTrail is NULL even after GetComponent!");
+        }
+
+        // Start line trail effect
+        if (dashLineTrail != null && useLineTrailEffect)
+        {
+            dashLineTrail.StartDashLines(dashDirection, settings.dashDuration);
         }
 
         // Start flash coroutine
@@ -434,6 +455,11 @@ public class KalbDashState : KalbState
         {
             dashTrail.StopDashTrail();
             dashTrail.ForceCleanupTrails();
+        }
+
+        if (dashLineTrail != null && useLineTrailEffect)
+        {
+            dashLineTrail.StopDashLines();
         }
 
         if (controller.ParticleController != null)

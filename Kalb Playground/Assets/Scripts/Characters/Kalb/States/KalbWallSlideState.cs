@@ -103,11 +103,11 @@ public class KalbWallSlideState : KalbState
         // Update animation with slide speed parameter
         UpdateAnimation();
 
-        Debug.Log($"Wall Slide State: Distance to Wall = {wallJump.GetDistanceToWall():F2}, Slide Speed Ratio = {wallJump.SlideSpeedRatio:F2}");
+
         // Update wall slide dust
         if (controller.ParticleController != null && controller.WallJump != null)
         {
-            Debug.Log($"Updating wall slide dust: IsWallSliding={controller.WallJump.IsWallSliding}, WallSide={controller.WallJump.WallSide}, SlideSpeed={controller.WallJump.CurrentSlideSpeed}");
+
             controller.ParticleController.UpdateWallSlideDust(
                 controller.WallJump.IsWallSliding,
                 controller.WallJump.WallSide,

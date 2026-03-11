@@ -100,7 +100,7 @@ public class KalbParticleController : MonoBehaviour
 
         if (isGrounded && Mathf.Abs(horizontalSpeed) > minSpeedThreshold)
         {
-            Debug.Log($"[Particle Debug] Emitting dust. Speed: {horizontalSpeed}");
+
             // Calculate emission rate based on speed
             float speedRatio = Mathf.Abs(horizontalSpeed) / settings.runSpeed;
             float emissionRate = Mathf.Lerp(minEmissionRate, maxEmissionRate, speedRatio);
@@ -111,7 +111,7 @@ public class KalbParticleController : MonoBehaviour
             // Make sure it's playing
             if (!runningDustSystem.isPlaying)
             {
-                Debug.Log("[Particle Debug] Starting dust system");
+
                 if (particlePool != null)
                 {
                     Vector3 footPosition = GetFootPosition();
@@ -170,7 +170,7 @@ public class KalbParticleController : MonoBehaviour
             shape.angle = 90; // Emit downward
             shape.rotation = new Vector3(0, 0, wallSide == 1 ? 0 : 180); // Flip for left wall
 
-            Debug.Log($"[Particle Debug] Positioned wall slide dust at side {wallSide}, local pos {localPosition}");
+
         }
     }
 
@@ -180,10 +180,10 @@ public class KalbParticleController : MonoBehaviour
     /// </summary>
     public void UpdateWallSlideDust(bool isWallSliding, int wallSide, float slideSpeed)
     {
-        Debug.Log($"[Particle Debug] UpdateWallSlideDust called with isWallSliding={isWallSliding}, wallSide={wallSide}, slideSpeed={slideSpeed}");
+
         if (wallSlideDustSystem == null) return;
 
-        Debug.Log($"[Particle Debug] Current emission rate: {wallSlideEmission.rateOverTime.constant}");
+
         if (isWallSliding && wallSide != 0)
         {
             // Update position (wall side might change)
@@ -194,12 +194,12 @@ public class KalbParticleController : MonoBehaviour
             float emissionRate = Mathf.Lerp(10f, 30f, speedRatio);
             wallSlideEmission.rateOverTime = emissionRate;
 
-            Debug.Log($"[Particle Debug] Emitting wall slide dust. Speed: {slideSpeed}, Emission Rate: {emissionRate}");
+
             // Play if not already playing
             if (!wallSlideDustSystem.isPlaying)
             {
 
-                Debug.Log("[Particle Debug] Starting dust system");
+
                 if (particlePool != null)
                 {
                     Vector3 wallSlidePosition = GetWallSlidePosition(wallSide);
@@ -272,7 +272,7 @@ public class KalbParticleController : MonoBehaviour
             dashTrailSystem.Play();
         }
 
-        Debug.Log("[Dash Particles] Trail started");
+
     }
 
     public void StopDashTrailParticles()
@@ -282,7 +282,7 @@ public class KalbParticleController : MonoBehaviour
         var emission = dashTrailSystem.emission;
         emission.rateOverTime = 0;
 
-        Debug.Log("[Dash Particles] Trail stopped");
+
     }
 
     private void PositionDashTrailSystem(Vector2 dashDirection)

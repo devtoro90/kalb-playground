@@ -86,6 +86,7 @@
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbAnimationController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbPhysics.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbDashLineTrail.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbLedgeDetector.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexShakeA.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbParticlePool.cs" />
