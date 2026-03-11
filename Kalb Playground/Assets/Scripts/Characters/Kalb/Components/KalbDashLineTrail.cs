@@ -8,32 +8,49 @@ public class KalbDashLineTrail : MonoBehaviour
     [SerializeField] private KalbController controller;
     [SerializeField] private SpriteRenderer playerSprite;
 
-    [Header("Line Settings - THIN LINES")]
-    [SerializeField] private int lineCount = 8;
-    [SerializeField] private float lineLength = 3f;
-    [SerializeField] private float lineWidth = 0.05f; // MUCH thinner
-    [SerializeField] private float lineSpread = 0.6f;
+    [Header("Line Settings - GLOWING LIGHTSABER LINES")]
+    [SerializeField] private int lineCount = 5;
+    [SerializeField] private float lineLength = 0.5f;
+    [SerializeField] private float lineWidth = 0.03f;
+    [SerializeField] private float lineSpread = 0.8f;
     [SerializeField] private Material lineMaterial;
 
-    [Header("Colors")]
-    [SerializeField] private Color lineColor = new Color(1f, 1f, 1f, 1f); // Bright white
+    [Header("Glow Settings")]
+    [SerializeField] private Color lineColor = new Color(1f, 1f, 1f, 0.2f);
+    [SerializeField] private Color glowColor = new Color(1f, 1f, 0f, 0.4f);
+    [SerializeField] private float coreWidthMultiplier = 0.6f;
+    [SerializeField] private float glowWidthMultiplier = 1f;
+    [SerializeField] private bool usePulseGlow = true;
+    [SerializeField] private float pulseSpeed = 3f;
+    [SerializeField] private float pulseIntensity = 0.2f;
+
+    [Header("Fade Settings")]
+    [SerializeField] private AnimationCurve fadeCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
+    [SerializeField] private bool fadeWidth = false;
+
+    [Header("Spawn Settings")]
+    [SerializeField] private float spawnInterval = 0.05f; // Spawn lines every 0.05 seconds
+    private float lastSpawnTime;
 
     [Header("Debug")]
     [SerializeField] private bool showDebugGizmos = true;
 
-    private class SimpleLine
+    private class GlowingLine
     {
-        public LineRenderer renderer;
+        public LineRenderer coreRenderer;
+        public LineRenderer glowRenderer;
         public float spawnTime;
-        public Vector3 startPos;
-        public Vector3 endPos;
+        public Vector3 startPos;  // Fixed start position when spawned
+        public Vector3 endPos;     // Fixed end position when spawned
+        public float baseCoreWidth;
+        public float baseGlowWidth;
     }
 
-    private List<SimpleLine> activeLines = new List<SimpleLine>();
-    private Queue<LineRenderer> linePool = new Queue<LineRenderer>();
+    private List<GlowingLine> activeLines = new List<GlowingLine>();
+    private Queue<LineRenderer> coreLinePool = new Queue<LineRenderer>();
+    private Queue<LineRenderer> glowLinePool = new Queue<LineRenderer>();
     private bool isDashing = false;
     private Vector2 dashDirection;
-    private float dashStartTime;
     private float dashDuration;
     private Transform lineContainer;
 
@@ -42,79 +59,94 @@ public class KalbDashLineTrail : MonoBehaviour
         if (controller == null) controller = GetComponent<KalbController>();
         if (playerSprite == null) playerSprite = GetComponent<SpriteRenderer>();
 
-        // Create container
         GameObject container = new GameObject("DashLineContainer");
         lineContainer = container.transform;
         lineContainer.SetParent(transform);
         lineContainer.localPosition = Vector3.zero;
 
-        // Create initial pool
         for (int i = 0; i < 30; i++)
         {
-            CreateLineRenderer();
+            CreateCoreLineRenderer();
+            CreateGlowLineRenderer();
         }
-
-
     }
 
-    private LineRenderer CreateLineRenderer()
+    private LineRenderer CreateCoreLineRenderer()
     {
-        GameObject lineObj = new GameObject("DashLine");
+        GameObject lineObj = new GameObject("DashLine_Core");
         lineObj.transform.SetParent(lineContainer);
         lineObj.transform.localPosition = Vector3.zero;
 
         LineRenderer line = lineObj.AddComponent<LineRenderer>();
         line.positionCount = 2;
 
-        // Material
         if (lineMaterial != null)
             line.material = lineMaterial;
         else
         {
             line.material = new Material(Shader.Find("Sprites/Default"));
-            line.material.color = Color.white;
+            line.material.renderQueue = 3000;
         }
 
-        // CRITICAL: Constant width - no tapering
-        line.startWidth = lineWidth;
-        line.endWidth = lineWidth; // SAME as start width - no taper!
-
-        // Color - start with full alpha
+        line.material.EnableKeyword("_ALPHABLEND_ON");
+        line.startWidth = lineWidth * coreWidthMultiplier;
+        line.endWidth = lineWidth * coreWidthMultiplier;
         line.startColor = lineColor;
-        line.endColor = lineColor; // SAME color - we'll fade both ends together
+        line.endColor = lineColor;
+        line.sortingOrder = 1001;
+        line.sortingLayerName = "Default";
+        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        line.receiveShadows = false;
 
-        // Rendering settings
+        lineObj.SetActive(false);
+        coreLinePool.Enqueue(line);
+        return line;
+    }
+
+    private LineRenderer CreateGlowLineRenderer()
+    {
+        GameObject lineObj = new GameObject("DashLine_Glow");
+        lineObj.transform.SetParent(lineContainer);
+        lineObj.transform.localPosition = Vector3.zero;
+
+        LineRenderer line = lineObj.AddComponent<LineRenderer>();
+        line.positionCount = 2;
+
+        if (lineMaterial != null)
+            line.material = lineMaterial;
+        else
+        {
+            line.material = new Material(Shader.Find("Sprites/Default"));
+            line.material.renderQueue = 2999;
+        }
+
+        line.material.EnableKeyword("_ALPHABLEND_ON");
+        line.startWidth = lineWidth * glowWidthMultiplier;
+        line.endWidth = lineWidth * glowWidthMultiplier;
+        line.startColor = glowColor;
+        line.endColor = glowColor;
         line.sortingOrder = 1000;
         line.sortingLayerName = "Default";
         line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         line.receiveShadows = false;
 
-        // No width curve (keeps constant width)
-        //line.widthCurve = null;
-        line.widthMultiplier = 1f;
-
-        // Deactivate and add to pool
         lineObj.SetActive(false);
-        linePool.Enqueue(line);
-
+        glowLinePool.Enqueue(line);
         return line;
     }
 
     public void StartDashLines(Vector2 direction, float duration)
     {
-
-
         isDashing = true;
         dashDirection = direction.normalized;
         dashDuration = duration;
-        dashStartTime = Time.time;
+        lastSpawnTime = Time.time; // Reset spawn timer
 
         ClearAllLines();
     }
 
     public void StopDashLines()
     {
-
         isDashing = false;
     }
 
@@ -125,20 +157,19 @@ public class KalbDashLineTrail : MonoBehaviour
 
         float currentTime = Time.time;
 
-        // Spawn new lines while dashing (every frame)
-        if (isDashing)
+        // Spawn new lines at intervals while dashing
+        if (isDashing && currentTime - lastSpawnTime >= spawnInterval)
         {
             SpawnLineSet();
+            lastSpawnTime = currentTime;
         }
 
-
-
-        // Update existing lines (just fade, no shrinking)
+        // Update existing lines - with stretching
         for (int i = activeLines.Count - 1; i >= 0; i--)
         {
-            SimpleLine line = activeLines[i];
+            GlowingLine line = activeLines[i];
 
-            if (line.renderer == null)
+            if (line.coreRenderer == null || line.glowRenderer == null)
             {
                 activeLines.RemoveAt(i);
                 continue;
@@ -149,28 +180,55 @@ public class KalbDashLineTrail : MonoBehaviour
 
             if (lifeRatio >= 1f)
             {
-                // Line expired
-                line.renderer.gameObject.SetActive(false);
-                linePool.Enqueue(line.renderer);
+                line.coreRenderer.gameObject.SetActive(false);
+                line.glowRenderer.gameObject.SetActive(false);
+                coreLinePool.Enqueue(line.coreRenderer);
+                glowLinePool.Enqueue(line.glowRenderer);
                 activeLines.RemoveAt(i);
             }
             else
             {
-                // ONLY fade alpha - keep same width
-                float alpha = 1f - lifeRatio;
-                Color fadedColor = lineColor;
-                fadedColor.a = lineColor.a * alpha;
+                float fadeAlpha = fadeCurve.Evaluate(lifeRatio);
 
-                // Apply same faded color to both ends
-                line.renderer.startColor = fadedColor;
-                line.renderer.endColor = fadedColor;
+                float pulse = 1f;
+                if (usePulseGlow && isDashing)
+                {
+                    pulse = 1f + Mathf.Sin(currentTime * pulseSpeed) * pulseIntensity;
+                }
 
-                // Keep positions updated if we want them to stretch with player
+                // STRETCHING: Update end position to stretch with player movement
                 if (isDashing)
                 {
-                    // Update end position to current player position + direction
-                    Vector3 currentEndPos = transform.position + (Vector3)dashDirection * lineLength;
-                    line.renderer.SetPosition(1, currentEndPos);
+                    // Calculate how far the player has moved since this line spawned
+                    float timeSinceSpawn = currentTime - line.spawnTime;
+                    float distanceMoved = timeSinceSpawn * controller.Settings.dashSpeed; // You'll need to expose dash speed
+
+                    // New end position = original start position + dash direction * (original length + distance moved)
+                    Vector3 stretchedEndPos = line.startPos + (Vector3)dashDirection * (lineLength + distanceMoved);
+
+                    line.coreRenderer.SetPosition(1, stretchedEndPos);
+                    line.glowRenderer.SetPosition(1, stretchedEndPos);
+                }
+
+                // Update CORE renderer
+                Color coreColor = lineColor;
+                coreColor.a = lineColor.a * fadeAlpha * pulse;
+                line.coreRenderer.startColor = coreColor;
+                line.coreRenderer.endColor = coreColor;
+
+                // Update GLOW renderer
+                Color glow = glowColor;
+                glow.a = glowColor.a * fadeAlpha * pulse * 0.8f;
+                line.glowRenderer.startColor = glow;
+                line.glowRenderer.endColor = glow;
+
+                if (fadeWidth)
+                {
+                    float widthMultiplier = Mathf.Lerp(0.3f, 1f, fadeAlpha);
+                    line.coreRenderer.startWidth = line.baseCoreWidth * widthMultiplier * pulse;
+                    line.coreRenderer.endWidth = line.baseCoreWidth * widthMultiplier * pulse;
+                    line.glowRenderer.startWidth = line.baseGlowWidth * widthMultiplier * pulse;
+                    line.glowRenderer.endWidth = line.baseGlowWidth * widthMultiplier * pulse;
                 }
             }
         }
@@ -178,12 +236,10 @@ public class KalbDashLineTrail : MonoBehaviour
 
     private void SpawnLineSet()
     {
-        if (activeLines.Count > 60) return; // Limit total lines
+        if (activeLines.Count > 60) return;
 
-        // Calculate perpendicular direction
         Vector2 perp = new Vector2(-dashDirection.y, dashDirection.x).normalized;
 
-        // Get player bounds
         Bounds bounds = new Bounds(transform.position, Vector3.one * 1.5f);
         if (playerSprite != null)
             bounds = playerSprite.bounds;
@@ -192,60 +248,95 @@ public class KalbDashLineTrail : MonoBehaviour
 
         float playerHeight = bounds.size.y;
 
+        // Calculate the vertical range - from 1/8 below top to 1/8 above bottom
+        float topBound = playerHeight * 0.5f; // Top of player from center
+        float bottomBound = -playerHeight * 0.5f; // Bottom of player from center
+
+        // Shrink the range by 1/8 from each end
+        // 1/8 of total height = playerHeight * 0.125f
+        float reducedTop = topBound - (playerHeight * 0.125f);
+        float reducedBottom = bottomBound + (playerHeight * 0.125f);
+
+        // Calculate center and new height for t calculation
+        float centerY = (reducedTop + reducedBottom) * 0.5f;
+        float reducedHeight = reducedTop - reducedBottom;
+
         for (int i = 0; i < lineCount; i++)
         {
-            if (linePool.Count == 0)
+            if (coreLinePool.Count == 0) CreateCoreLineRenderer();
+            if (glowLinePool.Count == 0) CreateGlowLineRenderer();
+            if (coreLinePool.Count == 0 || glowLinePool.Count == 0) continue;
+
+            LineRenderer coreLine = coreLinePool.Dequeue();
+            LineRenderer glowLine = glowLinePool.Dequeue();
+
+            coreLine.gameObject.SetActive(true);
+            glowLine.gameObject.SetActive(true);
+
+            // Calculate offset for this line - now using reduced range
+            float t;
+            if (lineCount == 1)
             {
-                CreateLineRenderer();
+                t = 0f; // Center if only one line
+            }
+            else
+            {
+                t = (i / (float)(lineCount - 1)) * 2f - 1f; // -1 to 1
             }
 
-            if (linePool.Count == 0) continue;
+            // Map t from -1..1 to reducedBottom..reducedTop
+            float verticalOffset = Mathf.Lerp(reducedBottom, reducedTop, (t + 1f) * 0.5f);
 
-            // Get line from pool
-            LineRenderer line = linePool.Dequeue();
-            line.gameObject.SetActive(true);
+            // Apply the offset using the perpendicular direction
+            Vector3 offset = perp * verticalOffset;
 
-            // Calculate offset for this line
-            float t = (i / (float)(lineCount - 1)) * 2f - 1f; // -1 to 1
-            float offsetAmount = t * lineSpread * (playerHeight * 0.5f);
-
-            Vector3 offset = perp * offsetAmount;
-
-            // Add slight random variation for natural look
+            // Add slight random variation (reduced to maintain the bounds more strictly)
             offset += new Vector3(
-                Random.Range(-0.03f, 0.03f),
-                Random.Range(-0.03f, 0.03f),
+                Random.Range(-0.02f, 0.02f),
+                Random.Range(-0.02f, 0.02f),
                 0
             );
 
-            // Calculate line positions
+            // CRITICAL FIX: Store the EXACT spawn positions
+            // Start at current player position + offset
             Vector3 startPos = transform.position + offset;
 
-            // End position is along dash direction
+            // End is exactly lineLength in dash direction from this start position
             Vector3 endPos = startPos + (Vector3)dashDirection * lineLength;
 
-            // Set line positions
-            line.SetPosition(0, startPos);
-            line.SetPosition(1, endPos);
+            // Set positions
+            coreLine.SetPosition(0, startPos);
+            coreLine.SetPosition(1, endPos);
+            glowLine.SetPosition(0, startPos);
+            glowLine.SetPosition(1, endPos);
 
-            // Set constant color (will fade in update)
-            line.startColor = lineColor;
-            line.endColor = lineColor;
+            // Set colors and widths
+            coreLine.startColor = lineColor;
+            coreLine.endColor = lineColor;
+            glowLine.startColor = glowColor;
+            glowLine.endColor = glowColor;
 
-            // Ensure constant width
-            line.startWidth = lineWidth;
-            line.endWidth = lineWidth;
+            float baseCoreWidth = lineWidth * coreWidthMultiplier * (1f + Random.Range(-0.1f, 0.1f));
+            float baseGlowWidth = lineWidth * glowWidthMultiplier * (1f + Random.Range(-0.1f, 0.1f));
 
-            // Track this line
-            SimpleLine simpleLine = new SimpleLine
+            coreLine.startWidth = baseCoreWidth;
+            coreLine.endWidth = baseCoreWidth;
+            glowLine.startWidth = baseGlowWidth;
+            glowLine.endWidth = baseGlowWidth;
+
+            // Track with FIXED positions
+            GlowingLine glowingLine = new GlowingLine
             {
-                renderer = line,
+                coreRenderer = coreLine,
+                glowRenderer = glowLine,
                 spawnTime = Time.time,
                 startPos = startPos,
-                endPos = endPos
+                endPos = endPos,
+                baseCoreWidth = baseCoreWidth,
+                baseGlowWidth = baseGlowWidth
             };
 
-            activeLines.Add(simpleLine);
+            activeLines.Add(glowingLine);
         }
     }
 
@@ -253,10 +344,15 @@ public class KalbDashLineTrail : MonoBehaviour
     {
         foreach (var line in activeLines)
         {
-            if (line.renderer != null)
+            if (line.coreRenderer != null)
             {
-                line.renderer.gameObject.SetActive(false);
-                linePool.Enqueue(line.renderer);
+                line.coreRenderer.gameObject.SetActive(false);
+                coreLinePool.Enqueue(line.coreRenderer);
+            }
+            if (line.glowRenderer != null)
+            {
+                line.glowRenderer.gameObject.SetActive(false);
+                glowLinePool.Enqueue(line.glowRenderer);
             }
         }
         activeLines.Clear();

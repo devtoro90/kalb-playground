@@ -17,10 +17,8 @@ public class KalbParticleController : MonoBehaviour
     [SerializeField] private float minEmissionRate = 5f;    // At minimum speed
     [SerializeField] private float maxEmissionRate = 30f;   // At maximum speed
     [SerializeField] private float minSpeedThreshold = 5.0f; // Minimum speed to emit
-    [SerializeField] private float dustSpawnOffset = 0.5f;   // How far below center to spawn
 
     [Header("Wall Slide Dust")]
-    [SerializeField] private float wallSlideEmissionRate = 20f;
     [SerializeField] private float wallSlideDustOffset = 0.4f; // Distance from center to wall
     [SerializeField] private float wallSlideVerticalOffset = 0.2f;
 
@@ -34,8 +32,6 @@ public class KalbParticleController : MonoBehaviour
     [SerializeField] private string jumpDustPoolName = "JumpDust";
     [SerializeField] private string wallSlideDustPoolName = "WallSlideDust";
     [SerializeField] private string landingDustPoolName = "LandingDust";
-    [SerializeField] private string dashTrailPoolName = "DashTrail";
-    [SerializeField] private string dashLinePoolName = "DashLineTrail";
 
     // Cache the emission module for performance
     private ParticleSystem.EmissionModule runningEmission;
@@ -93,8 +89,6 @@ public class KalbParticleController : MonoBehaviour
     /// </summary>
     public void UpdateRunningDust(float horizontalSpeed, bool isGrounded)
     {
-        Debug.Log($"[Particle Debug] Speed: {horizontalSpeed}, Grounded: {isGrounded}, " +
-              $"System exists: {runningDustSystem != null}, IsPlaying: {runningDustSystem?.isPlaying}");
 
         if (runningDustSystem == null) return;
 

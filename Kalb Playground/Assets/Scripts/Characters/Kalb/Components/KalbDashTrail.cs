@@ -14,7 +14,6 @@ public class KalbDashTrail : MonoBehaviour
     [SerializeField] private bool useWorldSpace = true; // NEW: Control positioning mode
 
     [Header("Trail Settings")]
-    [SerializeField] private int maxTrailCount = 10;
     [SerializeField] private float trailSpawnInterval = 0.03f;
     [SerializeField] private float trailLifetime = 0.3f;
 
@@ -24,19 +23,9 @@ public class KalbDashTrail : MonoBehaviour
     [SerializeField] private float trailScale = 1f;
     [SerializeField] private bool fadeOut = true;
 
-    [Header("Direction-Based Effects")]
-    [SerializeField] private bool rotateTrailsToDirection = true;
-    [SerializeField] private float rotationSmoothness = 5f;
-
     [Header("Performance")]
     [SerializeField] private bool useObjectPooling = true;
     [SerializeField] private int prewarmCount = 10;
-
-    [Header("Direction-Based Effects")]
-    [SerializeField] private bool useDirectionColors = true;
-    [SerializeField] private Color horizontalDashColor = Color.white;
-    [SerializeField] private Color verticalDashColor = Color.cyan;
-    [SerializeField] private Color diagonalDashColor = new Color(0.8f, 0.8f, 1f, 1f);
 
 
 
