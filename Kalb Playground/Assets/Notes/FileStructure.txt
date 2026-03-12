@@ -4,6 +4,8 @@ Scripts
 │   │   ├── Components/
 │   │   │   ├── KalbAnimationController.cs
 │   │   │   ├── KalbCollisionDetector.cs
+│   │   │   ├── KalbDashLineTrail.cs
+│   │   │   ├── KalbDashTrail.cs
 │   │   │   ├── KalbHealth.cs
 │   │   │   ├── KalbInputHandler.cs
 │   │   │   ├── KalbLedgeDetector.cs
