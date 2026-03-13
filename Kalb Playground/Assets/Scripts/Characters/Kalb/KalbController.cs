@@ -450,6 +450,7 @@ public class KalbController : MonoBehaviour
                 }
             }
         }
+
         // Handle state updates
         stateMachine.HandleInput();
         stateMachine.Update();
@@ -574,6 +575,9 @@ public class KalbController : MonoBehaviour
             hitReaction.TriggerHit(damageSource, damage);
         }
 
+        // CRITICAL FIX: Force exit any special states that might block transition
+        ForceExitCurrentState();
+
         // FORCE HURT STATE - This should work from ANY state
         if (hurtState != null)
         {
@@ -595,6 +599,52 @@ public class KalbController : MonoBehaviour
         {
 
             rb.linearVelocity = Vector2.zero;
+        }
+    }
+
+    private void ForceExitCurrentState()
+    {
+        var currentState = stateMachine.CurrentState;
+
+        // If we're in wall slide, force disengage
+        if (currentState is KalbWallSlideState && wallJump != null)
+        {
+
+            wallJump.DisengageWallSlide();
+        }
+
+        // If we're in wall lock, force exit
+        if (currentState is KalbWallLockState && wallJump != null)
+        {
+
+            wallJump.DisengageWallSlide();
+        }
+
+        // If we're in ledge state, force release
+        if (currentState is KalbLedgeState && ledgeDetector != null)
+        {
+
+            ledgeDetector.StartCooldown();
+        }
+
+        // If we're dashing, force reset dash
+        if (dashState != null && dashState.IsDashing)
+        {
+
+            dashState.ForceResetDash();
+        }
+
+        // If we're in combat, cancel combo
+        if (comboSystem != null)
+        {
+            comboSystem.CancelCombo();
+        }
+
+        // Stop all movement
+        if (movement != null)
+        {
+            movement.StopHorizontalMovement();
+            movement.ResetSmoothing();
         }
     }
 

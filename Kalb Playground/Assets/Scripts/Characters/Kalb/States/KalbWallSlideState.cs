@@ -48,11 +48,19 @@ public class KalbWallSlideState : KalbState
 
     public override void Exit()
     {
-        // Reset any wall slide specific state if needed
+        Debug.Log("[WallSlideState] Exiting");
+
         // Turn off dust when exiting wall slide
         if (controller.ParticleController != null)
         {
             controller.ParticleController.UpdateWallSlideDust(false, 0, 0);
+        }
+
+        // Ensure we're not stuck in wall slide state
+        if (controller.WallJump != null)
+        {
+            // Don't force disengage here as it might be called from hurt state
+            // which already handles that
         }
     }
 

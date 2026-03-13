@@ -49,7 +49,7 @@ public class KalbHurtState : KalbState
 
     public override void Enter()
     {
-        Debug.Log($"[HurtState] ENTER - Damage: {damageTaken}, Grounded: {controller.IsEffectivelyGrounded()}");
+
 
         // Set timer
         hurtStateTimer = settings.hitStunDuration;
@@ -85,12 +85,12 @@ public class KalbHurtState : KalbState
             gameCamera.TriggerScreenShake(0.15f, 0.2f, Vector3.one, true);
         }
 
-        Debug.Log($"[HurtState] Entered with timer: {hurtStateTimer}, Knockback: {knockbackVelocity}");
+
     }
 
     public override void Exit()
     {
-        Debug.Log("[HurtState] EXIT");
+
         hurtStateTimer = 0f;
         initialKnockbackApplied = false;
     }
@@ -211,20 +211,20 @@ public class KalbHurtState : KalbState
         {
             // In air, maintain full knockback longer
             airKnockbackMaintainTimer = 0.25f; // 0.25 seconds of full force in air
-            Debug.Log("[HurtState] AIR HIT - Full horizontal force: " + horizontalForce);
+
         }
         else
         {
             // On ground, brief maintain
             airKnockbackMaintainTimer = 0.1f;
-            Debug.Log("[HurtState] GROUND HIT - Full horizontal force: " + horizontalForce);
+
         }
 
         // IMMEDIATELY apply knockback
         rb.linearVelocity = knockbackVelocity;
         initialKnockbackApplied = true;
 
-        Debug.Log($"[HurtState] FINAL Knockback - Horizontal: {horizontalForce} (fixed), Vertical: {verticalForce}, Total: {knockbackVelocity}");
+
     }
 
     private void ApplyKnockback()
@@ -247,9 +247,6 @@ public class KalbHurtState : KalbState
 
                 airKnockbackMaintainTimer -= Time.fixedDeltaTime;
 
-                // Debug every few frames
-                if (Time.frameCount % 30 == 0)
-                    Debug.Log($"[HurtState] Maintaining air knockback: {rb.linearVelocity.x} (target: {targetHorizontalVelocity})");
             }
             else
             {
@@ -295,7 +292,7 @@ public class KalbHurtState : KalbState
 
         if (!string.IsNullOrEmpty(animationName))
         {
-            Debug.Log($"[HurtState] Playing animation: {animationName}");
+
             animController.PlayAnimation(animationName);
         }
         else
@@ -306,7 +303,7 @@ public class KalbHurtState : KalbState
 
     private void ExitToAppropriateState()
     {
-        Debug.Log("[HurtState] Exiting to appropriate state");
+
 
         if (controller.Health != null && controller.Health.IsDead)
         {

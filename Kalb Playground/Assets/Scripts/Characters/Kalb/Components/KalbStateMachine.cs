@@ -14,10 +14,18 @@ public class KalbStateMachine
 
     public void ChangeState(KalbState newState)
     {
+        if (currentState != null)
+        {
 
-        currentState.Exit();
+            currentState.Exit();
+        }
+
         currentState = newState;
-        currentState.Enter();
+
+        if (currentState != null)
+        {
+            currentState.Enter();
+        }
     }
 
     public void Update()

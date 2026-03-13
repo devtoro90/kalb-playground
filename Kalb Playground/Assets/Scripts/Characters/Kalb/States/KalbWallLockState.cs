@@ -57,11 +57,20 @@ public class KalbWallLockState : KalbState
 
     public override void Exit()
     {
+
+
         isWallLocked = false;
         isTransitioningIn = false;
         isTransitioningOut = false;
 
         controller.GravityManager.ClearOverride("WallLock");
+
+        // Ensure we're not stuck
+        if (controller.WallJump != null)
+        {
+            // Small cooldown to prevent immediate re-lock
+            controller.WallLockCooldownTimer = 0.2f;
+        }
     }
 
     public override void Update()

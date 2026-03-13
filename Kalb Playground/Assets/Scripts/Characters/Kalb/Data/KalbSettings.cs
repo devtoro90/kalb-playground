@@ -160,6 +160,7 @@ public class KalbSettings : ScriptableObject
     public bool cancelComboOnHit = true;
     public bool cancelDashOnHit = true;
     public LayerMask invincibilityIgnoreLayers;
+    public float postHurtWallCooldown = 0.5f;
 
     [Header("Ability Unlocks")]
     public bool ledgeGrabUnlocked = true;
