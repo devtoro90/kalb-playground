@@ -33,7 +33,7 @@ public class KalbHitReaction : MonoBehaviour
 
     private void Awake()
     {
-        if (enableDebugLogs) Debug.Log("[HitReaction] Awake started");
+
 
         if (controller == null) controller = GetComponent<KalbController>();
         if (rb == null) rb = GetComponent<Rigidbody2D>();
@@ -45,16 +45,16 @@ public class KalbHitReaction : MonoBehaviour
         {
             originalColor = spriteRenderer.color;
             originalMaterial = spriteRenderer.material;
-            if (enableDebugLogs) Debug.Log($"[HitReaction] Original color saved: {originalColor}");
+
         }
 
         if (health != null)
         {
             health.OnDamaged += HandleDamageTaken;
-            if (enableDebugLogs) Debug.Log("[HitReaction] Subscribed to health.OnDamaged");
+
         }
 
-        if (enableDebugLogs) Debug.Log("[HitReaction] Awake completed");
+
     }
 
     private void Update()
@@ -63,38 +63,38 @@ public class KalbHitReaction : MonoBehaviour
         {
             invulnerabilityTimer -= Time.deltaTime;
             if (enableDebugLogs && invulnerabilityTimer % 0.5f < Time.deltaTime)
-                Debug.Log($"[HitReaction] Invulnerability timer: {invulnerabilityTimer:F2}s remaining");
 
-            if (invulnerabilityTimer <= 0)
-            {
-                EndInvulnerability();
-            }
+
+                if (invulnerabilityTimer <= 0)
+                {
+                    EndInvulnerability();
+                }
         }
     }
 
     private void HandleDamageTaken(int damage, Vector2 hitSource)
     {
-        if (enableDebugLogs) Debug.Log($"[HitReaction] HandleDamageTaken called - Damage: {damage}, HitSource: {hitSource}, Current Invulnerable: {isInvulnerable}");
+
 
         if (isInvulnerable)
         {
-            if (enableDebugLogs) Debug.Log("[HitReaction] Ignoring damage - already invulnerable");
+
             return;
         }
 
         OnHitTriggered?.Invoke(damage, hitSource);
-        if (enableDebugLogs) Debug.Log("[HitReaction] OnHitTriggered event fired");
+
 
         StartInvulnerability();
     }
 
     public void TriggerHit(Vector2 hitSource, int damage)
     {
-        if (enableDebugLogs) Debug.Log($"[HitReaction] TriggerHit called externally - Damage: {damage}, HitSource: {hitSource}");
+
 
         if (isInvulnerable)
         {
-            if (enableDebugLogs) Debug.Log("[HitReaction] Ignoring hit - invulnerable");
+
             return;
         }
 
@@ -106,24 +106,24 @@ public class KalbHitReaction : MonoBehaviour
 
         if (health.IsDead)
         {
-            if (enableDebugLogs) Debug.Log("[HitReaction] Ignoring hit - player is dead");
+
             return;
         }
 
-        if (enableDebugLogs) Debug.Log("[HitReaction] Calling health.TakeDamage...");
+
         health.TakeDamage(damage, hitSource);
     }
 
     private void StartInvulnerability()
     {
-        if (enableDebugLogs) Debug.Log("[HitReaction] Starting invulnerability");
+
 
         if (isInvulnerable) return;
 
         isInvulnerable = true;
         invulnerabilityTimer = settings != null ? settings.invulnerabilityDuration : 1.5f;
 
-        if (enableDebugLogs) Debug.Log($"[HitReaction] Invulnerability set for {invulnerabilityTimer}s");
+
 
         if (health != null)
         {
@@ -138,12 +138,12 @@ public class KalbHitReaction : MonoBehaviour
 
         OnInvulnerabilityStarted?.Invoke();
 
-        Debug.Log("[HitReaction] Invulnerability started - Player should now be flashing");
+
     }
 
     private void EndInvulnerability()
     {
-        if (enableDebugLogs) Debug.Log("[HitReaction] Ending invulnerability");
+
 
         if (!isInvulnerable) return;
 
@@ -172,14 +172,14 @@ public class KalbHitReaction : MonoBehaviour
 
         OnInvulnerabilityEnded?.Invoke();
 
-        Debug.Log("[HitReaction] Invulnerability ended");
+
     }
 
     private IEnumerator InvulnerabilityFlashRoutine()
     {
         if (spriteRenderer == null) yield break;
 
-        if (enableDebugLogs) Debug.Log("[HitReaction] Flash routine started");
+
 
         float flashDuration = settings != null ? settings.invulnerabilityDuration : 1.5f;
         float flashInterval = settings != null ? settings.invulnerabilityFlashInterval : 0.1f;
@@ -202,14 +202,13 @@ public class KalbHitReaction : MonoBehaviour
                 newColor.a = isVisible ? 1f : 0.3f;
                 spriteRenderer.color = newColor;
 
-                if (enableDebugLogs && flashCount % 10 == 0)
-                    Debug.Log($"[HitReaction] Flash #{flashCount} - Visible: {isVisible}, Alpha: {newColor.a}");
+
             }
 
             yield return null;
         }
 
-        if (enableDebugLogs) Debug.Log($"[HitReaction] Flash routine ended after {flashCount} flashes");
+
         spriteRenderer.color = originalColor;
         flashRoutine = null;
     }
@@ -217,12 +216,6 @@ public class KalbHitReaction : MonoBehaviour
     public bool CanTakeDamage()
     {
         bool canTake = !isInvulnerable && health != null && !health.IsDead;
-        if (enableDebugLogs && !canTake)
-        {
-            if (isInvulnerable) Debug.Log("[HitReaction] CanTakeDamage: false - Invulnerable");
-            if (health == null) Debug.Log("[HitReaction] CanTakeDamage: false - Health null");
-            if (health != null && health.IsDead) Debug.Log("[HitReaction] CanTakeDamage: false - Dead");
-        }
         return canTake;
     }
 

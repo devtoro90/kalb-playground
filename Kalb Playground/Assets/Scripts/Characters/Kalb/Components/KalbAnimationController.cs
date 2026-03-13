@@ -36,9 +36,12 @@ public class KalbAnimationController : MonoBehaviour
         // NEW: Hurt state has HIGHEST priority
         if (controller != null && controller.StateMachine.CurrentState is KalbHurtState)
         {
-            // Hurt animation is already playing via state
-            // We just need to ensure we're not overriding it
-            return;
+            // Make sure hurt animation is playing
+            if (!string.IsNullOrEmpty(controller.Settings.hurtAnimationName))
+            {
+                PlayAnimation(controller.Settings.hurtAnimationName);
+            }
+            return; // CRITICAL: Return immediately, don't process other animations
         }
         UpdateLookingUpState();
 

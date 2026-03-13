@@ -559,66 +559,42 @@ public class KalbController : MonoBehaviour
 
     public void TakeDamage(int damage, Vector3 damageSource)
     {
-        Debug.Log($"[Controller] TakeDamage called - Damage: {damage}, Source: {damageSource}, Current State: {stateMachine.CurrentState?.GetType().Name}");
 
-        // Check if we can take damage
+
+        // Check if we're invulnerable
+        if (hitReaction != null && !hitReaction.CanTakeDamage())
+        {
+
+            return;
+        }
+
+        // Trigger hit reaction effects (flashing, etc)
         if (hitReaction != null)
         {
-            Debug.Log($"[Controller] HitReaction exists, CanTakeDamage: {hitReaction.CanTakeDamage()}");
-
-            if (!hitReaction.CanTakeDamage())
-            {
-                Debug.Log("[Controller] Damage blocked - cannot take damage");
-                return;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("[Controller] HitReaction is NULL!");
-        }
-
-        // Use hit reaction system
-        if (hitReaction != null && settings != null && settings.enableHitReaction)
-        {
-            Debug.Log("[Controller] Triggering hit reaction...");
-
-            // This will trigger health damage and events
             hitReaction.TriggerHit(damageSource, damage);
+        }
 
-            // Force state change to hurt state if not already in it
-            if (!(stateMachine.CurrentState is KalbHurtState))
-            {
-                Debug.Log($"[Controller] Changing to HurtState from {stateMachine.CurrentState?.GetType().Name}");
+        // FORCE HURT STATE - This should work from ANY state
+        if (hurtState != null)
+        {
 
-                // Set hit data on hurt state
-                if (hurtState != null)
-                {
-                    hurtState.SetHitData(damage, damageSource);
-                    stateMachine.ChangeState(hurtState);
-                    Debug.Log("[Controller] State changed to HurtState");
-                }
-                else
-                {
-                    Debug.LogError("[Controller] hurtState is NULL!");
-                }
-            }
-            else
-            {
-                Debug.Log("[Controller] Already in HurtState");
-            }
+
+            // Set the hit data
+            hurtState.SetHitData(damage, damageSource);
+
+            // Force the state change
+            stateMachine.ChangeState(hurtState);
         }
         else
         {
-            Debug.Log("[Controller] Using fallback damage system");
-            health.TakeDamage(damage);
+            Debug.LogError("[Controller] hurtState is NULL!");
         }
 
         // Check for death
         if (health != null && health.IsDead)
         {
-            Debug.Log("[Controller] Player died");
+
             rb.linearVelocity = Vector2.zero;
-            animationController.PlayAnimation("Kalb_death");
         }
     }
 
@@ -830,7 +806,7 @@ public class KalbController : MonoBehaviour
 
     public void ForceStateChange(KalbState newState)
     {
-        stateMachine.ChangeState(newState);
+        stateMachine.ForceChangeState(newState);
         OnStateChanged?.Invoke();
     }
 
@@ -868,6 +844,15 @@ public class KalbController : MonoBehaviour
         return comboSystem.CanPerformWallAttack;
     }
 
+    private void OnGUI()
+    {
+        // Simple debug UI - press H to test hurt state
+        if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.H)
+        {
+
+            TakeDamage(10, transform.position + Vector3.right * 2f);
+        }
+    }
 
 
 }

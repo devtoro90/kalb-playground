@@ -175,6 +175,24 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   hardLandingAnimation: Kalb_hard_land
+  enableHitReaction: 1
+  hitKnockbackForce: 100
+  hitUpwardForce: 5
+  invulnerabilityDuration: 1.5
+  invulnerabilityFlashInterval: 0.1
+  invulnerabilityFlashCount: 8
+  hitStunDuration: 0.3
+  hitRecoveryTime: 0.5
+  hurtAnimationName: Kalb_hurt
+  hurtAirAnimationName: Kalb_hurt
+  preserveMomentumOnHit: 0
+  momentumPreservationOnHit: 0.3
+  hurtStateMinDuration: 0.5
+  cancelComboOnHit: 1
+  cancelDashOnHit: 1
+  invincibilityIgnoreLayers:
+    serializedVersion: 2
+    m_Bits: 0
   ledgeGrabUnlocked: 1
   runUnlocked: 1
   dashUnlocked: 1

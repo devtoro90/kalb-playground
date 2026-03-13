@@ -145,18 +145,18 @@ public class KalbSettings : ScriptableObject
 
     [Header("Hit Reaction & Invulnerability")]
     public bool enableHitReaction = true;
-    public float hitKnockbackForce = 15f;
-    public float hitUpwardForce = 5f;
-    public float invulnerabilityDuration = 1.5f;
+    public float hitKnockbackForce = 5f;
+    public float hitUpwardForce = 2f;
+    public float invulnerabilityDuration = 0.5f;
     public float invulnerabilityFlashInterval = 0.1f;
-    public int invulnerabilityFlashCount = 8;
-    public float hitStunDuration = 0.3f;
+    public int invulnerabilityFlashCount = 4;
+    public float hitStunDuration = 0.5f;
     public float hitRecoveryTime = 0.5f;
     public string hurtAnimationName = "Kalb_hurt";
     public string hurtAirAnimationName = "Kalb_hurt_air"; // Optional: separate air hurt anim
     public bool preserveMomentumOnHit = false;
     public float momentumPreservationOnHit = 0.3f;
-    public float hurtStateMinDuration = 0.2f; // Minimum time in hurt state
+    public float hurtStateMinDuration = 0.5f; // Minimum time in hurt state
     public bool cancelComboOnHit = true;
     public bool cancelDashOnHit = true;
     public LayerMask invincibilityIgnoreLayers;

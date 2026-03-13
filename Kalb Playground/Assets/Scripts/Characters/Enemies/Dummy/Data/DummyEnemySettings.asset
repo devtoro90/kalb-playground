@@ -15,7 +15,7 @@ MonoBehaviour:
   maxHealth: 100
   destroyOnDeath: 1
   deathDelay: 0.5
-  contactDamage: 0
+  contactDamage: 1
   knockbackResistance: 1
   gravityScale: 2
   freezeRotation: 1
