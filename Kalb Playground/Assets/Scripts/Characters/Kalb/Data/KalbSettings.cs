@@ -7,30 +7,30 @@ public class KalbSettings : ScriptableObject
     public float moveSpeed = 7f;
     public float jumpForce = 15f;
     [Range(0, 0.3f)] public float movementSmoothing = 0.05f;
-    
+
     [Header("Jump & Air")]
     public float jumpCutMultiplier = 0.5f;
     public float jumpHorizontalPreservation = 0.8f; // % of run speed preserved on jump
     public float runningJumpBoost = 2.5f;           // Extra forward force on running jumps
     public float coyoteTime = 0.12f;               // Ground forgiveness time
-    public float jumpBufferTime = 0.1f;   
+    public float jumpBufferTime = 0.1f;
 
     [Header("Air Control")]
     public float airAcceleration = 10f;          // Normal air acceleration
     public float airDeceleration = 8f;          // Slowing down in air (no input)
     public float airTurnAcceleration = 10f;      // Quick turn acceleration
-    public float airFriction = 4f;  
-    
+    public float airFriction = 4f;
+
     [Header("Physics")]
     public float fallingGravityScale = 2.5f;
     public float normalGravityScale = 2f;
     public float quickFallGravityMultiplier = 1.2f;
     public float maxFallSpeed = -20f;
-    
+
     [Header("Environment Detection")]
     public float groundCheckRadius = 0.2f;
     public LayerMask environmentLayer;
-    
+
     [Header("Swimming Settings")]
     public float swimSpeed = 3f;
     public float swimFastSpeed = 5f;
@@ -56,7 +56,7 @@ public class KalbSettings : ScriptableObject
     public float comboWindow = 0.2f;
     public float comboResetTime = 0.6f;
     public bool enableAirCombo = true;
-    
+
     [Header("Combo Attack Data")]
     public float[] comboDamage = new float[] { 20f, 25f, 35f };
     public float[] comboKnockback = new float[] { 5f, 7f, 12f };
@@ -65,15 +65,15 @@ public class KalbSettings : ScriptableObject
     public float[] comboCooldowns = new float[] { 0.2f, 0.1f, 0.3f };
     public float[] comboForwardForce = new float[] { 3f, 4f, 0f };
     public float[] comboUpwardForce = new float[] { 0f, 0f, 3f };
-    
+
     [Header("Combo Animation Names")]
     public string[] comboAnimations = new string[] { "Kalb_attack1", "Kalb_attack2", "Kalb_attack3" };
     public string comboResetAnimation = "Kalb_attack_reset";
-    
+
     [Header("Combo Attack Point")]
     public Vector2 attackPointOffset = new Vector2(0.5f, 0f);
     public LayerMask enemyLayers;
-    
+
     [Header("Combo Visual Effects")]
     public GameObject hitEffectPrefab;
     public float hitEffectDuration = 0.3f;
@@ -96,7 +96,7 @@ public class KalbSettings : ScriptableObject
     public float upwardAirAttackDamage = 20f;
     public float upwardAirAttackKnockback = 6f;
     public string upwardAirAttackAnimation = "Kalb_attack_up";
-    
+
     [Header("Wall Attack Settings")]
     public bool enableWallAttack = true;
     public float wallAttackDamage = 30f;
@@ -107,7 +107,7 @@ public class KalbSettings : ScriptableObject
     public Vector2 wallAttackPointOffset = new Vector2(0.8f, 0f); // Horizontal offset from player center
     public Vector2 wallAttackKnockbackDirection = new Vector2(2f, 1f); // Away from wall and up
     public string wallAttackAnimation = "Kalb_attack_wall";
-    
+
     [Header("Wall Attack Exit Options")]
     public bool stayInWallLockAfterAttack = true; // Stay in wall lock after attack
     public bool allowWallJumpDuringAttack = true; // Can jump to cancel attack
@@ -132,8 +132,8 @@ public class KalbSettings : ScriptableObject
     public Vector2 pogoAttackPointOffset = new Vector2(0f, -0.8f);
     public Vector2 pogoAttackKnockbackDirection = new Vector2(0f, 1f);
     public string pogoAttackAnimation = "Kalb_pogo_attack";
-    public string pogoBounceAnimation = "Kalb_pogo_bounce"; 
-    public LayerMask pogoTargetLayers;  
+    public string pogoBounceAnimation = "Kalb_pogo_bounce";
+    public LayerMask pogoTargetLayers;
 
     [Header("Hard Landing Settings")]
     public bool enableHardLanding = true;
@@ -142,6 +142,24 @@ public class KalbSettings : ScriptableObject
     public float hardLandingMinVelocityThreshold = 8f;    // Minimum fall speed to trigger (optional fallback)
     public AnimationCurve hardLandingShakeIntensity = AnimationCurve.Linear(0, 0.1f, 10, 0.4f); // Maps fall distance to shake intensity
     public string hardLandingAnimation = "Kalb_hard_land";
+
+    [Header("Hit Reaction & Invulnerability")]
+    public bool enableHitReaction = true;
+    public float hitKnockbackForce = 15f;
+    public float hitUpwardForce = 5f;
+    public float invulnerabilityDuration = 1.5f;
+    public float invulnerabilityFlashInterval = 0.1f;
+    public int invulnerabilityFlashCount = 8;
+    public float hitStunDuration = 0.3f;
+    public float hitRecoveryTime = 0.5f;
+    public string hurtAnimationName = "Kalb_hurt";
+    public string hurtAirAnimationName = "Kalb_hurt_air"; // Optional: separate air hurt anim
+    public bool preserveMomentumOnHit = false;
+    public float momentumPreservationOnHit = 0.3f;
+    public float hurtStateMinDuration = 0.2f; // Minimum time in hurt state
+    public bool cancelComboOnHit = true;
+    public bool cancelDashOnHit = true;
+    public LayerMask invincibilityIgnoreLayers;
 
     [Header("Ability Unlocks")]
     public bool ledgeGrabUnlocked = true;
@@ -168,14 +186,14 @@ public class KalbSettings : ScriptableObject
     public float maxClimbDistance = 2f; // Maximum allowed climb distance
     public float climbSurfaceCheckDistance = 1.5f; // How far to check for platform surface
     public float climbHorizontalBuffer = 0.3f; // Buffer from platform edge
-    
+
     [Header("Run Settings")]
     public float runSpeed = 10f;
     public float runAcceleration = 20f;
     public float runDeceleration = 25f;
     public float runTurnaroundMultiplier = 0.7f;
     public float runJumpForwardForce = 2.5f; // NEW: Strong forward force for running jumps
-    
+
     [Header("Dash Settings")]
     public float dashSpeed = 20f;
     public float dashDuration = 0.2f;
@@ -198,15 +216,15 @@ public class KalbSettings : ScriptableObject
     public float wallCheckDistance = 0.45f;
     public float wallSlideSpeed = -2f;// Time player sticks to wall before sliding
     public LayerMask wallLayer;
-    public bool requireInputForWallSlide = true; 
+    public bool requireInputForWallSlide = true;
     public float awayInputGracePeriod = 0.25f; // Time before slide disengages when pressing away
     public float awayInputDisengageDistance = 0.3f;
-    
+
     [Header("Wall Jump Force")]
     public float wallJumpForce = 18f;
     public Vector2 wallJumpAngle = new Vector2(1f, 1.5f); // X,Y ratiopublic 
     public float wallJumpHorizontalLockDuration = 0.2f; // Reduced for more control
-    public float wallJumpControlReduction = 0.1f; 
+    public float wallJumpControlReduction = 0.1f;
 
     [Header("Wall Lock Settings")]
     public float wallLockEnterSpeed = 0.2f; // Time to transition into lock

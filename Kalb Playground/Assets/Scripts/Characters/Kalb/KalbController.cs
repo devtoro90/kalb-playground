@@ -5,7 +5,7 @@ public class KalbController : MonoBehaviour
     [Header("Component References")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private KalbSettings settings;
-    
+
     // Core Components
     private KalbInputHandler inputHandler;
     private KalbCollisionDetector collisionDetector;
@@ -21,10 +21,11 @@ public class KalbController : MonoBehaviour
     private KalbInputBuffer inputBuffer;
     private KalbWallJump wallJump;
     private KalbParticleController particleController;
-    
+    private KalbHitReaction hitReaction;
+
     // State Machine
     private KalbStateMachine stateMachine;
-    
+
     // States
     private KalbIdleState idleState;
     private KalbWalkState walkState;
@@ -32,8 +33,8 @@ public class KalbController : MonoBehaviour
     private KalbAirState airState;
     private KalbSwimState swimState;
     private KalbCombatState combatState;
-    private KalbRunState runState;    
-    private KalbDashState dashState;  
+    private KalbRunState runState;
+    private KalbDashState dashState;
     private KalbLedgeState ledgeState;
     private KalbLedgeClimbState ledgeClimbState;
     private KalbWallSlideState wallSlideState;
@@ -41,17 +42,18 @@ public class KalbController : MonoBehaviour
     private KalbPogoAttackState pogoAttackState;
     private KalbFloatFallState floatFallState;
     private KalbHardLandState hardLandState;
-    
+    private KalbHurtState hurtState;
+
     // Dash cooldown tracking - MOVED HERE from KalbDashState
     private float dashCooldownTimer = 0f;
-    
+
     // Ground check tolerance to prevent flickering
     private bool wasGroundedLastFrame = true;
     private float groundStickTimer = 0f;
     private const float GROUND_STICK_THRESHOLD = 0.15f; // How long to stay "grounded" after leaving ground
 
     private float wallLockCooldownTimer = 0f;
-    
+
     // Properties for component access
     public KalbInputHandler InputHandler => inputHandler;
     public KalbCollisionDetector CollisionDetector => collisionDetector;
@@ -69,29 +71,30 @@ public class KalbController : MonoBehaviour
     public KalbInputBuffer InputBuffer => inputBuffer;
     public KalbWallJump WallJump => wallJump;
     public KalbParticleController ParticleController => particleController;
+    public KalbHitReaction HitReaction => hitReaction;
 
     public float WallLockCooldownTimer
     {
         get => wallLockCooldownTimer;
         set => wallLockCooldownTimer = value;
     }
-    
+
     // Dash cooldown property - NEW
     public float DashCooldownTimer
     {
         get => dashCooldownTimer;
         set => dashCooldownTimer = value;
     }
-    
+
     // State Properties
     public KalbIdleState IdleState => idleState;
     public KalbWalkState WalkState => walkState;
     public KalbJumpState JumpState => jumpState;
     public KalbAirState AirState => airState;
     public KalbSwimState SwimState => swimState;
-    public KalbCombatState CombatState => combatState; 
-    public KalbRunState RunState => runState;    
-    public KalbDashState DashState => dashState; 
+    public KalbCombatState CombatState => combatState;
+    public KalbRunState RunState => runState;
+    public KalbDashState DashState => dashState;
     public KalbLedgeState LedgeState => ledgeState;
     public KalbLedgeClimbState LedgeClimbState => ledgeClimbState;
     public KalbWallSlideState WallSlideState => wallSlideState;
@@ -99,7 +102,8 @@ public class KalbController : MonoBehaviour
     public KalbPogoAttackState PogoAttackState => pogoAttackState;
     public KalbFloatFallState FloatFallState => floatFallState;
     public KalbHardLandState HardLandState => hardLandState;
-    
+    public KalbHurtState HurtState => hurtState;
+
     public bool FacingRight => movement != null ? movement.FacingRight : true;
     public bool IsLookingUp => animationController != null ? animationController.IsLookingUp : false;
 
@@ -108,46 +112,46 @@ public class KalbController : MonoBehaviour
     public System.Action OnStateChanged;
     public System.Action OnLanded;
     public System.Action OnWallSlideStarted;
-    
+
     private void Awake()
     {
         InitializeComponents();
         InitializeStateMachine();
         SetupPhysicsMaterial();
     }
-    
+
     private void InitializeComponents()
     {
         // Get or add required components
         rb = GetComponent<Rigidbody2D>();
         if (rb == null) rb = gameObject.AddComponent<Rigidbody2D>();
         rb.freezeRotation = true;
-        
+
         inputHandler = GetComponent<KalbInputHandler>();
         if (inputHandler == null) inputHandler = gameObject.AddComponent<KalbInputHandler>();
-        
+
         collisionDetector = GetComponent<KalbCollisionDetector>();
         if (collisionDetector == null) collisionDetector = gameObject.AddComponent<KalbCollisionDetector>();
-        
+
         movement = GetComponent<KalbMovement>();
         if (movement == null) movement = gameObject.AddComponent<KalbMovement>();
-        
+
         physics = GetComponent<KalbPhysics>();
         if (physics == null) physics = gameObject.AddComponent<KalbPhysics>();
-        
+
         animationController = GetComponent<KalbAnimationController>();
         if (animationController == null) animationController = gameObject.AddComponent<KalbAnimationController>();
-        
+
         health = GetComponent<KalbHealth>();
         if (health == null) health = gameObject.AddComponent<KalbHealth>();
-        
+
         swimming = GetComponent<KalbSwimming>();
         if (swimming == null) swimming = gameObject.AddComponent<KalbSwimming>();
 
         abilitySystem = GetComponent<KalbAbilitySystem>();
         if (abilitySystem == null) abilitySystem = gameObject.AddComponent<KalbAbilitySystem>();
 
-        comboSystem = GetComponent<KalbComboSystem>(); 
+        comboSystem = GetComponent<KalbComboSystem>();
         if (comboSystem == null) comboSystem = gameObject.AddComponent<KalbComboSystem>();
 
         ledgeDetector = GetComponent<KalbLedgeDetector>();
@@ -161,10 +165,13 @@ public class KalbController : MonoBehaviour
 
         wallJump = GetComponent<KalbWallJump>();
         if (wallJump == null) wallJump = gameObject.AddComponent<KalbWallJump>();
-        
+
         particleController = GetComponent<KalbParticleController>();
         if (particleController == null) particleController = gameObject.AddComponent<KalbParticleController>();
-        
+
+        hitReaction = GetComponent<KalbHitReaction>();
+        if (hitReaction == null) hitReaction = gameObject.AddComponent<KalbHitReaction>();
+
         // Create default settings if none provided
         if (settings == null)
         {
@@ -172,11 +179,11 @@ public class KalbController : MonoBehaviour
         }
 
     }
-    
+
     private void InitializeStateMachine()
     {
         stateMachine = new KalbStateMachine();
-        
+
         // Create states
         idleState = new KalbIdleState(this, stateMachine);
         walkState = new KalbWalkState(this, stateMachine);
@@ -184,16 +191,17 @@ public class KalbController : MonoBehaviour
         airState = new KalbAirState(this, stateMachine);
         swimState = new KalbSwimState(this, stateMachine);
         combatState = new KalbCombatState(this, stateMachine);
-        runState = new KalbRunState(this, stateMachine);    
-        dashState = new KalbDashState(this, stateMachine);  
-        ledgeState = new KalbLedgeState(this, stateMachine);        
-        ledgeClimbState = new KalbLedgeClimbState(this, stateMachine); 
-        wallSlideState = new KalbWallSlideState(this, stateMachine);    
+        runState = new KalbRunState(this, stateMachine);
+        dashState = new KalbDashState(this, stateMachine);
+        ledgeState = new KalbLedgeState(this, stateMachine);
+        ledgeClimbState = new KalbLedgeClimbState(this, stateMachine);
+        wallSlideState = new KalbWallSlideState(this, stateMachine);
         wallLockState = new KalbWallLockState(this, stateMachine);
         pogoAttackState = new KalbPogoAttackState(this, stateMachine);
-        floatFallState = new KalbFloatFallState(this,stateMachine);
+        floatFallState = new KalbFloatFallState(this, stateMachine);
         hardLandState = new KalbHardLandState(this, stateMachine);
-        
+        hurtState = new KalbHurtState(this, stateMachine);
+
         // Start with idle state
         stateMachine.Initialize(idleState);
     }
@@ -214,15 +222,15 @@ public class KalbController : MonoBehaviour
                 frictionlessMaterial.friction = 0f;
                 frictionlessMaterial.bounciness = 0f;
             }
-            
+
             collider.sharedMaterial = frictionlessMaterial;
         }
     }
-    
+
     private void Update()
     {
         if (health.IsDead) return;
-        
+
         // Update timers
         if (dashCooldownTimer > 0)
         {
@@ -233,9 +241,9 @@ public class KalbController : MonoBehaviour
         {
             wallLockCooldownTimer -= Time.deltaTime;
         }
-        
+
         UpdateGroundStickTimer();
-        
+
         // FIXED: Skip certain state checks if in water exit grace period
         bool inWaterGracePeriod = swimming != null && swimming.IsInWaterExitGracePeriod;
 
@@ -245,7 +253,7 @@ public class KalbController : MonoBehaviour
             stateMachine.ChangeState(wallLockState);
             return;
         }
-        
+
         // Then check for wall slide
         if (!inWaterGracePeriod && ShouldEnterWallSlideState() && !(stateMachine.CurrentState is KalbWallSlideState))
         {
@@ -254,15 +262,15 @@ public class KalbController : MonoBehaviour
         }
 
         // Check for ledge grab
-        if (!inWaterGracePeriod && abilitySystem.CanLedgeGrab() && !IsInLedgeState() && ledgeDetector != null && 
+        if (!inWaterGracePeriod && abilitySystem.CanLedgeGrab() && !IsInLedgeState() && ledgeDetector != null &&
             rb.linearVelocity.y < 0 && !IsEffectivelyGrounded())
         {
             if (!ledgeDetector.IsOnCooldown)
             {
                 bool ledgeFound = ledgeDetector.CheckForLedge(this);
-                
-                if (ledgeFound && !IsEffectivelyGrounded() && 
-                    !swimming.IsSwimming && !dashState.IsDashing && 
+
+                if (ledgeFound && !IsEffectivelyGrounded() &&
+                    !swimming.IsSwimming && !dashState.IsDashing &&
                     !comboSystem.IsAttacking)
                 {
                     Collider2D playerCollider = GetComponent<Collider2D>();
@@ -270,7 +278,7 @@ public class KalbController : MonoBehaviour
                     {
                         float playerBottom = playerCollider.bounds.min.y;
                         float ledgeTop = ledgeDetector.LedgePosition.y;
-                        
+
                         float grabRange = 1.0f;
                         if (playerBottom < ledgeTop && playerBottom > ledgeTop - grabRange)
                         {
@@ -284,7 +292,7 @@ public class KalbController : MonoBehaviour
                 }
             }
         }
-        
+
         // Check for swimming state transition
         if (swimming.IsInWater && !swimming.IsJumpingFromWater && !(stateMachine.CurrentState is KalbSwimState))
         {
@@ -293,26 +301,26 @@ public class KalbController : MonoBehaviour
 
             // Reset air dash when entering swim state
             if (dashState != null)
-            {   
-                
+            {
+
                 dashState.ResetAirDash();
             }
 
             physics.ResetDoubleJump();
             physics.SetCanDoubleJump(true);
         }
-        
+
         // Update coyote time and jump buffer
         if (IsEffectivelyGrounded() && !collisionDetector.IsTouchingCeiling)
         {
             physics.SetCoyoteTime();
             physics.ResetDoubleJump();
             physics.SetCanDoubleJump(true);
-            
+
             // Reset air dash when grounded
             if (dashState != null && stateMachine.CurrentState is not KalbDashState)
             {
-                
+
                 dashState.ResetAirDash();
             }
         }
@@ -323,141 +331,142 @@ public class KalbController : MonoBehaviour
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
             }
         }
-
-        // DASH INPUT
-        if (inputHandler.DashPressed && abilitySystem.CanDash())
+        if (CanAct())
         {
-            if (!(stateMachine.CurrentState is KalbDashState))
+            // DASH INPUT
+            if (inputHandler.DashPressed && abilitySystem.CanDash())
             {
-                if (CanDashFromCurrentState() && dashCooldownTimer <= 0)
+                if (!(stateMachine.CurrentState is KalbDashState))
                 {
-                    inputBuffer.BufferDash();
-
-                    if(inputBuffer.ConsumeBufferedInput("Dash"))
+                    if (CanDashFromCurrentState() && dashCooldownTimer <= 0)
                     {
-                        
-                        stateMachine.ChangeState(dashState);
-                        inputHandler.ResetDashInput();
+                        inputBuffer.BufferDash();
+
+                        if (inputBuffer.ConsumeBufferedInput("Dash"))
+                        {
+
+                            stateMachine.ChangeState(dashState);
+                            inputHandler.ResetDashInput();
+                        }
                     }
                 }
             }
-        }
-        
-        // Check for run state transitions
-        if (ShouldEnterRunState() && !(stateMachine.CurrentState is KalbRunState))
-        {
-            // Don't transition to run if we're in incompatible states
-            if (CanTransitionToRunState())
-            {
-                stateMachine.ChangeState(runState);
-                return; // Skip further input processing this frame
-            }
-        }
-        
-        // Check for jump input
-        if (inputHandler.JumpPressed)
-        {
-            physics.SetJumpBuffer();
-            inputBuffer.BufferJump();
-        }
-        
-        // Process jump with momentum boost
-        if (!swimming.IsSwimming && !swimming.IsJumpingFromWater && 
-            physics.JumpBufferCounter > 0 && physics.CoyoteTimeCounter > 0 &&
-            stateMachine.CurrentState is not KalbAirState)
-        {
-            if(inputBuffer.ConsumeBufferedInput("Jump"))
-            {
-                // Apply strong forward force for running jumps
-                ApplyRunningJumpForce();
-                stateMachine.ChangeState(jumpState);
-                inputHandler.ResetJumpInput();
-            }
-        }
 
-        // Check for attack
-        if (inputHandler.AttackPressed)
-        {
-            // LOGIC ORDER (Priority):
-            // 1. Pogo Attack (air + down held)
-            // 2. Wall Attack (in wall lock)
-            // 3. Upward Attack (up held)
-            // 4. Normal Attack
-            
-            bool attackHandled = false;
-            
-            // PRIORITY 1: Pogo Attack - when in air and holding down
-            if (!IsEffectivelyGrounded() && inputHandler.IsDownHeld && 
-                settings.enablePogoAttack && pogoAttackState != null)
+            // Check for run state transitions
+            if (ShouldEnterRunState() && !(stateMachine.CurrentState is KalbRunState))
             {
-                if (pogoAttackState.CanPogo)
+                // Don't transition to run if we're in incompatible states
+                if (CanTransitionToRunState())
+                {
+                    stateMachine.ChangeState(runState);
+                    return; // Skip further input processing this frame
+                }
+            }
+
+            // Check for jump input
+            if (inputHandler.JumpPressed)
+            {
+                physics.SetJumpBuffer();
+                inputBuffer.BufferJump();
+            }
+
+            // Process jump with momentum boost
+            if (!swimming.IsSwimming && !swimming.IsJumpingFromWater &&
+                physics.JumpBufferCounter > 0 && physics.CoyoteTimeCounter > 0 &&
+                stateMachine.CurrentState is not KalbAirState)
+            {
+                if (inputBuffer.ConsumeBufferedInput("Jump"))
+                {
+                    // Apply strong forward force for running jumps
+                    ApplyRunningJumpForce();
+                    stateMachine.ChangeState(jumpState);
+                    inputHandler.ResetJumpInput();
+                }
+            }
+
+            // Check for attack
+            if (inputHandler.AttackPressed)
+            {
+                // LOGIC ORDER (Priority):
+                // 1. Pogo Attack (air + down held)
+                // 2. Wall Attack (in wall lock)
+                // 3. Upward Attack (up held)
+                // 4. Normal Attack
+
+                bool attackHandled = false;
+
+                // PRIORITY 1: Pogo Attack - when in air and holding down
+                if (!IsEffectivelyGrounded() && inputHandler.IsDownHeld &&
+                    settings.enablePogoAttack && pogoAttackState != null)
+                {
+                    if (pogoAttackState.CanPogo)
+                    {
+                        inputBuffer.BufferAttack();
+
+                        if (inputBuffer.ConsumeBufferedInput("Attack"))
+                        {
+
+                            stateMachine.ChangeState(pogoAttackState);
+                            inputHandler.ResetAttackInput();
+                            attackHandled = true;
+                        }
+                    }
+                }
+
+                // PRIORITY 2: Wall Attack
+                if (!attackHandled && stateMachine.CurrentState is KalbWallLockState)
+                {
+                    if (CanPerformWallAttack())
+                    {
+                        comboSystem.StartWallAttack();
+                        inputHandler.ResetAttackInput();
+                        attackHandled = true;
+                    }
+                }
+
+                // PRIORITY 3: Upward Attack
+                if (!attackHandled && inputHandler.IsUpHeld && settings.enableUpwardAttack)
+                {
+                    // Let combo system handle upward attack
+                    if (comboSystem.CanPerformUpwardAttack)
+                    {
+                        stateMachine.ChangeState(combatState);
+                        inputHandler.ResetAttackInput();
+                        attackHandled = true;
+                    }
+                }
+
+                // PRIORITY 4: Normal Attack
+                if (!attackHandled && CanAttackFromCurrentState())
                 {
                     inputBuffer.BufferAttack();
-                    
+
                     if (inputBuffer.ConsumeBufferedInput("Attack"))
                     {
-                        
-                        stateMachine.ChangeState(pogoAttackState);
+                        stateMachine.ChangeState(combatState);
                         inputHandler.ResetAttackInput();
                         attackHandled = true;
                     }
                 }
             }
-            
-            // PRIORITY 2: Wall Attack
-            if (!attackHandled && stateMachine.CurrentState is KalbWallLockState)
-            {
-                if (CanPerformWallAttack())
-                {
-                    comboSystem.StartWallAttack();
-                    inputHandler.ResetAttackInput();
-                    attackHandled = true;
-                }
-            }
-            
-            // PRIORITY 3: Upward Attack
-            if (!attackHandled && inputHandler.IsUpHeld && settings.enableUpwardAttack)
-            {
-                // Let combo system handle upward attack
-                if (comboSystem.CanPerformUpwardAttack)
-                {
-                    stateMachine.ChangeState(combatState);
-                    inputHandler.ResetAttackInput();
-                    attackHandled = true;
-                }
-            }
-            
-            // PRIORITY 4: Normal Attack
-            if (!attackHandled && CanAttackFromCurrentState())
-            {
-                inputBuffer.BufferAttack();
-                
-                if (inputBuffer.ConsumeBufferedInput("Attack"))
-                {
-                    stateMachine.ChangeState(combatState);
-                    inputHandler.ResetAttackInput();
-                    attackHandled = true;
-                }
-            }
         }
-        
         // Handle state updates
         stateMachine.HandleInput();
         stateMachine.Update();
     }
-    
+
     private void FixedUpdate()
     {
         if (health.IsDead) return;
-        
+
         stateMachine.FixedUpdate();
     }
-    
+
     // NEW: Update ground stick timer to prevent flickering
     private void UpdateGroundStickTimer()
     {
         bool currentlyGrounded = collisionDetector.IsGrounded;
-        
+
         if (wasGroundedLastFrame && !currentlyGrounded)
         {
             groundStickTimer = GROUND_STICK_THRESHOLD;
@@ -465,12 +474,12 @@ public class KalbController : MonoBehaviour
         else if (currentlyGrounded)
         {
             groundStickTimer = 0f;
-            
+
             // NEW: Force state transition when grounded
             // This helps catch any states that might be stuck
             if (stateMachine.CurrentState is KalbFloatFallState)
             {
-                
+
                 stateMachine.ChangeState(idleState);
             }
         }
@@ -478,33 +487,33 @@ public class KalbController : MonoBehaviour
         {
             groundStickTimer -= Time.deltaTime;
         }
-        
+
         wasGroundedLastFrame = currentlyGrounded;
     }
-    
+
     public bool IsEffectivelyGrounded()
     {
         bool wasGrounded = collisionDetector.IsGrounded || groundStickTimer > 0;
         bool result = collisionDetector.IsGrounded || groundStickTimer > 0;
-        
+
         if (result && !wasGroundedLastFrame)
         {
             OnLanded?.Invoke();
         }
-        
+
         wasGroundedLastFrame = result;
         return result;
     }
-    
+
     // Apply strong forward force for running jumps
     private void ApplyRunningJumpForce()
     {
         float currentXVelocity = rb.linearVelocity.x;
-        
+
         // Determine if this is a running jump
         bool isRunningJump = false;
         float runSpeedThreshold = settings.runSpeed * 0.7f;
-        
+
         if (stateMachine.CurrentState is KalbRunState)
         {
             isRunningJump = true;
@@ -513,29 +522,29 @@ public class KalbController : MonoBehaviour
         {
             isRunningJump = true;
         }
-        
+
         if (isRunningJump)
         {
             // Hollow Knight-style: Strong forward preservation with boost
             float runSpeedRatio = Mathf.Clamp01(Mathf.Abs(currentXVelocity) / settings.runSpeed);
-            
+
             // Preserve 80-100% of running speed
             float preservedSpeed = Mathf.Lerp(
                 settings.moveSpeed * settings.jumpHorizontalPreservation,
                 settings.runSpeed * settings.jumpHorizontalPreservation,
                 runSpeedRatio
             );
-            
+
             // Apply forward boost for running jumps
             Vector2 forwardDirection = movement.FacingRight ? Vector2.right : Vector2.left;
             float forwardForce = settings.runningJumpBoost * runSpeedRatio;
-            
+
             // Set velocity directly for instant response
             rb.linearVelocity = new Vector2(
                 forwardDirection.x * preservedSpeed + (forwardDirection.x * forwardForce),
                 rb.linearVelocity.y
             );
-            
+
             // Start jump momentum preservation
             movement.StartJumpMomentum(0.3f); // Shorter for more control
         }
@@ -547,34 +556,93 @@ public class KalbController : MonoBehaviour
             movement.StartJumpMomentum(0.15f);
         }
     }
-    
+
     public void TakeDamage(int damage, Vector3 damageSource)
     {
-        health.TakeDamage(damage);
-        
-        // Cancel combo when taking damage
-        comboSystem.CancelCombo();
+        Debug.Log($"[Controller] TakeDamage called - Damage: {damage}, Source: {damageSource}, Current State: {stateMachine.CurrentState?.GetType().Name}");
 
-        // Cancel dash when taking damage
-        if (stateMachine.CurrentState is KalbDashState)
+        // Check if we can take damage
+        if (hitReaction != null)
         {
-            dashState.ForceResetDash();
-            dashCooldownTimer = 0f;
+            Debug.Log($"[Controller] HitReaction exists, CanTakeDamage: {hitReaction.CanTakeDamage()}");
+
+            if (!hitReaction.CanTakeDamage())
+            {
+                Debug.Log("[Controller] Damage blocked - cannot take damage");
+                return;
+            }
         }
-        
-        // Force exit combat state if taking damage
-        if (stateMachine.CurrentState is KalbCombatState)
+        else
         {
-            stateMachine.ChangeState(airState);
+            Debug.LogWarning("[Controller] HitReaction is NULL!");
         }
-        
-        if (health.IsDead)
+
+        // Use hit reaction system
+        if (hitReaction != null && settings != null && settings.enableHitReaction)
         {
+            Debug.Log("[Controller] Triggering hit reaction...");
+
+            // This will trigger health damage and events
+            hitReaction.TriggerHit(damageSource, damage);
+
+            // Force state change to hurt state if not already in it
+            if (!(stateMachine.CurrentState is KalbHurtState))
+            {
+                Debug.Log($"[Controller] Changing to HurtState from {stateMachine.CurrentState?.GetType().Name}");
+
+                // Set hit data on hurt state
+                if (hurtState != null)
+                {
+                    hurtState.SetHitData(damage, damageSource);
+                    stateMachine.ChangeState(hurtState);
+                    Debug.Log("[Controller] State changed to HurtState");
+                }
+                else
+                {
+                    Debug.LogError("[Controller] hurtState is NULL!");
+                }
+            }
+            else
+            {
+                Debug.Log("[Controller] Already in HurtState");
+            }
+        }
+        else
+        {
+            Debug.Log("[Controller] Using fallback damage system");
+            health.TakeDamage(damage);
+        }
+
+        // Check for death
+        if (health != null && health.IsDead)
+        {
+            Debug.Log("[Controller] Player died");
             rb.linearVelocity = Vector2.zero;
             animationController.PlayAnimation("Kalb_death");
         }
     }
-    
+
+    public bool CanAct()
+    {
+        if (health.IsDead) return false;
+
+        // Can't act if in hurt state
+        if (stateMachine.CurrentState is KalbHurtState) return false;
+
+        if (hitReaction != null && hitReaction.IsInvulnerable)
+        {
+            // Even if invulnerable, we can still act (just can't be hit again)
+            return true;
+        }
+
+        return true;
+    }
+
+    public bool IsInHitStun()
+    {
+        return stateMachine.CurrentState is KalbHurtState;
+    }
+
     public bool CanJump()
     {
         return physics.CoyoteTimeCounter > 0 || physics.JumpBufferCounter > 0;
@@ -587,26 +655,26 @@ public class KalbController : MonoBehaviour
 
         if (stateMachine.CurrentState is KalbDashState)
             return false;
-        
+
         if (stateMachine.CurrentState is KalbWallLockState)
             return true;
-        
-        if (stateMachine.CurrentState is KalbIdleState || 
+
+        if (stateMachine.CurrentState is KalbIdleState ||
             stateMachine.CurrentState is KalbWalkState ||
             stateMachine.CurrentState is KalbAirState ||
             stateMachine.CurrentState is KalbJumpState ||
             stateMachine.CurrentState is KalbRunState)
             return true;
-        
-        if (stateMachine.CurrentState is KalbCombatState && 
+
+        if (stateMachine.CurrentState is KalbCombatState &&
             (comboSystem.IsUpwardAttacking || comboSystem.IsWallAttacking))
             return true;
-        
+
         if (swimming.IsJumpingFromWater && rb.linearVelocity.y > 0)
         {
             return true;
         }
-        
+
         return false;
     }
 
@@ -614,47 +682,47 @@ public class KalbController : MonoBehaviour
     {
         if (stateMachine.CurrentState is KalbSwimState)
             return false;
-        
+
         if (stateMachine.CurrentState is KalbCombatState)
             return false;
-        
+
         if (stateMachine.CurrentState is KalbIdleState)
             return true;
-        
+
         if (stateMachine.CurrentState is KalbWalkState)
             return true;
-        
+
         if (stateMachine.CurrentState is KalbRunState)
             return true;
-        
+
         if (stateMachine.CurrentState is KalbAirState && dashState.AirDashCount < settings.maxAirDashes)
             return true;
-        
+
         if (stateMachine.CurrentState is KalbJumpState)
             return true;
-        
+
         return false;
     }
-    
+
     private bool ShouldEnterRunState()
     {
         if (!abilitySystem.CanRun())
             return false;
-        
+
         if (!IsEffectivelyGrounded()) // Use effective grounded check
             return false;
-        
+
         if (!inputHandler.DashHeld)
             return false;
-        
+
         if (Mathf.Abs(inputHandler.MoveInput.x) < 0.1f)
             return false;
-        
+
         if (stateMachine.CurrentState is KalbDashState ||
             stateMachine.CurrentState is KalbCombatState ||
             stateMachine.CurrentState is KalbSwimState)
             return false;
-        
+
         return true;
     }
 
@@ -669,7 +737,7 @@ public class KalbController : MonoBehaviour
         {
             return false;
         }
-        
+
         return true;
     }
 
@@ -682,16 +750,16 @@ public class KalbController : MonoBehaviour
         }
 
         if (wallJump == null) return false;
-        
+
         // Don't enter if we're on wall slide cooldown (from ledge release)
         if (wallJump.CooldownRemaining > 0)
         {
             return false;
         }
-        
+
         // Must be wall sliding (active state)
         if (!wallJump.IsWallSliding) return false;
-        
+
         // Don't enter from incompatible states
         if (stateMachine.CurrentState is KalbDashState ||
             stateMachine.CurrentState is KalbCombatState ||
@@ -702,7 +770,7 @@ public class KalbController : MonoBehaviour
         {
             return false;
         }
-        
+
         return true;
     }
 
@@ -718,24 +786,24 @@ public class KalbController : MonoBehaviour
     {
         if (!abilitySystem.CanWallLock())
             return false;
-        
+
         // Don't check if we're already in wall lock or transitioning to it
         if (stateMachine.CurrentState is KalbWallLockState)
             return false;
-        
+
         if (!wallJump.IsWallSliding)
             return false;
-        
+
         // Check if pushing toward wall
         float inputDirection = Mathf.Sign(inputHandler.MoveInput.x);
         float wallSide = wallJump.WallSide;
-        
-        bool pushingTowardWall = Mathf.Abs(inputHandler.MoveInput.x) > settings.wallLockInputThreshold && 
+
+        bool pushingTowardWall = Mathf.Abs(inputHandler.MoveInput.x) > settings.wallLockInputThreshold &&
                                 Mathf.Approximately(inputDirection, wallSide);
-        
+
         if (!pushingTowardWall)
             return false;
-        
+
         // Don't enter from incompatible states
         if (stateMachine.CurrentState is KalbDashState ||
             stateMachine.CurrentState is KalbCombatState ||
@@ -745,13 +813,13 @@ public class KalbController : MonoBehaviour
         {
             return false;
         }
-        
+
         return true;
     }
 
     public bool IsInLedgeState()
     {
-        return stateMachine.CurrentState is KalbLedgeState || 
+        return stateMachine.CurrentState is KalbLedgeState ||
             stateMachine.CurrentState is KalbLedgeClimbState;
     }
 
@@ -759,7 +827,7 @@ public class KalbController : MonoBehaviour
     {
         dashCooldownTimer = 0f;
     }
-    
+
     public void ForceStateChange(KalbState newState)
     {
         stateMachine.ChangeState(newState);
@@ -771,12 +839,12 @@ public class KalbController : MonoBehaviour
         // Can look up when grounded, not moving significantly, and not in action states
         bool isGrounded = IsEffectivelyGrounded();
         bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
-        bool isInActionState = dashState.IsDashing || 
-                            comboSystem.IsAttacking || 
+        bool isInActionState = dashState.IsDashing ||
+                            comboSystem.IsAttacking ||
                             swimming.IsSwimming ||
                             (wallJump != null && wallJump.IsWallSliding) ||
                             IsInLedgeState();
-        
+
         return isGrounded && !isMoving && !isInActionState;
     }
 
@@ -784,22 +852,22 @@ public class KalbController : MonoBehaviour
     {
         if (!(stateMachine.CurrentState is KalbWallLockState))
             return false;
-        
+
         if (comboSystem == null)
             return false;
-        
+
         if (!settings.enableWallAttack)
             return false;
-        
+
         if (comboSystem.IsAnyAttackActive)
             return false;
-        
+
         if (wallJump == null || !wallJump.IsTouchingWall)
             return false;
-        
+
         return comboSystem.CanPerformWallAttack;
     }
 
-    
+
 
 }

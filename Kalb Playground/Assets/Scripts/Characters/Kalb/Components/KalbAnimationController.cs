@@ -10,29 +10,36 @@ public class KalbAnimationController : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private KalbAbilitySystem abilitySystem;
     [SerializeField] private KalbComboSystem comboSystem;
-    [SerializeField] private KalbController controller; 
+    [SerializeField] private KalbController controller;
 
     [Header("Looking Up")]
     [SerializeField] private bool isLookingUp = false;
     [SerializeField] private float lookUpInputThreshold = 0.5f;
 
     public bool IsLookingUp => isLookingUp;
-    
+
     private void Start()
     {
         if (abilitySystem == null) abilitySystem = GetComponent<KalbAbilitySystem>();
         if (comboSystem == null) comboSystem = GetComponent<KalbComboSystem>();
         if (controller == null) controller = GetComponent<KalbController>();
     }
-    
+
     private void Update()
     {
         UpdateAnimations();
     }
-    
+
     private void UpdateAnimations()
     {
         if (animator == null) return;
+        // NEW: Hurt state has HIGHEST priority
+        if (controller != null && controller.StateMachine.CurrentState is KalbHurtState)
+        {
+            // Hurt animation is already playing via state
+            // We just need to ensure we're not overriding it
+            return;
+        }
         UpdateLookingUpState();
 
         if (isLookingUp)
@@ -54,7 +61,7 @@ public class KalbAnimationController : MonoBehaviour
             PlayAnimation("Kalb_walllock");
             return;
         }
-        
+
         // Check if wall sliding
         if (controller.WallJump != null && controller.WallJump.IsWallSliding)
         {
@@ -68,7 +75,7 @@ public class KalbAnimationController : MonoBehaviour
             PlayAnimation("Kalb_ledge_climb");
             return;
         }
-        
+
         // Check if ledge grabbing
         if (controller != null && controller.LedgeState != null && controller.LedgeState.IsLedgeGrabbing)
         {
@@ -95,7 +102,7 @@ public class KalbAnimationController : MonoBehaviour
             UpdateComboAnimations();
             return;
         }
-        
+
         // Check if swimming
         if (swimming != null && swimming.IsSwimming)
         {
@@ -113,30 +120,30 @@ public class KalbAnimationController : MonoBehaviour
         // Set movement speed parameter
         float speed = Mathf.Abs(rb.linearVelocity.x);
         animator.SetFloat("Speed", speed);
-        
+
         // Set grounded parameter
         animator.SetBool("IsGrounded", collisionDetector != null && controller.IsEffectivelyGrounded());
-        
+
         // Set vertical velocity parameter
         animator.SetFloat("VerticalVelocity", rb.linearVelocity.y);
-        
+
         // Set facing direction
         if (movement != null)
         {
             animator.SetBool("FacingRight", movement.FacingRight);
         }
-        
+
         // Set looking up parameter
         animator.SetBool("IsLookingUp", isLookingUp);
     }
-    
+
     private void UpdateDashAnimation()
     {
         if (controller.DashState == null) return;
-        
+
         // Get the current dash direction type
         var dashState = controller.DashState;
-        
+
         // Use appropriate animation based on dash direction
         switch (dashState.CurrentDashDirectionType)
         {
@@ -160,7 +167,7 @@ public class KalbAnimationController : MonoBehaviour
                 break;
         }
     }
-    
+
     private void UpdateComboAnimations()
     {
         if (comboSystem.IsComboFinishing)
@@ -183,7 +190,7 @@ public class KalbAnimationController : MonoBehaviour
             }
         }
     }
-    
+
     private void UpdateSwimmingAnimations()
     {
         if (swimming.IsSwimDashing)
@@ -194,7 +201,7 @@ public class KalbAnimationController : MonoBehaviour
         {
             KalbController controller = GetComponent<KalbController>();
             KalbInputHandler inputHandler = controller?.InputHandler;
-            
+
             if (inputHandler != null && Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)
             {
                 if (inputHandler.DashHeld && abilitySystem != null && abilitySystem.CanRun())
@@ -212,7 +219,7 @@ public class KalbAnimationController : MonoBehaviour
             }
         }
     }
-    
+
     public void PlayAnimation(string animationName)
     {
         if (animator != null)
@@ -224,34 +231,34 @@ public class KalbAnimationController : MonoBehaviour
     private void UpdateLookingUpState()
     {
         if (controller == null || controller.InputHandler == null) return;
-        
+
         // Log each condition to see what's failing
         bool isGrounded = controller.IsEffectivelyGrounded();
         bool isMoving = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
-        
+
         // MODIFIED: Include upward attack in action state check
-        bool isInActionState = controller.DashState.IsDashing || 
-                            comboSystem.IsAttacking || 
+        bool isInActionState = controller.DashState.IsDashing ||
+                            comboSystem.IsAttacking ||
                             comboSystem.IsUpwardAttacking || // NEW
                             swimming.IsSwimming ||
                             (controller.WallJump != null && controller.WallJump.IsWallSliding) ||
                             controller.IsInLedgeState();
-        
+
         float verticalInput = controller.InputHandler.MoveInput.y;
         bool lookingUpInputHeld = verticalInput > lookUpInputThreshold;
-        
+
         // Check if in idle state specifically
-        bool isInIdleState = controller.StateMachine != null && 
+        bool isInIdleState = controller.StateMachine != null &&
                             controller.StateMachine.CurrentState is KalbIdleState;
-        
+
         // Can look up when grounded, not moving, not in action state, and input held
         isLookingUp = isGrounded && !isMoving && !isInActionState && lookingUpInputHeld;
-        
+
         // Also check if we're in idle state specifically
         if (!isInIdleState)
         {
             isLookingUp = false;
-            
+
         }
         else
         {

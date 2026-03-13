@@ -69,6 +69,7 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_ExampleScript_01.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexShakeB.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbHurtState.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexJitter.cs" />
     <Compile Include="Assets/Scripts/Utilities/MetroidvaniaCamera.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_UiFrameRateCounter.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark01.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TextMeshSpawner.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbAirState.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbHitReaction.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/CameraController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark03.cs" />
     <Compile Include="Assets/Scripts/Characters/Enemies/Dummy/DummyEnemy.cs" />
