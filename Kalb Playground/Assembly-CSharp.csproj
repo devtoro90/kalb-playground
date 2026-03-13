@@ -56,6 +56,7 @@
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbCollisionDetector.cs" />
     <Compile Include="Assets/Scripts/Characters/Enemies/Base/Data/EnemySettings.cs" />
     <Compile Include="Assets/Scripts/Utilities/PlayerInputActions.cs" />
+    <Compile Include="Assets/Scripts/Characters/Kalb/Kalb.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/KalbController.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbHardLandState.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark02.cs" />
@@ -96,7 +97,6 @@
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbGravityManager.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbHealth.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbIdleState.cs" />
-    <Compile Include="Assets/Scripts/Utilities/Kalb.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark01_UGUI.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/SimpleScript.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark04.cs" />
@@ -111,6 +111,7 @@
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbHitReaction.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/CameraController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark03.cs" />
+    <Compile Include="Assets/Scripts/Utilities/DamageNumber.cs" />
     <Compile Include="Assets/Scripts/Characters/Enemies/Dummy/DummyEnemy.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/States/KalbLedgeState.cs" />
     <Compile Include="Assets/Scripts/Characters/Kalb/Components/KalbParticleController.cs" />

@@ -48,7 +48,7 @@ public class KalbWallSlideState : KalbState
 
     public override void Exit()
     {
-        Debug.Log("[WallSlideState] Exiting");
+
 
         // Turn off dust when exiting wall slide
         if (controller.ParticleController != null)

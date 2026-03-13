@@ -455,8 +455,13 @@ public class KalbComboSystem : MonoBehaviour
 
     public void StartWallAttack()
     {
-        if (!CanPerformWallAttack || isWallAttacking || isUpwardAttacking) return;
+        if (!CanPerformWallAttack || isWallAttacking || isUpwardAttacking)
+        {
 
+            return;
+        }
+
+        // CRITICAL: Don't reset or change state here - we're already in wall lock
         wallAttackSide = wallJump.WallSide;
         UpdateWallAttackPointPosition(wallAttackSide);
 
@@ -464,6 +469,8 @@ public class KalbComboSystem : MonoBehaviour
         attackTimer = settings.wallAttackDuration;
         wallAttackCooldownTimer = settings.wallAttackCooldown;
         canWallAttack = false;
+
+
 
         ExecuteWallAttack();
         PlayWallAttackAnimation();

@@ -65,9 +65,9 @@ MonoBehaviour:
   - 5
   - 5
   comboRange:
-  - 0.5
-  - 0.5
-  - 0.5
+  - 0.8
+  - 1
+  - 1.2
   comboAttackDurations:
   - 0.2
   - 0.2
@@ -89,10 +89,10 @@ MonoBehaviour:
   - Kalb_attack2
   - Kalb_attack3
   comboResetAnimation: Kalb_attack_reset
-  attackPointOffset: {x: 0.5, y: 0}
+  attackPointOffset: {x: 1, y: 0}
   enemyLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   hitEffectPrefab: {fileID: 0}
   hitEffectDuration: 0.3
   comboFlashColor: {r: 1, g: 1, b: 1, a: 1}
@@ -100,7 +100,7 @@ MonoBehaviour:
   enableUpwardAttack: 1
   upwardAttackDamage: 25
   upwardAttackKnockback: 8
-  upwardAttackRange: 0.7
+  upwardAttackRange: 1.5
   upwardAttackDuration: 0.2
   upwardAttackCooldown: 0.3
   upwardAttackPointOffset: {x: 0, y: 0.8}
@@ -115,7 +115,7 @@ MonoBehaviour:
   enableWallAttack: 1
   wallAttackDamage: 30
   wallAttackKnockback: 10
-  wallAttackRange: 0.8
+  wallAttackRange: 1.5
   wallAttackDuration: 0.25
   wallAttackCooldown: 0.3
   wallAttackPointOffset: {x: 0.8, y: 0}
@@ -145,7 +145,7 @@ MonoBehaviour:
   pogoBounceAnimation: Kalb_pogo_bounce
   pogoTargetLayers:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 384
   enableHardLanding: 1
   hardLandingFallThreshold: 10
   hardLandingRecoveryTime: 1
@@ -176,12 +176,12 @@ MonoBehaviour:
     m_RotationOrder: 4
   hardLandingAnimation: Kalb_hard_land
   enableHitReaction: 1
-  hitKnockbackForce: 100
-  hitUpwardForce: 5
-  invulnerabilityDuration: 1.5
+  hitKnockbackForce: 4
+  hitUpwardForce: 2
+  invulnerabilityDuration: 0.5
   invulnerabilityFlashInterval: 0.1
-  invulnerabilityFlashCount: 8
-  hitStunDuration: 0.3
+  invulnerabilityFlashCount: 4
+  hitStunDuration: 0.5
   hitRecoveryTime: 0.5
   hurtAnimationName: Kalb_hurt
   hurtAirAnimationName: Kalb_hurt
@@ -193,6 +193,7 @@ MonoBehaviour:
   invincibilityIgnoreLayers:
     serializedVersion: 2
     m_Bits: 0
+  postHurtWallCooldown: 0.5
   ledgeGrabUnlocked: 1
   runUnlocked: 1
   dashUnlocked: 1

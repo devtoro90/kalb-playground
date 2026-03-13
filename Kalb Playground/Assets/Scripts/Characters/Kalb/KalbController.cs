@@ -389,14 +389,33 @@ public class KalbController : MonoBehaviour
             {
                 // LOGIC ORDER (Priority):
                 // 1. Pogo Attack (air + down held)
-                // 2. Wall Attack (in wall lock)
+                // 2. Wall Attack (HIGHEST PRIORITY when in wall lock)
                 // 3. Upward Attack (up held)
                 // 4. Normal Attack
 
                 bool attackHandled = false;
 
-                // PRIORITY 1: Pogo Attack - when in air and holding down
-                if (!IsEffectivelyGrounded() && inputHandler.IsDownHeld &&
+                // PRIORITY 1: Wall Attack - Check this FIRST when in wall lock
+                if (stateMachine.CurrentState is KalbWallLockState)
+                {
+
+
+                    if (CanPerformWallAttack())
+                    {
+
+                        // Start wall attack directly through combo system
+                        comboSystem.StartWallAttack();
+                        inputHandler.ResetAttackInput();
+                        attackHandled = true;
+                    }
+                    else
+                    {
+
+                    }
+                }
+
+                // PRIORITY 2: Pogo Attack - only if not in wall lock
+                if (!attackHandled && !IsEffectivelyGrounded() && inputHandler.IsDownHeld &&
                     settings.enablePogoAttack && pogoAttackState != null)
                 {
                     if (pogoAttackState.CanPogo)
@@ -413,44 +432,39 @@ public class KalbController : MonoBehaviour
                     }
                 }
 
-                // PRIORITY 2: Wall Attack
-                if (!attackHandled && stateMachine.CurrentState is KalbWallLockState)
-                {
-                    if (CanPerformWallAttack())
-                    {
-                        comboSystem.StartWallAttack();
-                        inputHandler.ResetAttackInput();
-                        attackHandled = true;
-                    }
-                }
-
-                // PRIORITY 3: Upward Attack
+                // PRIORITY 3: Upward Attack - only if not in wall lock
                 if (!attackHandled && inputHandler.IsUpHeld && settings.enableUpwardAttack)
                 {
                     // Let combo system handle upward attack
                     if (comboSystem.CanPerformUpwardAttack)
                     {
+
                         stateMachine.ChangeState(combatState);
                         inputHandler.ResetAttackInput();
                         attackHandled = true;
                     }
                 }
 
-                // PRIORITY 4: Normal Attack
-                if (!attackHandled && CanAttackFromCurrentState())
+                // PRIORITY 4: Normal Attack - ONLY if not in wall lock
+                if (!attackHandled && !(stateMachine.CurrentState is KalbWallLockState) && CanAttackFromCurrentState())
                 {
                     inputBuffer.BufferAttack();
 
                     if (inputBuffer.ConsumeBufferedInput("Attack"))
                     {
+
                         stateMachine.ChangeState(combatState);
                         inputHandler.ResetAttackInput();
                         attackHandled = true;
                     }
                 }
+
+                if (!attackHandled)
+                {
+
+                }
             }
         }
-
         // Handle state updates
         stateMachine.HandleInput();
         stateMachine.Update();

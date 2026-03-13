@@ -9,7 +9,7 @@ public class KalbCombatState : KalbState
     private KalbSwimming swimming;
     private KalbCollisionDetector collisionDetector;
 
-    public KalbCombatState(KalbController controller, KalbStateMachine stateMachine) 
+    public KalbCombatState(KalbController controller, KalbStateMachine stateMachine)
         : base(controller, stateMachine)
     {
         inputHandler = controller.InputHandler;
@@ -19,7 +19,7 @@ public class KalbCombatState : KalbState
         swimming = controller.Swimming;
         collisionDetector = controller.CollisionDetector;
     }
-    
+
     public override void Enter()
     {
         // Start the combo attack - combo system will determine if it's upward
@@ -28,12 +28,12 @@ public class KalbCombatState : KalbState
         controller.InputBuffer?.ClearBufferedInput("Dash");
         controller.InputBuffer?.ClearBufferedInput("Attack");
     }
-    
+
     public override void Exit()
     {
         // Clean up if needed
     }
-    
+
     public override void Update()
     {
         // Check for swimming transition (cancel combo)
@@ -43,14 +43,14 @@ public class KalbCombatState : KalbState
             stateMachine.ChangeState(controller.SwimState);
             return;
         }
-        
+
         // If attack is finished, transition to appropriate state
         if (!comboSystem.IsAttacking && !comboSystem.IsUpwardAttacking && !comboSystem.IsWallAttacking)
         {
             TransitionToNextState();
         }
     }
-    
+
     public override void FixedUpdate()
     {
         // MODIFIED: Different movement handling for upward attacks
@@ -62,7 +62,7 @@ public class KalbCombatState : KalbState
             {
                 // Stay attached to wall
                 controller.Rb.linearVelocity = Vector2.zero;
-                
+
                 // Apply stick force to wall
                 Vector2 wallStickForce = new Vector2(controller.WallJump.WallSide * 10f, 0);
                 controller.Rb.AddForce(wallStickForce);
@@ -90,7 +90,7 @@ public class KalbCombatState : KalbState
             }
         }
     }
-    
+
     public override void HandleInput()
     {
         // Queue next attack if button pressed during combo window
@@ -98,7 +98,7 @@ public class KalbCombatState : KalbState
         {
             // The combo system will handle the queued attack
         }
-        
+
         // NEW: Allow upward attack during normal combo if conditions met
         if (inputHandler.AttackPressed && comboSystem.IsAttacking && comboSystem.ShouldPerformUpwardAttack())
         {
@@ -106,7 +106,7 @@ public class KalbCombatState : KalbState
             comboSystem.CancelCombo();
             comboSystem.StartAttack(); // This will trigger upward attack
         }
-        
+
         // Allow jump input (will cancel combo)
         if (inputHandler.JumpPressed)
         {
@@ -114,26 +114,31 @@ public class KalbCombatState : KalbState
             comboSystem.CancelCombo();
         }
     }
-    
+
     private void TransitionToNextState()
     {
         // If we were wall attacking, return to appropriate wall state
         if (comboSystem.IsWallAttacking)
         {
+
+
             if (controller.WallJump != null && controller.WallJump.IsTouchingWall)
             {
+                // Check if we should go to wall lock or wall slide
                 if (controller.WallLockState != null && Mathf.Abs(inputHandler.MoveInput.x) > controller.Settings.wallLockInputThreshold)
                 {
+
                     stateMachine.ChangeState(controller.WallLockState);
                 }
                 else
                 {
+
                     stateMachine.ChangeState(controller.WallSlideState);
                 }
                 return;
             }
         }
-        
+
         if (controller.IsEffectivelyGrounded())
         {
             if (Mathf.Abs(inputHandler.MoveInput.x) > 0.1f)

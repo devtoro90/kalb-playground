@@ -80,19 +80,11 @@ public class KalbWallLockState : KalbState
 
         if (isWallLocked)
         {
-            // NEW: Check for wall attack input (highest priority)
-            /*if (inputHandler.AttackPressed && comboSystem != null && 
-                controller.Settings.enableWallAttack && comboSystem.ShouldPerformWallAttack())
+            if (controller.ComboSystem != null && controller.ComboSystem.IsWallAttacking)
             {
-                controller.InputBuffer.BufferAttack();
-                
-                if (controller.InputBuffer.ConsumeBufferedInput("Attack"))
-                {
-                    stateMachine.ChangeState(controller.WallAttackState);
-                    inputHandler.ResetAttackInput();
-                    return;
-                }
-            }*/
+
+                return; // Skip exit checks during wall attack
+            }
 
             if (inputHandler.JumpPressed)
             {
