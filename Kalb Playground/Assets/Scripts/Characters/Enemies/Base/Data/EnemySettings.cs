@@ -23,9 +23,9 @@ public class EnemySettings : ScriptableObject
     public Vector2 knockbackDirectionOverride = Vector2.up;
 
     [Header("Visuals")]
-    public Color hitFlashColor = Color.red;
+    public Color hitFlashColor = Color.white; // Changed to white by default
     public float hitFlashDuration = 0.1f;
-    public int hitFlashCount = 1;
+    public int hitFlashCount = 2; // Changed to 2 for better visibility
 
     [Header("Death Effects")]
     public GameObject deathEffectPrefab;

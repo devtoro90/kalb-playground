@@ -7,11 +7,13 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private int currentHealth;
     [SerializeField] private int maxHealth;
     [SerializeField] private bool invulnerable = false;
+    [SerializeField] private bool immortal = false; // New: takes damage but never dies
 
     public int CurrentHealth => currentHealth;
     public int MaxHealth => maxHealth;
-    public bool IsDead => currentHealth <= 0;
+    public bool IsDead => !immortal && currentHealth <= 0; // Can't die if immortal
     public bool Invulnerable { get => invulnerable; set => invulnerable = value; }
+    public bool Immortal { get => immortal; set => immortal = value; }
 
     public event Action<int, int> OnHealthChanged; // current, max
     public event Action OnDeath;
@@ -25,15 +27,28 @@ public class EnemyHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (invulnerable || IsDead) return;
+        if (invulnerable || (IsDead && !immortal)) return;
 
-        currentHealth = Mathf.Max(0, currentHealth - damage);
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
-        OnDamaged?.Invoke();
+        // Store previous health to check if we actually changed
+        int previousHealth = currentHealth;
 
-        if (IsDead)
+        // Reduce health if not immortal, but still trigger events if immortal to allow for hit reactions
+        if (!immortal)
         {
-            OnDeath?.Invoke();
+            currentHealth = Mathf.Max(0, currentHealth - damage);
+        }
+
+        // Only trigger events if health actually changed or if immortal (to allow for hit reactions without death)
+        if (previousHealth != currentHealth || immortal)
+        {
+            OnDamaged?.Invoke();
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+
+            // Only trigger death if not immortal and health is 0
+            if (!immortal && currentHealth <= 0)
+            {
+                OnDeath?.Invoke();
+            }
         }
     }
 
@@ -50,9 +65,15 @@ public class EnemyHealth : MonoBehaviour
         invulnerable = value;
     }
 
+    public void SetImmortal(bool value)
+    {
+        immortal = value;
+    }
+
     public void ResetHealth()
     {
         currentHealth = maxHealth;
         invulnerable = false;
+        immortal = false;
     }
 }

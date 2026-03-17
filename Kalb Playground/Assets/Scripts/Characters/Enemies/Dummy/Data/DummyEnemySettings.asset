@@ -22,9 +22,9 @@ MonoBehaviour:
   knockbackDeceleration: 10
   useKnockbackDirectionOverride: 0
   knockbackDirectionOverride: {x: 0, y: 1}
-  hitFlashColor: {r: 1, g: 0, b: 0, a: 1}
-  hitFlashDuration: 0.1
-  hitFlashCount: 1
+  hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  hitFlashDuration: 0.2
+  hitFlashCount: 5
   deathEffectPrefab: {fileID: 0}
   deathSound: {fileID: 0}
   deathEffectDuration: 1

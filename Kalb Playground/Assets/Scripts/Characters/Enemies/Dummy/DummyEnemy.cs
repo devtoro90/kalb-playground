@@ -5,18 +5,32 @@ using System.Collections;
 public class DummyEnemy : BaseEnemy
 {
     [Header("Dummy Specific")]
-    [SerializeField] private float knockbackMultiplier = 1.5f; // Dummy flies farther
-    [SerializeField] private float recoverTime = 1.5f; // Time to reset position
+    [SerializeField] private float knockbackMultiplier = 1.5f;
+    [SerializeField] private float recoverTime = 1.5f;
     [SerializeField] private Transform resetPosition;
+
+    [Header("Hit Shake")]
+    [SerializeField] private bool enableHitShake = true;
+    [SerializeField] private float shakeDuration = 0.2f;
+    [SerializeField] private float shakeMagnitude = 0.1f;
+    [SerializeField] private int shakeVibrato = 10;
+    [SerializeField] private bool shakeEvenIfStuck = true;
 
     private Vector2 startPosition;
     private bool isRecovering = false;
     private Coroutine knockbackRoutine;
+    private Coroutine shakeRoutine;
 
     protected override void Awake()
     {
         base.Awake();
         startPosition = transform.position;
+
+        // Make the dummy immortal
+        if (health != null)
+        {
+            health.SetImmortal(true);
+        }
 
         if (resetPosition == null)
         {
@@ -27,14 +41,25 @@ public class DummyEnemy : BaseEnemy
         }
     }
 
+    // Override to add shake effect
+    protected override void HandleDamaged()
+    {
+        Debug.Log("Dummy took damage - triggering hit shake and knockback");
+        base.HandleDamaged(); // This triggers the flash and event
+
+        // Add hit shake
+        if (enableHitShake)
+        {
+            Debug.Log("Playing hit shake effect");
+            PlayHitShake();
+        }
+    }
+
     public override void TakeDamage(int damage, Vector2 hitSource, float knockbackForce, Vector2 knockbackDirection)
     {
         if (!IsAlive || isRecovering) return;
 
         base.TakeDamage(damage, hitSource, knockbackForce, knockbackDirection);
-
-        // Play hit effect
-        StartCoroutine(HitFlashRoutine());
     }
 
     protected override void ApplyKnockback(Vector2 hitSource, float force, Vector2 direction)
@@ -45,20 +70,85 @@ public class DummyEnemy : BaseEnemy
         knockbackRoutine = StartCoroutine(KnockbackRoutine(direction * force * knockbackMultiplier));
     }
 
+    // Override death handling to do nothing (immortal)
+    protected override void HandleDeath()
+    {
+        // Dummy doesn't die - override to do nothing
+        Debug.Log("Dummy is immortal - ignoring death");
+    }
+
+    #region Hit Shake
+    private int shakeHitCount = 0;
+
+    public void PlayHitShake()
+    {
+        Debug.Log("Attempting to play hit shake");
+
+        // Don't stop existing shake - queue it instead
+        if (shakeRoutine != null)
+        {
+            shakeHitCount++;
+            Debug.Log($"Hit during shake - queueing. Count: {shakeHitCount}");
+            return;
+        }
+
+        shakeHitCount = 1;
+        shakeRoutine = StartCoroutine(HitShakeRoutine());
+    }
+
+    private IEnumerator HitShakeRoutine()
+    {
+        Debug.Log("Starting hit shake");
+
+        int totalShakes = shakeHitCount;
+        shakeHitCount = 0; // Reset
+
+        for (int s = 0; s < totalShakes; s++)
+        {
+            Vector3 originalPos = transform.localPosition;
+            float elapsed = 0f;
+
+            while (elapsed < shakeDuration)
+            {
+                float xOffset = Random.Range(-1f, 1f) * shakeMagnitude;
+                float yOffset = Random.Range(-1f, 1f) * shakeMagnitude;
+
+                transform.localPosition = originalPos + new Vector3(xOffset, yOffset, 0);
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            // Return to original position between shakes
+            transform.localPosition = originalPos;
+
+            // Small pause between shakes if multiple hits
+            if (s < totalShakes - 1)
+            {
+                yield return new WaitForSeconds(0.05f);
+            }
+        }
+
+        shakeRoutine = null;
+    }
+    #endregion
+
     private IEnumerator KnockbackRoutine(Vector2 knockbackVelocity)
     {
         isRecovering = true;
 
         // Apply knockback
-        rb.linearVelocity = knockbackVelocity;
+        if (rb != null)
+        {
+            rb.linearVelocity = knockbackVelocity;
+        }
 
         // Let physics handle the knockback arc
         float elapsed = 0f;
-        float maxTime = 2f; // Max time before forced reset
+        float maxTime = 2f;
 
-        while (elapsed < maxTime)
+        while (elapsed < maxTime && rb != null)
         {
-            // Check if we've landed/stabilized
             if (Mathf.Abs(rb.linearVelocity.y) < 0.1f &&
                 Mathf.Abs(rb.linearVelocity.x) < 0.1f &&
                 elapsed > 0.5f)
@@ -84,7 +174,8 @@ public class DummyEnemy : BaseEnemy
         Vector2 startPos = transform.position;
 
         // Disable physics during recovery
-        rb.simulated = false;
+        if (rb != null)
+            rb.simulated = false;
 
         while (elapsed < duration)
         {
@@ -97,52 +188,22 @@ public class DummyEnemy : BaseEnemy
         transform.position = resetPosition.position;
 
         // Re-enable physics
-        rb.simulated = true;
-        rb.linearVelocity = Vector2.zero;
-    }
-
-    private IEnumerator HitFlashRoutine()
-    {
-        if (spriteRenderer == null) yield break;
-
-        Color originalColor = spriteRenderer.color;
-        float flashDuration = settings.hitFlashDuration;
-        float halfFlash = flashDuration * 0.5f;
-
-        // Flash to hit color
-        float elapsed = 0f;
-        while (elapsed < halfFlash)
+        if (rb != null)
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / halfFlash;
-            spriteRenderer.color = Color.Lerp(originalColor, settings.hitFlashColor, t);
-            yield return null;
+            rb.simulated = true;
+            rb.linearVelocity = Vector2.zero;
         }
-
-        // Flash back
-        elapsed = 0f;
-        while (elapsed < halfFlash)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / halfFlash;
-            spriteRenderer.color = Color.Lerp(settings.hitFlashColor, originalColor, t);
-            yield return null;
-        }
-
-        spriteRenderer.color = originalColor;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Check if colliding with player
         if (collision.gameObject.CompareTag("Player"))
         {
-            // Get player controller and deal damage
             KalbController player = collision.gameObject.GetComponent<KalbController>();
-            if (player != null && settings.contactDamage > 0)
+            if (player != null && settings != null && settings.contactDamage > 0)
             {
                 Vector2 hitDirection = (collision.transform.position - transform.position).normalized;
-                player.TakeDamage(settings.contactDamage, transform.position);
+                player.TakeDamage(settings.contactDamage, hitDirection);
             }
         }
     }
