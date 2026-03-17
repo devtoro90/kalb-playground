@@ -614,6 +614,8 @@ public class KalbController : MonoBehaviour
 
             rb.linearVelocity = Vector2.zero;
         }
+
+        pogoAttackState.ForceReset();
     }
 
     private void ForceExitCurrentState()

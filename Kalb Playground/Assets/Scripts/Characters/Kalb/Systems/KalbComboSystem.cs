@@ -21,6 +21,11 @@ public class KalbComboSystem : MonoBehaviour
     private bool isComboFinishing = false;
     private bool attackQueued = false;
 
+    [Header("Target Hit Effects")]
+    [SerializeField] private bool enableTargetHitEffects = true;
+    [SerializeField] private GameObject whiteSparkPrefab; // Optional: assign in inspector
+    private KalbTargetHitEffectPool targetEffectPool;
+
     // Separate attack states
     private bool isUpwardAttacking = false;
     private bool isWallAttacking = false;
@@ -83,6 +88,25 @@ public class KalbComboSystem : MonoBehaviour
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (animationController == null) animationController = GetComponent<KalbAnimationController>();
         if (movement == null) movement = GetComponent<KalbMovement>();
+
+        if (enableTargetHitEffects)
+        {
+            targetEffectPool = FindFirstObjectByType<KalbTargetHitEffectPool>();
+            if (targetEffectPool == null && whiteSparkPrefab != null)
+            {
+                // Create pool if it doesn't exist
+                GameObject poolObj = new GameObject("KalbTargetHitEffectPool");
+                var pool = poolObj.AddComponent<KalbTargetHitEffectPool>();
+
+                // Use reflection to set the prefab
+                var field = typeof(KalbTargetHitEffectPool).GetField("whiteSparkPrefab",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (field != null)
+                    field.SetValue(pool, whiteSparkPrefab);
+
+                targetEffectPool = pool;
+            }
+        }
     }
 
     private void CreateAttackPoint()
@@ -389,6 +413,9 @@ public class KalbComboSystem : MonoBehaviour
                     settings.upwardAttackKnockback,
                     hitDirection
                 );
+
+                // SPAWN HIT EFFECT ON THE TARGET
+                SpawnTargetHitEffect(enemy.transform.position);
             }
             else
             {
@@ -399,15 +426,11 @@ public class KalbComboSystem : MonoBehaviour
                     Vector2 knockback = settings.upwardAttackKnockbackDirection.normalized *
                                         settings.upwardAttackKnockback;
                     rb.AddForce(knockback, ForceMode2D.Impulse);
+
+                    // SPAWN HIT EFFECT ON THE TARGET
+                    SpawnTargetHitEffect(enemy.transform.position);
                 }
             }
-        }
-
-        // Spawn hit effect if available
-        if (settings.hitEffectPrefab != null && hitEnemies.Length > 0)
-        {
-            GameObject effect = Instantiate(settings.hitEffectPrefab, upwardAttackPoint.position, Quaternion.identity);
-            Destroy(effect, settings.hitEffectDuration);
         }
     }
 
@@ -491,13 +514,16 @@ public class KalbComboSystem : MonoBehaviour
             BaseEnemy baseEnemy = enemy.GetComponent<BaseEnemy>();
             if (baseEnemy != null)
             {
-                Vector2 hitDirection = settings.upwardAttackKnockbackDirection.normalized;
+                Vector2 hitDirection = settings.wallAttackKnockbackDirection.normalized;
                 baseEnemy.TakeDamage(
-                    (int)settings.upwardAttackDamage,
+                    (int)settings.wallAttackDamage,
                     transform.position,
-                    settings.upwardAttackKnockback,
+                    settings.wallAttackKnockback,
                     hitDirection
                 );
+
+                // SPAWN HIT EFFECT ON THE TARGET
+                SpawnTargetHitEffect(enemy.transform.position);
             }
             else
             {
@@ -505,17 +531,14 @@ public class KalbComboSystem : MonoBehaviour
                 var rb = enemy.GetComponent<Rigidbody2D>();
                 if (rb != null)
                 {
-                    Vector2 knockback = settings.upwardAttackKnockbackDirection.normalized *
-                                        settings.upwardAttackKnockback;
+                    Vector2 knockback = settings.wallAttackKnockbackDirection.normalized *
+                                        settings.wallAttackKnockback;
                     rb.AddForce(knockback, ForceMode2D.Impulse);
+
+                    // SPAWN HIT EFFECT ON THE TARGET
+                    SpawnTargetHitEffect(enemy.transform.position);
                 }
             }
-        }
-
-        if (settings.hitEffectPrefab != null && hitEnemies.Length > 0)
-        {
-            GameObject effect = Instantiate(settings.hitEffectPrefab, wallAttackPoint.position, Quaternion.identity);
-            Destroy(effect, settings.hitEffectDuration);
         }
     }
 
@@ -570,24 +593,37 @@ public class KalbComboSystem : MonoBehaviour
                     knockbackForce,
                     hitDirection
                 );
+
+                // SPAWN HIT EFFECT ON THE TARGET
+                SpawnTargetHitEffect(enemy.transform.position);
             }
 
-            // Apply knockback
+            // Apply knockback to physics objects
             var rb = enemy.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
                 Vector2 knockbackDirection = (enemy.transform.position - transform.position).normalized;
                 knockbackDirection.y = 0.5f; // Add some upward component
                 rb.AddForce(knockbackDirection * settings.comboKnockback[comboIndex], ForceMode2D.Impulse);
+
+                // SPAWN HIT EFFECT ON THE TARGET
+                SpawnTargetHitEffect(enemy.transform.position);
             }
         }
+    }
 
-        // Spawn hit effect if available
-        if (settings.hitEffectPrefab != null && hitEnemies.Length > 0)
+    private void SpawnTargetHitEffect(Vector3 position)
+    {
+        if (!enableTargetHitEffects) return;
+
+        if (targetEffectPool == null)
         {
-            GameObject effect = Instantiate(settings.hitEffectPrefab, attackPoint.position, Quaternion.identity);
-            Destroy(effect, settings.hitEffectDuration);
+            targetEffectPool = FindFirstObjectByType<KalbTargetHitEffectPool>();
+            if (targetEffectPool == null) return;
         }
+
+        // Spawn white spark effect at the target's position
+        targetEffectPool.GetHitEffect(position, "WhiteSpark");
     }
 
     private void ApplyAttackMovement(int comboIndex)

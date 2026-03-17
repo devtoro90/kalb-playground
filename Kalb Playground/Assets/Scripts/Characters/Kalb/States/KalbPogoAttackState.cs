@@ -10,6 +10,8 @@ public class KalbPogoAttackState : KalbState
     private Rigidbody2D rb;
     private KalbSettings settings;
     private KalbAnimationController animController;
+    private KalbTargetHitEffectPool targetEffectPool;
+    private bool enableTargetHitEffects = true;
 
     // Pogo state
     private bool isPogoAttacking = false;
@@ -57,6 +59,8 @@ public class KalbPogoAttackState : KalbState
 
         // Create attack point
         CreatePogoAttackPoint();
+
+        targetEffectPool = GameObject.FindFirstObjectByType<KalbTargetHitEffectPool>();
     }
 
     private void CreatePogoAttackPoint()
@@ -478,6 +482,7 @@ public class KalbPogoAttackState : KalbState
         PlayBounceAnimation();
     }
 
+
     private void EnterBouncePhase()
     {
         isPogoAttacking = false;
@@ -528,6 +533,7 @@ public class KalbPogoAttackState : KalbState
             health.TakeDamage((int)settings.pogoAttackDamage);
         }
         */
+        
 
         // Apply knockback
         var targetRb = target.GetComponent<Rigidbody2D>();
@@ -536,6 +542,22 @@ public class KalbPogoAttackState : KalbState
             Vector2 knockbackDirection = settings.pogoAttackKnockbackDirection.normalized;
             targetRb.AddForce(knockbackDirection * settings.pogoAttackKnockback, ForceMode2D.Impulse);
         }
+
+        SpawnTargetHitEffect(target.transform.position);
+    }
+
+    private void SpawnTargetHitEffect(Vector3 position)
+    {
+        if (!enableTargetHitEffects) return;
+
+        if (targetEffectPool == null)
+        {
+            targetEffectPool = GameObject.FindFirstObjectByType<KalbTargetHitEffectPool>();
+            if (targetEffectPool == null) return;
+        }
+
+        // Spawn white spark effect at the target's position
+        targetEffectPool.GetHitEffect(position, "WhiteSpark");
     }
 
     private void ApplyPogoBounce()
@@ -598,6 +620,8 @@ public class KalbPogoAttackState : KalbState
 
     private void SpawnHitEffect()
     {
+        
+        
         if (settings.hitEffectPrefab != null && pogoAttackPoint != null)
         {
             GameObject effect = Object.Instantiate(settings.hitEffectPrefab, pogoAttackPoint.position, Quaternion.identity);
